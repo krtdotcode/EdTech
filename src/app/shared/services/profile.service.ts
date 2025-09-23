@@ -1,37 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
-export interface MentorProfile {
-  id: string;
-  name: string;
-  skills: string[];
-  goals: string[];
-  industry: string;
-  location: string;
-  availability: string[];
-  ratings: number;
-  bio: string;
-  activeMentees: number;
-  maxMentees: number;
-}
-
-export interface MenteeProfile {
-  id: string;
-  name: string;
-  skills: string[];
-  goals: string[];
-  industry: string;
-  location: string;
-  bio: string;
-}
-
-export interface MentorshipRequest {
-  id: string;
-  menteeId: string;
-  mentorId: string;
-  status: 'pending' | 'accepted' | 'rejected';
-  requestDate: Date;
-}
+import { MentorProfile, MenteeProfile, MentorshipRequest } from '../models/profile.model';
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +11,9 @@ export class ProfileService {
   private mentors: MentorProfile[] = [
     {
       id: 'mentor1',
+      userId: 'user1',
       name: 'Juan Dela Cruz',
+      email: 'juan.delacruz@example.com',
       skills: ['Web Development', 'Angular', 'TypeScript'],
       goals: ['Career Growth', 'Technical Skills'],
       industry: 'IT',
@@ -54,7 +26,9 @@ export class ProfileService {
     },
     {
       id: 'mentor2',
+      userId: 'user2',
       name: 'Maria Santos',
+      email: 'maria.santos@example.com',
       skills: ['Project Management', 'Leadership'],
       goals: ['Leadership Skills', 'Project Delivery'],
       industry: 'Consulting',
@@ -72,11 +46,16 @@ export class ProfileService {
   private mentees: MenteeProfile[] = [
     {
       id: 'mentee1',
+      userId: 'user3',
       name: 'Pedro Reyes',
+      email: 'pedro.reyes@example.com',
       skills: ['Web Development'],
       goals: ['Learn Angular'],
       industry: 'IT',
       location: 'Manila',
+      availability: ['Weekdays'],
+      preferredMentorSkills: ['Angular', 'TypeScript'],
+      preferredMentorGoals: ['Career Growth'],
       bio: 'Aspiring web developer looking for guidance in Angular.'
     }
   ];

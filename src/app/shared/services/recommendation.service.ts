@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { MentorProfile, MenteeProfile } from './profile.service';
+import { MentorProfile, MenteeProfile } from '../models/profile.model';
 
 @Injectable({
   providedIn: 'root'
@@ -16,11 +16,11 @@ export class RecommendationService {
         let score = 0;
 
         // Skill overlap (higher weight)
-        const skillOverlap = mentee.skills.filter(skill => mentor.skills.includes(skill)).length;
+        const skillOverlap = mentee.skills.filter((skill: string) => mentor.skills.includes(skill)).length;
         score += skillOverlap * 3; // Weight skills higher
 
         // Goal overlap
-        const goalOverlap = mentee.goals.filter(goal => mentor.goals.includes(goal)).length;
+        const goalOverlap = mentee.goals.filter((goal: string) => mentor.goals.includes(goal)).length;
         score += goalOverlap * 2; // Weight goals moderately
 
         // Industry match
@@ -34,7 +34,7 @@ export class RecommendationService {
         }
 
         // Availability (simple check for now, can be more complex)
-        const commonAvailability = mentee.skills.filter(avail => mentor.availability.includes(avail)).length;
+        const commonAvailability = mentee.availability.filter((avail: string) => mentor.availability.includes(avail)).length;
         if (commonAvailability > 0) {
             score += 0.2; // Even lower weight for availability
         }

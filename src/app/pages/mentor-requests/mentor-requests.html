@@ -1,17 +1,17 @@
-<div class="mentor-requests-container">
-  <h1>Mentorship Requests</h1>
+<div class="p-5 font-sans">
+  <h1 class="text-3xl font-bold text-center mb-5 text-gray-800">Mentorship Requests</h1>
 
-  <div *ngIf="mentorshipRequests.length === 0" class="no-requests">
+  <div *ngIf="mentorshipRequests.length === 0" class="text-center text-gray-600 mt-5">
     <p>No pending mentorship requests.</p>
   </div>
 
-  <div *ngFor="let request of mentorshipRequests" class="request-card">
-    <p><strong>Mentee ID:</strong> {{ request.menteeId }}</p>
-    <p><strong>Status:</strong> {{ request.status }}</p>
-    <p><strong>Request Date:</strong> {{ request.requestDate | date:'medium' }}</p>
-    <div class="actions">
-      <button (click)="acceptRequest(request.id)" [disabled]="request.status !== 'pending'">Accept</button>
-      <button (click)="rejectRequest(request.id)" [disabled]="request.status !== 'pending'">Reject</button>
+  <div *ngFor="let request of mentorshipRequests" class="card bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 shadow-xl border border-blue-300 rounded-2xl p-7 mb-4 w-full md:w-96 flex flex-col items-center text-center">
+    <p class="text-gray-900 mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-800 via-purple-800 to-pink-800">Mentee ID:</strong> {{ request.menteeId }}</p>
+    <p class="text-gray-900 mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-800 via-purple-800 to-pink-800">Status:</strong> {{ request.status }}</p>
+    <p class="text-gray-900 mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-800 via-purple-800 to-pink-800">Request Date:</strong> {{ request.requestDate | date:'medium' }}</p>
+    <div class="flex gap-2 mt-4">
+      <button (click)="acceptRequest(request.id)" [disabled]="request.status !== 'pending'" class="btn bg-gradient-to-r from-blue-600 via-purple-700 to-pink-700 text-white btn-md shadow-lg hover:shadow-xl border-none">Accept</button>
+      <button (click)="rejectRequest(request.id)" [disabled]="request.status !== 'pending'" class="btn bg-gradient-to-r from-red-500 to-pink-600 text-white btn-md shadow-lg hover:shadow-xl border-none">Reject</button>
     </div>
   </div>
 </div>

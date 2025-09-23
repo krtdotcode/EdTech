@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProfileService, MentorshipRequest, MentorProfile } from '../../shared/services/profile.service';
+import { ProfileService } from '../../shared/services/profile.service';
+import { MentorshipRequest, MentorProfile } from '../../shared/models/profile.model';
 import { Observable, of } from 'rxjs';
 
 @Component({
@@ -8,7 +9,6 @@ import { Observable, of } from 'rxjs';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './mentor-requests.html',
-  styleUrl: './mentor-requests.scss'
 })
 export class MentorRequests implements OnInit {
   mentorshipRequests: MentorshipRequest[] = [];

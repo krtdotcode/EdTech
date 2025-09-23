@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ProfileService, MentorProfile, MenteeProfile } from '../../shared/services/profile.service';
+import { ProfileService } from '../../shared/services/profile.service';
+import { MentorProfile, MenteeProfile } from '../../shared/models/profile.model';
 import { RecommendationService } from '../../shared/services/recommendation.service';
 
 @Component({
@@ -9,7 +10,6 @@ import { RecommendationService } from '../../shared/services/recommendation.serv
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './matching.html',
-  styleUrl: './matching.scss'
 })
 export class Matching implements OnInit {
   searchTerm: string = '';
@@ -33,11 +33,16 @@ export class Matching implements OnInit {
   // For demonstration, a hardcoded mentee profile
   currentMentee: MenteeProfile = {
     id: 'mentee1',
+    userId: 'user3',
     name: 'Pedro Reyes',
+    email: 'pedro.reyes@example.com',
     skills: ['Web Development', 'Angular'],
     goals: ['Learn Angular', 'Career Growth'],
     industry: 'IT',
     location: 'Manila',
+    availability: ['Weekdays'],
+    preferredMentorSkills: ['Angular', 'TypeScript'],
+    preferredMentorGoals: ['Career Growth'],
     bio: 'Aspiring web developer looking for guidance in Angular.'
   };
 
@@ -68,8 +73,8 @@ export class Matching implements OnInit {
       const matchesSearchTerm = this.searchTerm === '' ||
         mentor.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         mentor.bio.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        mentor.skills.some(skill => skill.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
-        mentor.goals.some(goal => goal.toLowerCase().includes(this.searchTerm.toLowerCase()));
+        mentor.skills.some((skill: string) => skill.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+        mentor.goals.some((goal: string) => goal.toLowerCase().includes(this.searchTerm.toLowerCase()));
 
       const matchesSkill = this.selectedSkill === '' || mentor.skills.includes(this.selectedSkill);
       const matchesGoal = this.selectedGoal === '' || mentor.goals.includes(this.selectedGoal);
