@@ -1,0 +1,17 @@
+<div class="mentor-requests-container">
+  <h1>Mentorship Requests</h1>
+
+  <div *ngIf="mentorshipRequests.length === 0" class="no-requests">
+    <p>No pending mentorship requests.</p>
+  </div>
+
+  <div *ngFor="let request of mentorshipRequests" class="request-card">
+    <p><strong>Mentee ID:</strong> {{ request.menteeId }}</p>
+    <p><strong>Status:</strong> {{ request.status }}</p>
+    <p><strong>Request Date:</strong> {{ request.requestDate | date:'medium' }}</p>
+    <div class="actions">
+      <button (click)="acceptRequest(request.id)" [disabled]="request.status !== 'pending'">Accept</button>
+      <button (click)="rejectRequest(request.id)" [disabled]="request.status !== 'pending'">Reject</button>
+    </div>
+  </div>
+</div>

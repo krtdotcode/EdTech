@@ -1,1 +1,68 @@
-<p>matching works!</p>
+<div class="matching-container">
+  <h1>Mentor Matching</h1>
+
+  <div class="search-filter-section">
+    <input type="text" [(ngModel)]="searchTerm" placeholder="Search by keyword..." (input)="applyFilters()">
+
+    <select [(ngModel)]="selectedSkill" (change)="applyFilters()">
+      <option value="">Filter by Skill</option>
+      <option *ngFor="let skill of uniqueSkills" [value]="skill">{{ skill }}</option>
+    </select>
+
+    <select [(ngModel)]="selectedGoal" (change)="applyFilters()">
+      <option value="">Filter by Goal</option>
+      <option *ngFor="let goal of uniqueGoals" [value]="goal">{{ goal }}</option>
+    </select>
+
+    <select [(ngModel)]="selectedIndustry" (change)="applyFilters()">
+      <option value="">Filter by Industry</option>
+      <option *ngFor="let industry of uniqueIndustries" [value]="industry">{{ industry }}</option>
+    </select>
+
+    <select [(ngModel)]="selectedLocation" (change)="applyFilters()">
+      <option value="">Filter by Location</option>
+      <option *ngFor="let location of uniqueLocations" [value]="location">{{ location }}</option>
+    </select>
+
+    <select [(ngModel)]="selectedAvailability" (change)="applyFilters()">
+      <option value="">Filter by Availability</option>
+      <option *ngFor="let availability of uniqueAvailabilities" [value]="availability">{{ availability }}</option>
+    </select>
+
+    <input type="number" [(ngModel)]="minRating" placeholder="Min Rating" (input)="applyFilters()">
+  </div>
+
+  <div class="mentor-list">
+    <h2>Recommended Mentors</h2>
+    <div *ngFor="let mentor of recommendedMentors" class="mentor-card">
+      <h3>{{ mentor.name }}</h3>
+      <p><strong>Skills:</strong> {{ mentor.skills.join(', ') }}</p>
+      <p><strong>Goals:</strong> {{ mentor.goals.join(', ') }}</p>
+      <p><strong>Industry:</strong> {{ mentor.industry }}</p>
+      <p><strong>Location:</strong> {{ mentor.location }}</p>
+      <p><strong>Availability:</strong> {{ mentor.availability.join(', ') }}</p>
+      <p><strong>Ratings:</strong> {{ mentor.ratings }}</p>
+      <p>{{ mentor.bio }}</p>
+      <button (click)="sendRequest(mentor.id)">Send Mentorship Request</button>
+    </div>
+    <div *ngIf="recommendedMentors.length === 0">
+      <p>No recommended mentors found for your profile.</p>
+    </div>
+
+    <h2>All Mentors (Filtered)</h2>
+    <div *ngFor="let mentor of filteredMentors" class="mentor-card">
+      <h3>{{ mentor.name }}</h3>
+      <p><strong>Skills:</strong> {{ mentor.skills.join(', ') }}</p>
+      <p><strong>Goals:</strong> {{ mentor.goals.join(', ') }}</p>
+      <p><strong>Industry:</strong> {{ mentor.industry }}</p>
+      <p><strong>Location:</strong> {{ mentor.location }}</p>
+      <p><strong>Availability:</strong> {{ mentor.availability.join(', ') }}</p>
+      <p><strong>Ratings:</strong> {{ mentor.ratings }}</p>
+      <p>{{ mentor.bio }}</p>
+      <button (click)="sendRequest(mentor.id)">Send Mentorship Request</button>
+    </div>
+    <div *ngIf="filteredMentors.length === 0 && recommendedMentors.length > 0">
+      <p>No other mentors found matching your criteria.</p>
+    </div>
+  </div>
+</div>
