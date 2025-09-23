@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Practice } from './practice';
+import { TryLang } from './try-lang';
 
-describe('Practice', () => {
-  let component: Practice;
-  let fixture: ComponentFixture<Practice>;
+describe('TryLang', () => {
+  let component: TryLang;
+  let fixture: ComponentFixture<TryLang>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Practice]
+      imports: [TryLang]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Practice);
+    fixture = TestBed.createComponent(TryLang);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
