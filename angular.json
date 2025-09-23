@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "mentoring-app": {
+    "edtech": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -61,10 +61,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "mentoring-app:build:production"
+              "buildTarget": "edtech:build:production"
             },
             "development": {
-              "buildTarget": "mentoring-app:build:development"
+              "buildTarget": "edtech:build:development"
             }
           },
           "defaultConfiguration": "development"
