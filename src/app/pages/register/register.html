@@ -1,33 +1,52 @@
-<div class="register-container">
-  <h2>Register</h2>
-  <form class="register-form">
-    <div class="form-group">
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required>
-    </div>
-    <div class="form-group">
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required>
-    </div>
-    <div class="form-group">
-      <label for="confirmPassword">Confirm Password:</label>
-      <input type="password" id="confirmPassword" name="confirmPassword" required>
-    </div>
-    <button type="submit">Register</button>
-  </form>
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <div class="card bg-white/90 shadow-xl rounded-2xl">
+      <div class="card-body">
+        <!-- Title -->
+        <h2 class="text-2xl font-bold text-center text-purple-700">Create your account</h2>
+        <p class="text-center text-gray-500 mb-6">Join EdTech and start connecting with mentors</p>
 
-  <div class="social-logins">
-    <p>Or register with:</p>
-    <button class="social-button google">Register with Google</button>
-    <button class="social-button linkedin">Register with LinkedIn</button>
-    <button class="social-button microsoft">Register with Microsoft</button>
-  </div>
+        <!-- Email Input -->
+        <label class="input validator flex items-center gap-2 mb-4">
+          <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor">
+              <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+            </g>
+          </svg>
+          <input type="email" placeholder="mail@site.com" class="grow" required />
+        </label>
 
-  <div class="sso-register">
-    <button class="sso-button">Register with Enterprise SSO</button>
-  </div>
+        <!-- Password Input -->
+        <label class="input validator flex items-center gap-2 mb-4">
+          <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor">
+              <path
+                d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"
+              ></path>
+              <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle>
+            </g>
+          </svg>
+          <input
+            type="password"
+            placeholder="Password"
+            class="grow"
+            required
+            minlength="8"
+          />
+        </label>
 
-  <div class="verification-links">
-    <a href="/verify-email">Verify Email</a> | <a href="/verify-phone">Verify Phone Number</a>
+        <!-- Register Button -->
+        <button class="btn btn-primary w-full bg-purple-600 hover:bg-purple-700 text-white rounded-lg">
+          Register
+        </button>
+
+        <!-- Extra text -->
+        <p class="text-sm text-center text-gray-500 mt-4">
+          Already have an account?
+          <a href="./login">Sign in</a>
+        </p>
+      </div>
+    </div>
   </div>
 </div>

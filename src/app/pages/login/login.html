@@ -1,30 +1,52 @@
-<div class="login-container">
-  <h2>Login</h2>
-  <form class="login-form">
-    <div class="form-group">
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required>
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <div class="card bg-white/90 shadow-xl rounded-2xl">
+      <div class="card-body">
+        <!-- Title -->
+        <h2 class="text-2xl font-bold text-center text-purple-700">Welcome back</h2>
+        <p class="text-center text-gray-500 mb-6">Log in to your EdTech account</p>
+
+        <!-- Email Input -->
+        <label class="input validator flex items-center gap-2 mb-4">
+          <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor">
+              <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+            </g>
+          </svg>
+          <input type="email" placeholder="mail@site.com" class="grow" required />
+        </label>
+
+        <!-- Password Input -->
+        <label class="input validator flex items-center gap-2 mb-4">
+          <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor">
+              <path
+                d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"
+              ></path>
+              <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle>
+            </g>
+          </svg>
+          <input
+            type="password"
+            placeholder="Password"
+            class="grow"
+            required
+            minlength="8"
+          />
+        </label>
+
+        <!-- Login Button -->
+        <button class="btn btn-primary w-full bg-purple-600 hover:bg-purple-700 text-white rounded-lg">
+          Sign in
+        </button>
+
+        <!-- Extra text -->
+        <p class="text-sm text-center text-gray-500 mt-4">
+          Don’t have an account?
+          <a href="#" class="text-purple-600 hover:underline">Create one</a>
+        </p>
+      </div>
     </div>
-    <div class="form-group">
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required>
-      <a href="/forgot-password" class="forgot-password-link">Forgot Password?</a>
-    </div>
-    <button type="submit">Login</button>
-  </form>
-
-  <div class="social-logins">
-    <p>Or login with:</p>
-    <button class="social-button google">Login with Google</button>
-    <button class="social-button linkedin">Login with LinkedIn</button>
-    <button class="social-button microsoft">Login with Microsoft</button>
-  </div>
-
-  <div class="sso-login">
-    <button class="sso-button">Login with Enterprise SSO</button>
-  </div>
-
-  <div class="verification-links">
-    <a href="/verify-email">Verify Email</a> | <a href="/verify-phone">Verify Phone Number</a>
   </div>
 </div>
