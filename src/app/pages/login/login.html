@@ -1,8 +1,11 @@
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
+<form [formGroup]="loginForm" (ngSubmit)="onSignIn()" class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
   <div class="w-full max-w-md">
     <div class="card bg-white/90 shadow-xl rounded-2xl">
       <div class="card-body">
-        <!-- Title -->
+        <!-- EdTech Logo -->
+        <div class="flex justify-center mb-4">
+          <img src="edtech-logo.png" alt="EdTech Logo" class="h-16 w-auto" />
+        </div>
         <h2 class="text-2xl font-bold text-center text-purple-700">Welcome back</h2>
         <p class="text-center text-gray-500 mb-6">Log in to your EdTech account</p>
 
@@ -14,8 +17,13 @@
               <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
             </g>
           </svg>
-          <input type="email" placeholder="mail@site.com" class="grow" required />
+          <input type="email" formControlName="email" placeholder="mail@site.com" class="grow" required />
         </label>
+        @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+          <div class="text-red-500 text-xs mb-2">
+            Valid email is required.
+          </div>
+        }
 
         <!-- Password Input -->
         <label class="input validator flex items-center gap-2 mb-4 w-full">
@@ -27,26 +35,43 @@
               <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle>
             </g>
           </svg>
-          <input
-            type="password"
-            placeholder="Password"
-            class="grow"
-            required
-            minlength="8"
-          />
+          <input type="password" formControlName="password" placeholder="Password" class="grow" required minlength="8" />
         </label>
+        @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+          <div class="text-red-500 text-xs mb-2">
+            Password must be at least 6 characters.
+          </div>
+        }
+
+        <!-- Error Message -->
+        @if (errorMessage) {
+          <div class="alert alert-error mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{{ errorMessage }}</span>
+          </div>
+        }
 
         <!-- Login Button -->
-        <button class="bg-purple-600 hover:bg-purple-700 text-white px-10 py-4 border-2 border-black shadow-[6px_6px_0px_0px_black] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all duration-150 cursor-pointer w-full rounded-lg font-bold">
-          Sign in
+        <button
+          class="bg-purple-600 hover:bg-purple-700 text-white px-10 py-4 border-2 border-black shadow-[6px_6px_0px_0px_black] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all duration-150 cursor-pointer w-full rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+          type="submit"
+          [disabled]="loginForm.invalid || loading"
+        >
+          @if (loading) {
+            <span class="loading loading-spinner loading-sm mr-2"></span>
+            Signing in...
+          } @else {
+            Sign in
+          }
         </button>
-
-        <!-- Extra text -->
+        
         <p class="text-sm text-center text-gray-500 mt-4">
           Don't have an account?
-          <a href="#" class="text-purple-600 hover:underline">Create one</a>
+          <a class="text-purple-600 hover:underline cursor-pointer" (click)="goToRegister()">Create one</a>
         </p>
       </div>
     </div>
   </div>
-</div>
+</form>

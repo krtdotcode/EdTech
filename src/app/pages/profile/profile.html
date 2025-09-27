@@ -1,94 +1,137 @@
-<div class="max-w-2xl mx-auto mt-10">
-  <div class="bg-base-100 rounded-xl shadow-lg overflow-hidden">
-    <!-- Cover Photo -->
-    <div class="h-32 bg-gradient-to-r from-primary to-secondary"></div>
-    <!-- Profile Photo & Name -->
-    <div class="relative flex flex-col items-center -mt-16 pb-6">
-      <div class="avatar">
-        <div class="w-28 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 -mt-12">
-          <img id="profile-photo-preview" src="https://api.dicebear.com/7.x/person/svg?seed=profile" alt="Profile Photo"/>
+<div class="hero min-h-screen bg-base-200">
+  <div class="hero-content flex-col lg:flex-row">
+    <!-- Profile Card -->
+    <div class="card w-full max-w-4xl shadow-2xl bg-base-100">
+      <!-- Cover Image -->
+      <figure class="h-48 bg-gradient-to-r from-primary via-secondary to-accent relative overflow-hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+        <div class="absolute top-4 right-4">
+          <button class="btn btn-sm btn-circle btn-ghost text-white">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </button>
         </div>
-      </div>
-      <label for="photo" class="btn btn-xs btn-outline mt-2">Change Photo</label>
-      <input type="file" id="photo" class="hidden" accept="image/*" onchange="previewPhoto(event)">
-      <h2 class="text-2xl font-bold mt-2" id="profile-name">Your Name</h2>
-      <p class="text-sm text-gray-500" id="profile-location">City, Country</p>
-      <div class="flex gap-2 mt-2">
-        <span class="badge badge-primary" id="profile-role">Mentor</span>
-        <span class="badge badge-outline" id="profile-language">English</span>
+      </figure>
+
+      <div class="card-body">
+        <!-- Profile Avatar and Info -->
+        <div class="flex flex-col md:flex-row gap-6">
+          <!-- Avatar -->
+          <div class="flex flex-col items-center">
+            <div class="avatar">
+              <div class="w-32 rounded-2xl ring-4 ring-primary ring-offset-4 ring-offset-base-100">
+                <img src="https://api.dicebear.com/7.x/personas/svg?seed=Profile" alt="Profile" />
+              </div>
+            </div>
+          </div>
+
+          <!-- User Details -->
+          <div class="flex-1">
+            <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+              <div>
+                <h1 class="card-title text-4xl">John Doe</h1>
+                <p class="text-lg text-base-content/70">john.doe@example.com</p>
+                <div class="flex flex-wrap gap-2 mt-4">
+                  <div class="badge badge-primary badge-lg">Student</div>
+                  <div class="badge badge-outline badge-lg">Member since January 2024</div>
+                </div>
+              </div>
+
+              <div class="flex gap-2">
+                <button class="btn btn-outline btn-sm">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                  Edit Profile
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider my-8">Profile Information</div>
+
+        <!-- Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Personal Info -->
+          <div class="space-y-4">
+            <h3 class="text-xl font-semibold">Personal Information</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center py-2 px-4 bg-base-200 rounded-lg">
+                <span class="font-medium">Full Name:</span>
+                <span class="text-primary font-semibold">John Doe</span>
+              </div>
+              <div class="flex justify-between items-center py-2 px-4 bg-base-200 rounded-lg">
+                <span class="font-medium">Email:</span>
+                <span class="text-primary font-semibold">john.doe@example.com</span>
+              </div>
+              <div class="flex justify-between items-center py-2 px-4 bg-base-200 rounded-lg">
+                <span class="font-medium">Role:</span>
+                <span class="text-primary font-semibold">Student</span>
+              </div>
+              <div class="flex justify-between items-center py-2 px-4 bg-base-200 rounded-lg">
+                <span class="font-medium">Member Since:</span>
+                <span class="text-primary font-semibold">January 2024</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bio and Stats -->
+          <div class="space-y-6">
+            <!-- Bio -->
+            <div>
+              <h3 class="text-xl font-semibold mb-3">About Me</h3>
+              <p class="text-base-content/80 leading-relaxed">
+                Passionate learner exploring new technologies and building amazing projects.
+                Always eager to learn and grow in the ever-evolving world of technology.
+              </p>
+            </div>
+
+            <!-- Stats -->
+            <div>
+              <h3 class="text-xl font-semibold mb-4">Learning Statistics</h3>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="stat bg-primary/10 rounded-lg p-4">
+                  <div class="stat-value text-primary text-2xl">0</div>
+                  <div class="stat-label text-primary/70">Courses</div>
+                </div>
+                <div class="stat bg-secondary/10 rounded-lg p-4">
+                  <div class="stat-value text-secondary text-2xl">0</div>
+                  <div class="stat-label text-secondary/70">Completed</div>
+                </div>
+                <div class="stat bg-accent/10 rounded-lg p-4">
+                  <div class="stat-value text-accent text-2xl">0</div>
+                  <div class="stat-label text-accent/70">Certificates</div>
+                </div>
+                <div class="stat bg-neutral/10 rounded-lg p-4">
+                  <div class="stat-value text-neutral text-2xl">0</div>
+                  <div class="stat-label text-neutral/70">Hours Learned</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider mt-8"></div>
+
+        <!-- Action Buttons -->
+        <div class="card-actions justify-center pt-6">
+          <button class="btn btn-primary btn-lg flex-1 max-w-xs">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+            Edit Profile
+          </button>
+          <button class="btn btn-outline btn-lg flex-1 max-w-xs">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            View Certificates
+          </button>
+        </div>
       </div>
     </div>
-    <!-- Profile Details Form -->
-    <form class="px-8 pb-8 space-y-5">
-      <!-- Role Selection -->
-      <div>
-        <label class="block font-semibold mb-1">Role</label>
-        <div class="join">
-          <input type="radio" id="mentor" name="role" class="btn join-item" value="Mentor">
-          <label for="mentor" class="btn join-item">Mentor</label>
-          <input type="radio" id="mentee" name="role" class="btn join-item" value="Mentee">
-          <label for="mentee" class="btn join-item">Mentee</label>
-          <input type="radio" id="both" name="role" class="btn join-item" value="Both">
-          <label for="both" class="btn join-item">Both</label>
-        </div>
-      </div>
-      <!-- Name -->
-      <div>
-        <label class="block font-semibold mb-1" for="name">Name</label>
-        <input type="text" id="name" class="input input-bordered w-full" placeholder="Your Name" oninput="document.getElementById('profile-name').textContent = this.value">
-      </div>
-      <!-- Location -->
-      <div>
-        <label class="block font-semibold mb-1" for="location">Location</label>
-        <input type="text" id="location" class="input input-bordered w-full" placeholder="City, Country" oninput="document.getElementById('profile-location').textContent = this.value">
-      </div>
-      <!-- Preferred Language -->
-      <div>
-        <label class="block font-semibold mb-1" for="language">Preferred Language</label>
-        <input type="text" id="language" class="input input-bordered w-full" placeholder="e.g. English, Spanish" oninput="document.getElementById('profile-language').textContent = this.value">
-      </div>
-      <!-- Bio -->
-      <div>
-        <label class="block font-semibold mb-1" for="bio">Bio</label>
-        <textarea id="bio" class="textarea textarea-bordered w-full" rows="2" placeholder="Short bio"></textarea>
-      </div>
-      <!-- Skills, Expertise, Interests, Goals, Availability -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block font-semibold mb-1" for="skills">Skills</label>
-          <input type="text" id="skills" class="input input-bordered w-full" placeholder="e.g. JavaScript, Teaching">
-        </div>
-        <div>
-          <label class="block font-semibold mb-1" for="expertise">Expertise</label>
-          <input type="text" id="expertise" class="input input-bordered w-full" placeholder="e.g. Web Development">
-        </div>
-        <div>
-          <label class="block font-semibold mb-1" for="interests">Interests</label>
-          <input type="text" id="interests" class="input input-bordered w-full" placeholder="e.g. AI, Education">
-        </div>
-        <div>
-          <label class="block font-semibold mb-1" for="goals">Goals</label>
-          <input type="text" id="goals" class="input input-bordered w-full" placeholder="e.g. Learn React, Mentor 5 people">
-        </div>
-        <div>
-          <label class="block font-semibold mb-1" for="availability">Availability</label>
-          <input type="text" id="availability" class="input input-bordered w-full" placeholder="e.g. Weekends, Evenings">
-        </div>
-      </div>
-      <!-- Save Button -->
-      <div class="text-center pt-4">
-        <button type="submit" class="btn btn-primary w-full">Save Profile</button>
-      </div>
-    </form>
   </div>
 </div>
-<script>
-  // Simple preview for profile photo
-  function previewPhoto(event) {
-    const reader = new FileReader();
-    reader.onload = function(){
-      document.getElementById('profile-photo-preview').src = reader.result;
-    };
-    reader.readAsDataURL(event.target.files[0]);
-  }
-</script>

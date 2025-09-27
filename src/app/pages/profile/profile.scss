@@ -1,0 +1,200 @@
+/* Modern Profile Page Styles - Tailwind/DaisyUI Inspired */
+
+/* Custom animations and effects */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Profile page container */
+:host {
+  display: block;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Enhanced form focus states */
+.form-control {
+  .input, .textarea, .select {
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      border-color: #3b82f6;
+    }
+  }
+
+  .label {
+    .label-text {
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .label-text-alt {
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+/* Role selection cards */
+.role-selection {
+  .role-option {
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    &.selected {
+      border-color: #3b82f6;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(124, 58, 237, 0.05));
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+  }
+}
+
+/* Availability cards */
+.availability-grid {
+  .availability-option {
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    &.selected {
+      border-color: #3b82f6;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(124, 58, 237, 0.05));
+    }
+  }
+}
+
+/* Enhanced buttons */
+.btn {
+  transition: all 0.2s ease;
+  font-weight: 600;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  &.btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border: none;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+    }
+  }
+
+  &.btn-outline {
+    &:hover:not(:disabled) {
+      background: #3b82f6;
+      border-color: #3b82f6;
+      color: white;
+    }
+  }
+}
+
+/* Loading states */
+.loading {
+  &.loading-spinner {
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Profile photo upload */
+.photo-upload {
+  .photo-upload-btn {
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
+
+/* Success states */
+.success-message {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+  .form-control {
+    .grid {
+      gap: 1rem;
+    }
+  }
+
+  .role-selection {
+    .role-option {
+      padding: 1rem;
+    }
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :host {
+    background: linear-gradient(135deg, #1f2937, #111827);
+  }
+
+  .bg-white {
+    background: #374151;
+    color: white;
+  }
+
+  .form-control {
+    .input, .textarea, .select {
+      background: #4b5563;
+      border-color: #6b7280;
+      color: white;
+
+      &::placeholder {
+        color: #9ca3af;
+      }
+    }
+  }
+}
+
+/* Print styles */
+@media print {
+  .btn, .photo-upload-btn {
+    display: none;
+  }
+}
