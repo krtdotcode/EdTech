@@ -1,1 +1,94 @@
-<p>profile works!</p>
+<div class="max-w-2xl mx-auto mt-10">
+  <div class="bg-base-100 rounded-xl shadow-lg overflow-hidden">
+    <!-- Cover Photo -->
+    <div class="h-32 bg-gradient-to-r from-primary to-secondary"></div>
+    <!-- Profile Photo & Name -->
+    <div class="relative flex flex-col items-center -mt-16 pb-6">
+      <div class="avatar">
+        <div class="w-28 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 -mt-12">
+          <img id="profile-photo-preview" src="https://api.dicebear.com/7.x/person/svg?seed=profile" alt="Profile Photo"/>
+        </div>
+      </div>
+      <label for="photo" class="btn btn-xs btn-outline mt-2">Change Photo</label>
+      <input type="file" id="photo" class="hidden" accept="image/*" onchange="previewPhoto(event)">
+      <h2 class="text-2xl font-bold mt-2" id="profile-name">Your Name</h2>
+      <p class="text-sm text-gray-500" id="profile-location">City, Country</p>
+      <div class="flex gap-2 mt-2">
+        <span class="badge badge-primary" id="profile-role">Mentor</span>
+        <span class="badge badge-outline" id="profile-language">English</span>
+      </div>
+    </div>
+    <!-- Profile Details Form -->
+    <form class="px-8 pb-8 space-y-5">
+      <!-- Role Selection -->
+      <div>
+        <label class="block font-semibold mb-1">Role</label>
+        <div class="join">
+          <input type="radio" id="mentor" name="role" class="btn join-item" value="Mentor">
+          <label for="mentor" class="btn join-item">Mentor</label>
+          <input type="radio" id="mentee" name="role" class="btn join-item" value="Mentee">
+          <label for="mentee" class="btn join-item">Mentee</label>
+          <input type="radio" id="both" name="role" class="btn join-item" value="Both">
+          <label for="both" class="btn join-item">Both</label>
+        </div>
+      </div>
+      <!-- Name -->
+      <div>
+        <label class="block font-semibold mb-1" for="name">Name</label>
+        <input type="text" id="name" class="input input-bordered w-full" placeholder="Your Name" oninput="document.getElementById('profile-name').textContent = this.value">
+      </div>
+      <!-- Location -->
+      <div>
+        <label class="block font-semibold mb-1" for="location">Location</label>
+        <input type="text" id="location" class="input input-bordered w-full" placeholder="City, Country" oninput="document.getElementById('profile-location').textContent = this.value">
+      </div>
+      <!-- Preferred Language -->
+      <div>
+        <label class="block font-semibold mb-1" for="language">Preferred Language</label>
+        <input type="text" id="language" class="input input-bordered w-full" placeholder="e.g. English, Spanish" oninput="document.getElementById('profile-language').textContent = this.value">
+      </div>
+      <!-- Bio -->
+      <div>
+        <label class="block font-semibold mb-1" for="bio">Bio</label>
+        <textarea id="bio" class="textarea textarea-bordered w-full" rows="2" placeholder="Short bio"></textarea>
+      </div>
+      <!-- Skills, Expertise, Interests, Goals, Availability -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block font-semibold mb-1" for="skills">Skills</label>
+          <input type="text" id="skills" class="input input-bordered w-full" placeholder="e.g. JavaScript, Teaching">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1" for="expertise">Expertise</label>
+          <input type="text" id="expertise" class="input input-bordered w-full" placeholder="e.g. Web Development">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1" for="interests">Interests</label>
+          <input type="text" id="interests" class="input input-bordered w-full" placeholder="e.g. AI, Education">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1" for="goals">Goals</label>
+          <input type="text" id="goals" class="input input-bordered w-full" placeholder="e.g. Learn React, Mentor 5 people">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1" for="availability">Availability</label>
+          <input type="text" id="availability" class="input input-bordered w-full" placeholder="e.g. Weekends, Evenings">
+        </div>
+      </div>
+      <!-- Save Button -->
+      <div class="text-center pt-4">
+        <button type="submit" class="btn btn-primary w-full">Save Profile</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  // Simple preview for profile photo
+  function previewPhoto(event) {
+    const reader = new FileReader();
+    reader.onload = function(){
+      document.getElementById('profile-photo-preview').src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+  }
+</script>
