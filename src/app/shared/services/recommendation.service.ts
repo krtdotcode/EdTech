@@ -23,10 +23,8 @@ export class RecommendationService {
         const goalOverlap = mentee.goals.filter((goal: string) => mentor.goals.includes(goal)).length;
         score += goalOverlap * 2; // Weight goals moderately
 
-        // Industry match
-        if (mentee.industry === mentor.industry) {
-          score += 1;
-        }
+        // Industry match (removed as 'industry' is no longer in profile model)
+        // Removed industry match as it's no longer in the profile model
 
         // Location match
         if (mentee.location === mentor.location) {
@@ -41,7 +39,9 @@ export class RecommendationService {
 
 
         // Consider mentor's active mentees to avoid overloading
-        if (mentor.activeMentees >= mentor.maxMentees) {
+        const activeMentees = mentor.activeMentees ?? 0;
+        const maxMentees = mentor.maxMentees ?? 0;
+        if (activeMentees >= maxMentees && maxMentees > 0) { // Only if maxMentees is set and not 0
           score = 0; // Do not recommend if mentor is full
         }
 

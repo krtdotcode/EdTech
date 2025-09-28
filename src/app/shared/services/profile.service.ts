@@ -16,13 +16,17 @@ export class ProfileService {
       email: 'juan.delacruz@example.com',
       skills: ['Web Development', 'Angular', 'TypeScript'],
       goals: ['Career Growth', 'Technical Skills'],
-      industry: 'IT',
       location: 'Manila',
       availability: ['Weekdays', 'Evenings'],
       ratings: 4.8,
       bio: 'Experienced web developer specializing in Angular.',
       activeMentees: 1,
-      maxMentees: 3
+      maxMentees: 3,
+      photoUrl: 'https://example.com/juan.jpg',
+      expertise: ['Angular', 'TypeScript'],
+      interests: ['Mentoring', 'Open Source'],
+      preferredLanguage: 'Tagalog',
+      role: 'mentor'
     },
     {
       id: 'mentor2',
@@ -31,13 +35,17 @@ export class ProfileService {
       email: 'maria.santos@example.com',
       skills: ['Project Management', 'Leadership'],
       goals: ['Leadership Skills', 'Project Delivery'],
-      industry: 'Consulting',
       location: 'Cebu',
       availability: ['Weekends'],
       ratings: 4.5,
       bio: 'Project Manager with a passion for guiding new leaders.',
       activeMentees: 0,
-      maxMentees: 2
+      maxMentees: 2,
+      photoUrl: 'https://example.com/maria.jpg',
+      expertise: ['Project Planning', 'Team Leadership'],
+      interests: ['Coaching', 'Innovation'],
+      preferredLanguage: 'English',
+      role: 'mentor'
     }
   ];
 
@@ -51,16 +59,31 @@ export class ProfileService {
       email: 'pedro.reyes@example.com',
       skills: ['Web Development'],
       goals: ['Learn Angular'],
-      industry: 'IT',
       location: 'Manila',
       availability: ['Weekdays'],
       preferredMentorSkills: ['Angular', 'TypeScript'],
       preferredMentorGoals: ['Career Growth'],
-      bio: 'Aspiring web developer looking for guidance in Angular.'
+      bio: 'Aspiring web developer looking for guidance in Angular.',
+      photoUrl: 'https://example.com/pedro.jpg',
+      interests: ['Web Development', 'Learning'],
+      preferredLanguage: 'Tagalog',
+      role: 'mentee'
     }
   ];
 
   constructor() { }
+
+  // Create a new mentee profile
+  createMenteeProfile(profile: MenteeProfile): Observable<MenteeProfile> {
+    this.mentees.push(profile);
+    return of(profile);
+  }
+
+  // Create a new mentor profile
+  createMentorProfile(profile: MentorProfile): Observable<MentorProfile> {
+    this.mentors.push(profile);
+    return of(profile);
+  }
 
   getMentors(): Observable<MentorProfile[]> {
     return of(this.mentors);
@@ -117,13 +140,13 @@ export class ProfileService {
       // If accepted, update mentor's active mentees
       if (status === 'accepted') {
         const mentor = this.mentors.find(m => m.id === request.mentorId);
-        if (mentor && mentor.activeMentees < mentor.maxMentees) {
+        if (mentor && mentor.activeMentees !== undefined && mentor.maxMentees !== undefined && mentor.activeMentees < mentor.maxMentees) {
           mentor.activeMentees++;
           this.updateMentorProfile(mentor); // Update the mentor profile
         } else {
-          // If mentor is full, reject the request
+          // If mentor is full or properties are undefined, reject the request
           request.status = 'rejected';
-          console.warn(`Mentor ${mentor?.name} is full. Request rejected.`);
+          console.warn(`Mentor ${mentor?.name} is full or has undefined activeMentees/maxMentees. Request rejected.`);
         }
       }
     }

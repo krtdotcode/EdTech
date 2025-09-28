@@ -20,7 +20,7 @@ export class Register {
   successMessage = ''; // Shows success messages
 
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private router: Router,
     private authService: AuthService
   ) {
@@ -28,15 +28,17 @@ export class Register {
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]], // Required + valid email
       password: ['', [Validators.required, Validators.minLength(6)]], // Required + min 6 chars
-      confirmPassword: ['', [Validators.required]] // Required password confirmation
+      confirmPassword: ['', [Validators.required]], // Required password confirmation
+      role: ['', [Validators.required]] // Required role selection
     }, { validators: this.passwordMatchValidator }); // Custom validation for matching passwords
   }
+
 
   // CUSTOM VALIDATION: Check if passwords match
   passwordMatchValidator(form: FormGroup) {
     const password = form.get('password');
     const confirmPassword = form.get('confirmPassword');
-    
+
     // Return error if passwords don't match
     if (password && confirmPassword && password.value !== confirmPassword.value) {
       return { passwordMismatch: true };
@@ -51,21 +53,21 @@ export class Register {
       this.loading = true;
       this.errorMessage = '';
       this.successMessage = '';
-      
+
       // Get values from form
-      const { email, password } = this.registerForm.value;
-      
-      // Call auth service to create account
-      this.authService.register(email, password).subscribe({
+      const { email, password, role } = this.registerForm.value;
+
+      // Call auth service to create account with role
+      this.authService.register(email, password, role).subscribe({
         next: (result) => {
           // SUCCESS: Account created
           console.log('Registration successful:', result);
           this.loading = false;
-          this.successMessage = 'Account created successfully! Redirecting to profile...';
+          this.successMessage = 'Account created successfully! Redirecting to profile completion...';
 
-          // Auto-login happens automatically, redirect to profile
+          // Auto-login happens automatically, redirect to profile completion
           setTimeout(() => {
-            this.router.navigate(['/profile']);
+            this.router.navigate(['/profile-completion']);
           }, 2000);
         },
         error: (error) => {
@@ -99,3 +101,4 @@ export class Register {
     this.router.navigate(['/login']);
   }
 }
+

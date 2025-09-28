@@ -2,7 +2,7 @@
 // It's like a bridge between your app and Firebase's authentication system
 import { Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, user, User } from '@angular/fire/auth';
-import { Observable, from } from 'rxjs';
+import { Observable, from, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -18,9 +18,15 @@ export class AuthService {
 
   // CREATE NEW ACCOUNT
   // Takes email and password, creates account in Firebase
-  register(email: string, password: string): Observable<any> {
+  register(email: string, password: string, role: 'mentee' | 'mentor' | 'both'): Observable<any> {
     const promise = createUserWithEmailAndPassword(this.auth, email, password);
-    return from(promise); // Convert promise to observable
+    return from(promise).pipe(
+      map(userCredential => {
+        // You might want to save the role to a database here, or as a custom claim
+        // For now, we'll just return the user credential and role
+        return { user: userCredential.user, role };
+      })
+    );
   }
 
   // SIGN IN TO EXISTING ACCOUNT

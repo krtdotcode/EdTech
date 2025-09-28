@@ -14,10 +14,6 @@
       <option *ngFor="let goal of uniqueGoals" [value]="goal">{{ goal }}</option>
     </select>
 
-    <select [(ngModel)]="selectedIndustry" (change)="applyFilters()" class="select select-bordered select-primary rounded-lg w-full md:w-auto flex-grow shadow-sm focus:ring-2 focus:ring-blue-300">
-      <option value="">Filter by Industry</option>
-      <option *ngFor="let industry of uniqueIndustries" [value]="industry">{{ industry }}</option>
-    </select>
 
     <select [(ngModel)]="selectedLocation" (change)="applyFilters()" class="select select-bordered select-primary rounded-lg w-full md:w-auto flex-grow shadow-sm focus:ring-2 focus:ring-blue-300">
       <option value="">Filter by Location</option>
@@ -39,7 +35,6 @@
         <h3 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-900 via-purple-900 to-pink-900 mb-4">{{ mentor.name }}</h3>
         <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Skills:</strong> {{ mentor.skills.join(', ') }}</p>
         <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Goals:</strong> {{ mentor.goals.join(', ') }}</p>
-        <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Industry:</strong> {{ mentor.industry }}</p>
         <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Location:</strong> {{ mentor.location }}</p>
         <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Availability:</strong> {{ mentor.availability.join(', ') }}</p>
         <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Ratings:</strong> {{ mentor.ratings }}</p>
@@ -57,7 +52,6 @@
         <h3 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-900 via-purple-900 to-pink-900 mb-4">{{ mentor.name }}</h3>
         <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Skills:</strong> {{ mentor.skills.join(', ') }}</p>
         <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Goals:</strong> {{ mentor.goals.join(', ') }}</p>
-        <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Industry:</strong> {{ mentor.industry }}</p>
         <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Location:</strong> {{ mentor.location }}</p>
         <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Availability:</strong> {{ mentor.availability.join(', ') }}</p>
         <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Ratings:</strong> {{ mentor.ratings }}</p>

@@ -1,32 +1,29 @@
-export interface MentorProfile {
+export interface UserProfile {
   id: string;
   userId: string;
   name: string;
   email: string;
-  skills: string[];
-  goals: string[];
-  industry: string;
-  location: string;
-  availability: string[];
-  ratings: number;
+  photoUrl?: string;
   bio: string;
-  activeMentees: number;
-  maxMentees: number;
+  location: string;
+  skills: string[];
+  expertise?: string[];
+  interests?: string[];
+  goals: string[];
+  availability: string[];
+  preferredLanguage?: string;
+  role: 'mentee' | 'mentor' | 'both';
 }
 
-export interface MenteeProfile {
-  id: string;
-  userId: string;
-  name: string;
-  email: string;
-  skills: string[];
-  goals: string[];
-  industry: string;
-  location: string;
-  availability: string[];
-  preferredMentorSkills: string[];
-  preferredMentorGoals: string[];
-  bio: string;
+export interface MentorProfile extends UserProfile {
+  ratings?: number;
+  activeMentees?: number;
+  maxMentees?: number;
+}
+
+export interface MenteeProfile extends UserProfile {
+  preferredMentorSkills?: string[];
+  preferredMentorGoals?: string[];
 }
 
 export interface MentorshipRequest {

@@ -1,0 +1,197 @@
+<form [formGroup]="profileForm" (ngSubmit)="onProfileSubmit()" class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <div class="card bg-white/90 shadow-xl rounded-2xl">
+      <div class="card-body">
+        <h2 class="text-2xl font-bold text-center text-purple-700 mb-6">Complete Your Profile</h2>
+
+        <!-- Name Input -->
+        <label class="form-control w-full mb-4">
+          <div class="label">
+            <span class="label-text">Name</span>
+          </div>
+          <input type="text" formControlName="name" placeholder="Enter your Name" class="input input-bordered w-full" />
+          @if (profileForm.get('name')?.invalid && profileForm.get('name')?.touched) {
+            <div class="text-red-500 text-xs mt-2">
+              Name is required.
+            </div>
+          }
+        </label>
+
+        <!-- Photo URL Input -->
+        <label class="form-control w-full mb-4">
+          <div class="label">
+            <span class="label-text">Photo URL</span>
+          </div>
+          <input type="text" formControlName="photoUrl" placeholder="Paste your photo URL here" class="input input-bordered w-full" />
+        </label>
+
+        <!-- Bio Input -->
+        <label class="form-control w-full mb-4">
+          <div class="label">
+            <span class="label-text">Bio</span>
+          </div>
+          <textarea formControlName="bio" placeholder="Tell us about yourself…" class="textarea textarea-bordered h-24 w-full"></textarea>
+          @if (profileForm.get('bio')?.invalid && profileForm.get('bio')?.touched) {
+            <div class="text-red-500 text-xs mt-2">
+              Bio is required.
+            </div>
+          }
+        </label>
+
+        <!-- Location Input -->
+        <label class="form-control w-full mb-4">
+          <div class="label">
+            <span class="label-text">Location</span>
+          </div>
+          <input type="text" formControlName="location" placeholder="Enter your Location" class="input input-bordered w-full" />
+          @if (profileForm.get('location')?.invalid && profileForm.get('location')?.touched) {
+            <div class="text-red-500 text-xs mt-2">
+              Location is required.
+            </div>
+          }
+        </label>
+
+        <!-- Skills Input -->
+        <label class="form-control w-full mb-4">
+          <div class="label">
+            <span class="label-text">Experienced (comma-separated)</span>
+          </div>
+          <input type="text" formControlName="skills" placeholder="Ex. Web Development, Angular" class="input input-bordered w-full" />
+          @if (profileForm.get('skills')?.invalid && profileForm.get('skills')?.touched) {
+            <div class="text-red-500 text-xs mt-2">
+              Experienced is required.
+            </div>
+          }
+        </label>
+
+        <!-- Expertise Input (Conditional for Mentor/Both) -->
+        @if (userRole === 'mentor' || userRole === 'both') {
+          <label class="form-control w-full mb-4">
+            <div class="label">
+              <span class="label-text">Expertise (comma-separated)</span>
+            </div>
+            <input type="text" formControlName="expertise" placeholder="Ex. Frontend, Backend" class="input input-bordered w-full" />
+            @if (profileForm.get('expertise')?.invalid && profileForm.get('expertise')?.touched) {
+              <div class="text-red-500 text-xs mt-2">
+                Expertise is required for mentors.
+              </div>
+            }
+          </label>
+        }
+
+        <!-- Interests Input (Conditional for Mentee/Both) -->
+        @if (userRole === 'mentee' || userRole === 'both') {
+          <label class="form-control w-full mb-4">
+            <div class="label">
+              <span class="label-text">Interest (comma-separated)</span>
+            </div>
+            <input type="text" formControlName="interests" placeholder="Ex. Machine Learning, UI/UX" class="input input-bordered w-full" />
+            @if (profileForm.get('interests')?.invalid && profileForm.get('interests')?.touched) {
+              <div class="text-red-500 text-xs mt-2">
+                Interests are required for mentees.
+              </div>
+            }
+          </label>
+        }
+
+        <!-- Goals Input -->
+        <label class="form-control w-full mb-4">
+          <div class="label">
+            <span class="label-text">Your Goals (comma-separated)</span>
+          </div>
+          <input type="text" formControlName="goals" placeholder="Ex. Career Growth, Learn New Tech" class="input input-bordered w-full" />
+          @if (profileForm.get('goals')?.invalid && profileForm.get('goals')?.touched) {
+            <div class="text-red-500 text-xs mt-2">
+              Goals are required.
+            </div>
+          }
+        </label>
+
+        <!-- Availability Input -->
+        <label class="form-control w-full mb-4">
+          <div class="label">
+            <span class="label-text">Availability (comma-separated)</span>
+          </div>
+          <input type="text" formControlName="availability" placeholder="Ex. Weekdays, Evenings" class="input input-bordered w-full" />
+          @if (profileForm.get('availability')?.invalid && profileForm.get('availability')?.touched) {
+            <div class="text-red-500 text-xs mt-2">
+              Availability is required.
+            </div>
+          }
+        </label>
+
+        <!-- Preferred Language Input -->
+        <label class="form-control w-full mb-4">
+          <div class="label">
+            <span class="label-text">Preferred Language</span>
+          </div>
+          <input type="text" formControlName="preferredLanguage" placeholder="Ex. English, Tagalog" class="input input-bordered w-full" />
+        </label>
+
+        <!-- Preferred Mentor Skills (Conditional for Mentee/Both) -->
+        @if (userRole === 'mentee' || userRole === 'both') {
+          <label class="form-control w-full mb-4">
+            <div class="label">
+              <span class="label-text">Preferred Mentor Skills (comma-separated)</span>
+            </div>
+            <input type="text" formControlName="preferredMentorSkills" placeholder="Ex. Leadership, Project Management" class="input input-bordered w-full" />
+            @if (profileForm.get('preferredMentorSkills')?.invalid && profileForm.get('preferredMentorSkills')?.touched) {
+              <div class="text-red-500 text-xs mt-2">
+                Preferred mentor skills are required for mentees.
+              </div>
+            }
+          </label>
+        }
+
+        <!-- Preferred Mentor Goals (Conditional for Mentee/Both) -->
+        @if (userRole === 'mentee' || userRole === 'both') {
+          <label class="form-control w-full mb-4">
+            <div class="label">
+              <span class="label-text">Preferred Mentor Goals (comma-separated)</span>
+            </div>
+            <input type="text" formControlName="preferredMentorGoals" placeholder="Ex. Career Growth, Technical Skills" class="input input-bordered w-full" />
+            @if (profileForm.get('preferredMentorGoals')?.invalid && profileForm.get('preferredMentorGoals')?.touched) {
+              <div class="text-red-500 text-xs mt-2">
+                Preferred mentor goals are required for mentees.
+              </div>
+            }
+          </label>
+        }
+
+        <!-- Success Message -->
+        @if (successMessage) {
+          <div class="alert alert-success mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{{ successMessage }}</span>
+          </div>
+        }
+
+        <!-- Error Message -->
+        @if (errorMessage) {
+          <div class="alert alert-error mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{{ errorMessage }}</span>
+          </div>
+        }
+
+        <!-- Submit Button -->
+        <button
+          class="bg-purple-600 hover:bg-purple-700 text-white px-10 py-4 border-2 border-black shadow-[6px_6px_0px_0px_black] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all duration-150 cursor-pointer w-full rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+          type="submit"
+          [disabled]="profileForm.invalid || loading"
+        >
+          @if (loading) {
+            <span class="loading loading-spinner loading-sm mr-2"></span>
+            saving profile...
+          } @else {
+            Save Profile
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
