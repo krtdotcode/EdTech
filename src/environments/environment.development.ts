@@ -1,6 +1,6 @@
 export const environment = {
-  production: true,
-  firebase: {
+  production: false,
+  firebaseConfig: {
     apiKey: "AIzaSyDEJu4Cucl0y63UPHrtnfbJS1PlCeHcegw",
     authDomain: "edtech-56637.firebaseapp.com",
     projectId: "edtech-56637",

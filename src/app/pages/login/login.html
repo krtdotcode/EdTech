@@ -3,8 +3,9 @@
     <div class="card bg-white/90 shadow-xl rounded-2xl">
       <div class="card-body">
         <!-- EdTech Logo -->
+         
         <div class="flex justify-center mb-4">
-          <img src="edtech-logo.png" alt="EdTech Logo" class="h-16 w-auto" />
+          <img src="edtech.png" alt="EdTech Logo" class="h-25 w-auto relative top-7" />
         </div>
         <h2 class="text-2xl font-bold text-center text-purple-700">Welcome back</h2>
         <p class="text-center text-gray-500 mb-6">Log in to your EdTech account</p>
@@ -17,7 +18,7 @@
               <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
             </g>
           </svg>
-          <input type="email" formControlName="email" placeholder="mail@site.com" class="grow" required />
+          <input type="email" formControlName="email" placeholder="Email" class="grow" required />
         </label>
         @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
           <div class="text-red-500 text-xs mb-2">
@@ -66,7 +67,7 @@
             Sign in
           }
         </button>
-        
+
         <p class="text-sm text-center text-gray-500 mt-4">
           Don't have an account?
           <a class="text-purple-600 hover:underline cursor-pointer" (click)="goToRegister()">Create one</a>

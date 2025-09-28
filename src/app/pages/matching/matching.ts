@@ -15,7 +15,6 @@ export class Matching implements OnInit {
   searchTerm: string = '';
   selectedSkill: string = '';
   selectedGoal: string = '';
-  selectedIndustry: string = '';
   selectedLocation: string = '';
   selectedAvailability: string = '';
   minRating: number | null = null;
@@ -26,7 +25,6 @@ export class Matching implements OnInit {
 
   uniqueSkills: string[] = [];
   uniqueGoals: string[] = [];
-  uniqueIndustries: string[] = [];
   uniqueLocations: string[] = [];
   uniqueAvailabilities: string[] = [];
 
@@ -38,12 +36,15 @@ export class Matching implements OnInit {
     email: 'pedro.reyes@example.com',
     skills: ['Web Development', 'Angular'],
     goals: ['Learn Angular', 'Career Growth'],
-    industry: 'IT',
     location: 'Manila',
     availability: ['Weekdays'],
     preferredMentorSkills: ['Angular', 'TypeScript'],
     preferredMentorGoals: ['Career Growth'],
-    bio: 'Aspiring web developer looking for guidance in Angular.'
+    bio: 'Aspiring web developer looking for guidance in Angular.',
+    role: 'mentee',
+    photoUrl: '', // Added photoUrl
+    interests: ['Web Development'], // Added interests
+    preferredLanguage: 'English' // Added preferredLanguage
   };
 
   constructor(
@@ -63,7 +64,6 @@ export class Matching implements OnInit {
   populateFilterOptions(): void {
     this.uniqueSkills = [...new Set(this.allMentors.flatMap(mentor => mentor.skills))];
     this.uniqueGoals = [...new Set(this.allMentors.flatMap(mentor => mentor.goals))];
-    this.uniqueIndustries = [...new Set(this.allMentors.map(mentor => mentor.industry))];
     this.uniqueLocations = [...new Set(this.allMentors.map(mentor => mentor.location))];
     this.uniqueAvailabilities = [...new Set(this.allMentors.flatMap(mentor => mentor.availability))];
   }
@@ -78,12 +78,11 @@ export class Matching implements OnInit {
 
       const matchesSkill = this.selectedSkill === '' || mentor.skills.includes(this.selectedSkill);
       const matchesGoal = this.selectedGoal === '' || mentor.goals.includes(this.selectedGoal);
-      const matchesIndustry = this.selectedIndustry === '' || mentor.industry === this.selectedIndustry;
       const matchesLocation = this.selectedLocation === '' || mentor.location === this.selectedLocation;
       const matchesAvailability = this.selectedAvailability === '' || mentor.availability.includes(this.selectedAvailability);
-      const matchesRating = this.minRating === null || mentor.ratings >= this.minRating;
+      const matchesRating = this.minRating === null || (mentor.ratings !== undefined && mentor.ratings >= this.minRating);
 
-      return matchesSearchTerm && matchesSkill && matchesGoal && matchesIndustry && matchesLocation && matchesAvailability && matchesRating;
+      return matchesSearchTerm && matchesSkill && matchesGoal && matchesLocation && matchesAvailability && matchesRating;
     });
   }
 
