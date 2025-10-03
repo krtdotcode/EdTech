@@ -4,10 +4,9 @@ import { Observable, of } from 'rxjs';
 import { MentorProfile, MenteeProfile, MentorshipRequest } from '../models/profile.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProfileService {
-
   private mentors: MentorProfile[] = [
     {
       id: 'mentor1',
@@ -26,7 +25,7 @@ export class ProfileService {
       expertise: ['Angular', 'TypeScript'],
       interests: ['Mentoring', 'Open Source'],
       preferredLanguage: 'Tagalog',
-      role: 'mentor'
+      role: 'mentor',
     },
     {
       id: 'mentor2',
@@ -45,8 +44,8 @@ export class ProfileService {
       expertise: ['Project Planning', 'Team Leadership'],
       interests: ['Coaching', 'Innovation'],
       preferredLanguage: 'English',
-      role: 'mentor'
-    }
+      role: 'mentor',
+    },
   ];
 
   private mentorshipRequests: MentorshipRequest[] = [];
@@ -67,11 +66,11 @@ export class ProfileService {
       photoUrl: 'https://example.com/pedro.jpg',
       interests: ['Web Development', 'Learning'],
       preferredLanguage: 'Tagalog',
-      role: 'mentee'
-    }
+      role: 'mentee',
+    },
   ];
 
-  constructor() { }
+  constructor() {}
 
   // Create a new mentee profile
   createMenteeProfile(profile: MenteeProfile): Observable<MenteeProfile> {
@@ -90,11 +89,11 @@ export class ProfileService {
   }
 
   getMentorById(id: string): Observable<MentorProfile | undefined> {
-    return of(this.mentors.find(mentor => mentor.id === id));
+    return of(this.mentors.find((mentor) => mentor.id === id));
   }
 
   updateMentorProfile(profile: MentorProfile): Observable<MentorProfile> {
-    const index = this.mentors.findIndex(m => m.id === profile.id);
+    const index = this.mentors.findIndex((m) => m.id === profile.id);
     if (index > -1) {
       this.mentors[index] = profile;
     }
@@ -106,11 +105,11 @@ export class ProfileService {
   }
 
   getMenteeById(id: string): Observable<MenteeProfile | undefined> {
-    return of(this.mentees.find(mentee => mentee.id === id));
+    return of(this.mentees.find((mentee) => mentee.id === id));
   }
 
   updateMenteeProfile(profile: MenteeProfile): Observable<MenteeProfile> {
-    const index = this.mentees.findIndex(m => m.id === profile.id);
+    const index = this.mentees.findIndex((m) => m.id === profile.id);
     if (index > -1) {
       this.mentees[index] = profile;
     }
@@ -127,26 +126,36 @@ export class ProfileService {
       menteeId,
       mentorId,
       status: 'pending',
-      requestDate: new Date()
+      requestDate: new Date(),
     };
     this.mentorshipRequests.push(newRequest);
     return of(newRequest);
   }
 
-  updateMentorshipRequestStatus(requestId: string, status: 'accepted' | 'rejected'): Observable<MentorshipRequest | undefined> {
-    const request = this.mentorshipRequests.find(req => req.id === requestId);
+  updateMentorshipRequestStatus(
+    requestId: string,
+    status: 'accepted' | 'rejected'
+  ): Observable<MentorshipRequest | undefined> {
+    const request = this.mentorshipRequests.find((req) => req.id === requestId);
     if (request) {
       request.status = status;
       // If accepted, update mentor's active mentees
       if (status === 'accepted') {
-        const mentor = this.mentors.find(m => m.id === request.mentorId);
-        if (mentor && mentor.activeMentees !== undefined && mentor.maxMentees !== undefined && mentor.activeMentees < mentor.maxMentees) {
+        const mentor = this.mentors.find((m) => m.id === request.mentorId);
+        if (
+          mentor &&
+          mentor.activeMentees !== undefined &&
+          mentor.maxMentees !== undefined &&
+          mentor.activeMentees < mentor.maxMentees
+        ) {
           mentor.activeMentees++;
           this.updateMentorProfile(mentor); // Update the mentor profile
         } else {
           // If mentor is full or properties are undefined, reject the request
           request.status = 'rejected';
-          console.warn(`Mentor ${mentor?.name} is full or has undefined activeMentees/maxMentees. Request rejected.`);
+          console.warn(
+            `Mentor ${mentor?.name} is full or has undefined activeMentees/maxMentees. Request rejected.`
+          );
         }
       }
     }

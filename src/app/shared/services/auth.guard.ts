@@ -6,20 +6,17 @@ import { Observable, map, take } from 'rxjs';
 import { AuthService } from './auth.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   // CHECK IF USER CAN ACCESS ROUTE
   canActivate(): Observable<boolean> {
     // Get user state and check if someone is signed in
     return this.authService.user$.pipe(
       take(1), // Only take one value from the observable
-      map(user => {
+      map((user) => {
         if (user) {
           // USER IS SIGNED IN: Allow access
           return true;
