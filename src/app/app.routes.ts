@@ -1,13 +1,12 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './shared/services/auth.guard';
-import { ProfileCompletion } from './pages/profile-completion/profile-completion';
+import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' }, // Default route
-  { path: 'login', loadComponent: () => import('./pages/login/login').then((m) => m.Login) },
+  { path: 'login', loadComponent: () => import('./pages/auth/login/login').then((m) => m.Login) },
   {
     path: 'register',
-    loadComponent: () => import('./pages/register/register').then((m) => m.Register),
+    loadComponent: () => import('./pages/auth/register/register').then((m) => m.Register),
   },
   {
     path: 'profile-completion',
@@ -44,7 +43,7 @@ export const routes: Routes = [
   {
     path: 'forgot-password',
     loadComponent: () =>
-      import('./pages/forgot-password/forgot-password').then((m) => m.ForgotPassword),
+      import('./pages/auth/forgot-password/forgot-password').then((m) => m.ForgotPassword),
     canActivate: [AuthGuard],
   },
   {
@@ -65,6 +64,12 @@ export const routes: Routes = [
   {
     path: 'scheduling',
     loadComponent: () => import('./pages/scheduling/scheduling').then((m) => m.Scheduling),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'mentor-requests',
+    loadComponent: () =>
+      import('./pages/mentor-requests/mentor-requests').then((m) => m.MentorRequests),
     canActivate: [AuthGuard],
   },
   { path: '**', redirectTo: '/login' }, // Wildcard route for any unmatched URL

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { AuthService } from '../../shared/services/auth.service';
+import { AuthService } from '../../core/auth/auth.service';
 import { ProfileService } from '../../shared/services/profile.service';
 import { MenteeProfile, MentorProfile } from '../../shared/models/profile.model';
 import { User } from 'firebase/auth';
