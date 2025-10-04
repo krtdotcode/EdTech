@@ -2,11 +2,21 @@ import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' }, // Default route
+  { path: '', redirectTo: '/home', pathMatch: 'full' }, // Default route
+  {
+    path: 'home',
+    loadComponent: () => import('./pages/home/home').then((m) => m.Home),
+  },
   { path: 'login', loadComponent: () => import('./pages/auth/login/login').then((m) => m.Login) },
   {
     path: 'register',
     loadComponent: () => import('./pages/auth/register/register').then((m) => m.Register),
+  },
+  {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./pages/auth/forgot-password/forgot-password').then((m) => m.ForgotPassword),
+    canActivate: [AuthGuard],
   },
   {
     path: 'profile-completion',
@@ -38,12 +48,6 @@ export const routes: Routes = [
   {
     path: 'feedback',
     loadComponent: () => import('./pages/feedback/feedback').then((m) => m.Feedback),
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'forgot-password',
-    loadComponent: () =>
-      import('./pages/auth/forgot-password/forgot-password').then((m) => m.ForgotPassword),
     canActivate: [AuthGuard],
   },
   {

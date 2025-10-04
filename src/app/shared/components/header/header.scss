@@ -1,0 +1,6 @@
+/* Remove DaisyUI active background */
+.menu li > a.active,
+.menu li > a:active {
+  background-color: transparent !important;
+  color: inherit !important;
+}

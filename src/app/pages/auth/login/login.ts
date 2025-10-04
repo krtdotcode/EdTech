@@ -1,5 +1,6 @@
 // This component handles the login form and user sign-in process
 import { Component } from '@angular/core';
+import { Header } from '../../../shared/components/header/header';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -8,7 +9,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, Header],
   templateUrl: './login.html',
   styleUrl: './login.scss'
 })
