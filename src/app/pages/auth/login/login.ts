@@ -78,8 +78,8 @@ export class Login {
     }
   }
 
-  // NAVIGATE TO REGISTER PAGE
-  goToRegister() {
-    this.router.navigate(['/register']);
+  // NAVIGATE TO SIGNUP PAGE
+  goToSignup() {
+    this.router.navigate(['/signup']);
   }
 }

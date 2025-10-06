@@ -1,0 +1,223 @@
+.signup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #6a0dad; /* Deep purple background */
+  position: relative;
+  overflow: hidden;
+}
+
+.map-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0; /* Ensure map is behind the card */
+}
+
+.map-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Cover the entire container */
+  opacity: 0.8; /* Slightly transparent */
+}
+
+.map-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(106, 13, 173, 0.5), rgba(106, 13, 173, 0.8)); /* Gradient overlay */
+}
+
+.signup-card-wrapper {
+  position: relative;
+  z-index: 1; /* Ensure card is above the map */
+  padding: 20px;
+  max-width: 400px;
+  width: 100%;
+}
+
+.signup-card {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 40px 30px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.logo-section {
+  margin-bottom: 20px;
+}
+
+.edtech-logo {
+  height: 60px;
+  width: auto;
+}
+
+.signup-title {
+  font-size: 2.2em;
+  font-weight: bold;
+  color: #6a0dad; /* Deep purple */
+  margin-bottom: 30px;
+}
+
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group {
+  text-align: left;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.9em;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.text-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1em;
+  color: #333;
+  background-color: #f9f9f9;
+  box-sizing: border-box; /* Include padding in width */
+}
+
+.text-input::placeholder {
+  color: #bbb;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #6a0dad;
+  box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
+}
+
+.error-message {
+  color: #e74c3c;
+  font-size: 0.85em;
+  margin-top: 5px;
+}
+
+.signup-button {
+  background-color: #6a0dad;
+  color: #ffffff;
+  padding: 15px 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.signup-button:hover {
+  background-color: #5a009d;
+}
+
+.signup-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.or-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.or-divider::before,
+.or-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.or-text {
+  padding: 0 15px;
+  color: #888;
+  font-size: 0.9em;
+}
+
+.social-login-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.social-button {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
+  background-size: 60%;
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.social-button:hover {
+  border-color: #6a0dad;
+  background-color: #f0f0f0;
+}
+
+.social-button.google {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg');
+}
+
+.social-button.linkedin {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png');
+}
+
+.social-button.microsoft {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg');
+}
+
+.login-link-text {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.login-link {
+  color: #6a0dad;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}

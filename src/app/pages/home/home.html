@@ -1,9 +1,19 @@
-<div class="bg-[linear-gradient(245deg,#430F97_30.48%,#730BDA_58.47%)] min-h-screen w-full">
+<div class="bg-[linear-gradient(245deg,#430F97_30.48%,#730BDA_58.47%)] h-screen w-full overflow-hidden">
 <app-header></app-header>
 
-
-<img src="map.png" alt="Map" class=" ml-2 w-[800px] h-[750px]"/>
-
+<div class="flex items-center w-full h-[calc(100vh-64px)] relative overflow-hidden">
+  <!-- Map on the left with more negative margin -->
+  <div class="flex-shrink-0 -ml-21">
+    <img src="map.png" alt="Map" class="w-[900px] h-[850px] object-contain"/>
+  </div>
+  
+  <!-- Text content on the right with negative left margin -->
+  <div class="flex-1 flex flex-col justify-center items-start text-left -ml-15 pr-30">
+    <h1 class="text-white text-[135px] leading-none font-black" style="font-family: 'Archivo', sans-serif; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);">EdTech</h1>
+    <h2 class="text-white text-6xl font-bold mt-4 tracking-wide" style="font-family: 'Archivo', sans-serif; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);">Connecting Mentors & Mentees</h2>
+    <p class="text-white text-xl mt-6 max-w-2xl opacity-60 tracking-wide" style="font-family: 'Archivo', sans-serif;">Mentoring made easy: Smart matching, secure messaging, and guided progress—all crafted for your success.</p>
+  </div>
+</div>
 
 
 </div>
