@@ -18,22 +18,22 @@
             <div class="flex justify-center mb-4">
               <img src="edtech-logo.png" alt="EdTech Logo" class="h-20 w-auto"/>
             </div>
-            <h1 class="text-4xl font-black text-purple-700" style="font-family: 'Archivo', sans-serif; text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);">Login</h1>
+            <h1 class="text-4xl font-black text-purple-700" style="font-family: 'Archivo', sans-serif; text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);">Sign Up</h1>
           </div>
 
           <!-- Login Form -->
-          <form [formGroup]="loginForm" (ngSubmit)="onSignIn()">
+          <form [formGroup]="signupForm" (ngSubmit)="onSignup()">
             
             <!-- Email Input -->
             <div class="mb-4">
               <label class="block text-sm text-gray-600 mb-2">E-mail or phone number</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 formControlName="email"
                 placeholder="Type your e-mail or phone number"
                 class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition"
               />
-              @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+              @if (signupForm.get('email')?.invalid && signupForm.get('email')?.touched) {
                 <p class="text-red-500 text-xs mt-1">Valid email is required</p>
               }
             </div>
@@ -41,13 +41,13 @@
             <!-- Password Input -->
             <div class="mb-2">
               <label class="block text-sm text-gray-600 mb-2">Password</label>
-              <input 
-                type="password" 
+              <input
+                type="password"
                 formControlName="password"
                 placeholder="Type your password"
                 class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition"
               />
-              @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+              @if (signupForm.get('password')?.invalid && signupForm.get('password')?.touched) {
                 <p class="text-red-500 text-xs mt-1">Password must be at least 6 characters</p>
               }
             </div>
@@ -67,7 +67,7 @@
             <!-- Sign In Button -->
             <button
               type="submit"
-              [disabled]="loginForm.invalid || loading"
+              [disabled]="signupForm.invalid || loading"
               class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-full transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed mb-6"
             >
               @if (loading) {
@@ -76,10 +76,10 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Signing in...
+                  Signing up...
                 </span>
               } @else {
-                Sign In
+                Sign Up
               }
             </button>
 
@@ -125,8 +125,8 @@
 
             <!-- Sign Up Link -->
             <p class="text-center text-sm text-gray-600">
-              Don't have an account? 
-              <a class="text-purple-600 font-semibold hover:underline cursor-pointer" (click)="goToSignup()">Sign Up</a>
+              Have an account?
+              <a class="text-purple-600 font-semibold hover:underline cursor-pointer" (click)="goToLogin()">Sign in</a>
             </p>
 
           </form>
