@@ -46,9 +46,22 @@ export class Login {
         next: (result) => {
           // SUCCESS: User signed in
           console.log('Login successful:', result);
-          this.loading = false;
-          // Go to profile page
-          this.router.navigate(['/profile']);
+          // Get user role and redirect accordingly
+          this.authService.getUserRole(result.user.uid).subscribe({
+            next: (role) => {
+              this.loading = false;
+              if (role === 'mentor') {
+                this.router.navigate(['/mentor-dashboard']);
+              } else {
+                this.router.navigate(['/mentee-dashboard']); // For 'mentee' or 'both'
+              }
+            },
+            error: (error) => {
+              console.error('Failed to get user role:', error);
+              this.loading = false;
+              this.errorMessage = 'Failed to load user profile. Please try again.';
+            }
+          });
         },
         error: (error) => {
           // ERROR: Something went wrong

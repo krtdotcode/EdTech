@@ -9,7 +9,8 @@ import {
   user,
   User,
 } from '@angular/fire/auth';
-import { Observable, from, map } from 'rxjs';
+import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
+import { Observable, from, map, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +20,7 @@ export class AuthService {
   // It automatically updates when user logs in/out
   user$: Observable<User | null>;
 
-  constructor(private auth: Auth) {
+  constructor(private auth: Auth, private firestore: Firestore) {
     this.user$ = user(this.auth);
   }
 
@@ -28,9 +29,9 @@ export class AuthService {
   register(email: string, password: string, role: 'mentee' | 'mentor' | 'both'): Observable<any> {
     const promise = createUserWithEmailAndPassword(this.auth, email, password);
     return from(promise).pipe(
+      tap((userCredential) => this.saveUserRole(userCredential.user.uid, role).subscribe()),
       map((userCredential) => {
-        // You might want to save the role to a database here, or as a custom claim
-        // For now, we'll just return the user credential and role
+        // Return the user credential and role
         return { user: userCredential.user, role };
       })
     );
@@ -60,5 +61,21 @@ export class AuthService {
   // Returns true if someone is signed in, false if not
   isAuthenticated(): boolean {
     return !!this.auth.currentUser; // !! converts to boolean
+  }
+
+  // SAVE USER ROLE TO FIRESTORE
+  saveUserRole(uid: string, role: 'mentee' | 'mentor' | 'both'): Observable<void> {
+    const userDoc = doc(this.firestore, 'users', uid);
+    return from(setDoc(userDoc, { role }));
+  }
+
+  // GET USER ROLE FROM FIRESTORE
+  getUserRole(uid: string): Observable<string | null> {
+    const userDoc = doc(this.firestore, 'users', uid);
+    return from(getDoc(userDoc)).pipe(
+      map((userDocSnap) => {
+        return userDocSnap.exists() ? userDocSnap.data()['role'] : null;
+      })
+    );
   }
 }

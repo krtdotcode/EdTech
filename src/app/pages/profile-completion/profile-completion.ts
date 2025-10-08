@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -6,6 +6,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { ProfileService } from '../../shared/services/profile.service';
 import { MenteeProfile, MentorProfile } from '../../shared/models/profile.model';
 import { User } from 'firebase/auth';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-profile-completion',
@@ -14,12 +15,15 @@ import { User } from 'firebase/auth';
   templateUrl: './profile-completion.html',
   styleUrl: './profile-completion.scss'
 })
-export class ProfileCompletion implements OnInit {
+export class ProfileCompletion implements OnInit, OnDestroy {
   profileForm: FormGroup;
   loading = false;
   errorMessage = '';
   successMessage = '';
   userRole: 'mentee' | 'mentor' | 'both' = 'mentee'; // Default role
+  currentStep = 1;
+  totalSteps = 3;
+  private authSub: Subscription = new Subscription();
 
   constructor(
     private fb: FormBuilder,
@@ -46,17 +50,35 @@ export class ProfileCompletion implements OnInit {
   ngOnInit(): void {
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
-      // Fetch user role from AuthService or wherever it's stored
-      // For now, let's assume the role is available after registration
-      // In a real app, you'd fetch this from a database or custom claims
-      // This is a placeholder, actual role should be fetched
-      this.authService.register(currentUser.email!, '', this.userRole).subscribe(result => {
-        this.userRole = result.role;
-        this.updateFormValidators();
+      this.authService.getUserRole(currentUser.uid).subscribe({
+        next: (role) => {
+          if (role) {
+            this.userRole = role as 'mentee' | 'mentor' | 'both';
+            this.updateFormValidators();
+          } else {
+            this.errorMessage = 'Role not found. Please sign up again.';
+            this.router.navigate(['/signup']);
+          }
+        },
+        error: (err) => {
+          this.errorMessage = 'Error fetching user role.';
+          console.error(err);
+          this.router.navigate(['/login']);
+        }
       });
     } else {
       this.router.navigate(['/login']);
     }
+
+    this.authSub.add(this.authService.user$.subscribe(user => {
+      if (!user) {
+        this.router.navigate(['/login']);
+      }
+    }));
+  }
+
+  ngOnDestroy(): void {
+    this.authSub.unsubscribe();
   }
 
   updateFormValidators(): void {
@@ -86,6 +108,60 @@ export class ProfileCompletion implements OnInit {
     interestsControl?.updateValueAndValidity();
     preferredMentorSkillsControl?.updateValueAndValidity();
     preferredMentorGoalsControl?.updateValueAndValidity();
+  }
+
+  nextStep(): void {
+    if (this.isCurrentStepValid()) {
+      this.currentStep++;
+    } else {
+      this.markStepControlsAsTouched();
+    }
+  }
+
+  prevStep(): void {
+    this.currentStep--;
+  }
+
+  isCurrentStepValid(): boolean {
+    const stepFields = this.getStepFields();
+    return stepFields.every(fieldKey => {
+      const control = this.profileForm.get(fieldKey);
+      return control && control.valid;
+    });
+  }
+
+  markStepControlsAsTouched(): void {
+    const stepFields = this.getStepFields();
+    stepFields.forEach(fieldKey => {
+      const control = this.profileForm.get(fieldKey);
+      if (control) {
+        control.markAsTouched();
+      }
+    });
+  }
+
+  getStepFields(): string[] {
+    switch (this.currentStep) {
+      case 1: return ['name', 'photoUrl', 'bio', 'location'];
+      case 2: {
+        const fields = ['skills', 'goals'];
+        if (this.userRole === 'mentor' || this.userRole === 'both') {
+          fields.push('expertise');
+        }
+        if (this.userRole === 'mentee' || this.userRole === 'both') {
+          fields.push('interests');
+        }
+        return fields;
+      }
+      case 3: {
+        const fields = ['availability', 'preferredLanguage'];
+        if (this.userRole === 'mentee' || this.userRole === 'both') {
+          fields.push('preferredMentorSkills', 'preferredMentorGoals');
+        }
+        return fields;
+      }
+      default: return [];
+    }
   }
 
   onProfileSubmit(): void {
@@ -174,4 +250,3 @@ export class ProfileCompletion implements OnInit {
       }
     }
   }
-
