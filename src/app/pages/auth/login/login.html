@@ -123,9 +123,18 @@
               </button>
             </div>
 
+            <!-- Create Account Button -->
+            <button
+              type="button"
+              (click)="goToSignup()"
+              class="w-full bg-white hover:bg-gray-50 text-purple-600 font-semibold py-3 rounded-full border-2 border-purple-600 transition duration-200 mb-4"
+            >
+              Create Account
+            </button>
+
             <!-- Sign Up Link -->
             <p class="text-center text-sm text-gray-600">
-              Don't have an account? 
+              Don't have an account?
               <a class="text-purple-600 font-semibold hover:underline cursor-pointer" (click)="goToSignup()">Sign Up</a>
             </p>
 

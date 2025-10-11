@@ -26,15 +26,19 @@ export const routes: Routes = [
   },
   {
     path: 'mentee-dashboard',
-    loadComponent: () => import('./pages/matching/matching').then((m) => m.Matching),
+    loadComponent: () => import('./pages/mentee-dashboard/mentee-dashboard').then((m) => m.MenteeDashboard),
     canActivate: [AuthGuard],
-  }, // Assuming matching is mentee dashboard
+  },
   {
     path: 'mentor-dashboard',
-    loadComponent: () =>
-      import('./pages/mentor-requests/mentor-requests').then((m) => m.MentorRequests),
+    loadComponent: () => import('./pages/mentor-dashboard/mentor-dashboard').then((m) => m.MentorDashboard),
     canActivate: [AuthGuard],
-  }, // Assuming mentor-requests is mentor dashboard
+  },
+  {
+    path: 'matching',
+    loadComponent: () => import('./pages/matching/matching').then((m) => m.Matching),
+    canActivate: [AuthGuard],
+  },
   {
     path: 'profile',
     loadComponent: () => import('./pages/profile/profile').then((m) => m.Profile),

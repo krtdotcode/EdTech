@@ -12,17 +12,16 @@ import { Subscription } from 'rxjs';
   selector: 'app-profile-completion',
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule],
-  templateUrl: './profile-completion.html',
-  styleUrl: './profile-completion.scss'
+  templateUrl: './profile-completion.html'
 })
 export class ProfileCompletion implements OnInit, OnDestroy {
   profileForm: FormGroup;
+  roleForm: FormGroup;
   loading = false;
   errorMessage = '';
   successMessage = '';
-  userRole: 'mentee' | 'mentor' | 'both' = 'mentee'; // Default role
-  currentStep = 1;
-  totalSteps = 3;
+  userRole: 'mentee' | 'mentor' | 'both' | null = null;
+  showRoleSelection = false;
   private authSub: Subscription = new Subscription();
 
   constructor(
@@ -31,6 +30,10 @@ export class ProfileCompletion implements OnInit, OnDestroy {
     private authService: AuthService,
     private profileService: ProfileService
   ) {
+    this.roleForm = this.fb.group({
+      role: ['', Validators.required]
+    });
+
     this.profileForm = this.fb.group({
       name: ['', Validators.required],
       photoUrl: [''],
@@ -48,30 +51,75 @@ export class ProfileCompletion implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.loading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
+      console.log('Profile completion - Current user:', currentUser.uid);
+
+      // First check if user has already completed profile (should redirect if so)
+      this.profileService.hasUserCompletedProfile(currentUser.uid).subscribe({
+        next: (hasCompleted) => {
+          if (hasCompleted) {
+            console.log('Profile completion - User already completed profile, redirecting');
+            // User already completed profile, get their role and redirect
+            this.authService.getUserRole(currentUser.uid).subscribe({
+              next: (role) => {
+                if (role === 'mentor') {
+                  this.router.navigate(['/mentor-dashboard']);
+                } else {
+                  this.router.navigate(['/mentee-dashboard']);
+                }
+              },
+              error: (error) => {
+                console.error('Error getting role after completion check:', error);
+                this.router.navigate(['/mentee-dashboard']); // fallback
+              }
+            });
+            return;
+          }
+
+          // User hasn't completed profile, proceed with role checking
+        },
+        error: (error) => {
+          console.error('Error checking profile completion status:', error);
+          // Continue with normal flow on error
+        }
+      });
+
       this.authService.getUserRole(currentUser.uid).subscribe({
         next: (role) => {
+          console.log('Profile completion - User role:', role);
+
           if (role) {
             this.userRole = role as 'mentee' | 'mentor' | 'both';
-            this.updateFormValidators();
+            // Check if user already has a profile for their role
+            this.checkExistingProfileAndRedirect(currentUser.uid, role as 'mentee' | 'mentor' | 'both');
           } else {
-            this.errorMessage = 'Role not found. Please sign up again.';
-            this.router.navigate(['/signup']);
+            console.log('Profile completion - No role found, showing role selection');
+            this.showRoleSelection = true;
+            this.userRole = null;
+            this.loading = false;
           }
         },
-        error: (err) => {
+        error: (err: any) => {
+          console.error('Profile completion - Error fetching user role:', err);
           this.errorMessage = 'Error fetching user role.';
-          console.error(err);
-          this.router.navigate(['/login']);
+          this.showRoleSelection = true;
+          this.userRole = null;
+          this.loading = false;
         }
       });
     } else {
+      console.log('Profile completion - No current user, redirecting to login');
       this.router.navigate(['/login']);
     }
 
     this.authSub.add(this.authService.user$.subscribe(user => {
       if (!user) {
+        console.log('Profile completion - User logged out, redirecting to login');
         this.router.navigate(['/login']);
       }
     }));
@@ -82,6 +130,8 @@ export class ProfileCompletion implements OnInit, OnDestroy {
   }
 
   updateFormValidators(): void {
+    console.log('Profile completion - Setting up form validators for role:', this.userRole);
+
     const expertiseControl = this.profileForm.get('expertise');
     const interestsControl = this.profileForm.get('interests');
     const preferredMentorSkillsControl = this.profileForm.get('preferredMentorSkills');
@@ -108,59 +158,100 @@ export class ProfileCompletion implements OnInit, OnDestroy {
     interestsControl?.updateValueAndValidity();
     preferredMentorSkillsControl?.updateValueAndValidity();
     preferredMentorGoalsControl?.updateValueAndValidity();
+
+    // Form is ready, stop loading
+    this.loading = false;
+    console.log('Profile completion - Form setup complete, loading = false');
   }
 
-  nextStep(): void {
-    if (this.isCurrentStepValid()) {
-      this.currentStep++;
-    } else {
-      this.markStepControlsAsTouched();
+  onRoleSelect(): void {
+    if (this.roleForm.valid) {
+      const selectedRole = this.roleForm.value.role;
+      const currentUser = this.authService.getCurrentUser();
+      if (currentUser) {
+        this.authService.saveUserRole(currentUser.uid, selectedRole).subscribe({
+          next: () => {
+            this.userRole = selectedRole;
+            this.showRoleSelection = false;
+            // After role selection, check if user already has a profile
+            this.checkExistingProfileAndRedirect(currentUser.uid, selectedRole);
+          },
+          error: (err: any) => {
+            this.errorMessage = 'Failed to save role. Please try again.';
+            console.error('Save role error:', err);
+          }
+        });
+      }
     }
   }
 
-  prevStep(): void {
-    this.currentStep--;
-  }
-
-  isCurrentStepValid(): boolean {
-    const stepFields = this.getStepFields();
-    return stepFields.every(fieldKey => {
-      const control = this.profileForm.get(fieldKey);
-      return control && control.valid;
-    });
-  }
-
-  markStepControlsAsTouched(): void {
-    const stepFields = this.getStepFields();
-    stepFields.forEach(fieldKey => {
-      const control = this.profileForm.get(fieldKey);
-      if (control) {
-        control.markAsTouched();
-      }
-    });
-  }
-
-  getStepFields(): string[] {
-    switch (this.currentStep) {
-      case 1: return ['name', 'photoUrl', 'bio', 'location'];
-      case 2: {
-        const fields = ['skills', 'goals'];
-        if (this.userRole === 'mentor' || this.userRole === 'both') {
-          fields.push('expertise');
+  // CHECK IF USER ALREADY HAS A PROFILE AND REDIRECT ACCORDINGLY
+  checkExistingProfileAndRedirect(userId: string, role: 'mentee' | 'mentor' | 'both'): void {
+    if (role === 'mentee') {
+      this.profileService.getMenteeById(userId).subscribe({
+        next: (profile) => {
+          if (profile) {
+            // Already has mentee profile, go to mentee dashboard
+            this.router.navigate(['/mentee-dashboard']);
+          } else {
+            // No profile, show form
+            this.updateFormValidators();
+          }
+        },
+        error: (error: any) => {
+          console.error('Error checking existing mentee profile:', error);
+          // Show form even if error checking
+          this.updateFormValidators();
         }
-        if (this.userRole === 'mentee' || this.userRole === 'both') {
-          fields.push('interests');
+      });
+    } else if (role === 'mentor') {
+      this.profileService.getMentorById(userId).subscribe({
+        next: (profile) => {
+          if (profile) {
+            // Already has mentor profile, go to mentor dashboard
+            this.router.navigate(['/mentor-dashboard']);
+          } else {
+            // No profile, show form
+            this.updateFormValidators();
+          }
+        },
+        error: (error: any) => {
+          console.error('Error checking existing mentor profile:', error);
+          // Show form even if error checking
+          this.updateFormValidators();
         }
-        return fields;
-      }
-      case 3: {
-        const fields = ['availability', 'preferredLanguage'];
-        if (this.userRole === 'mentee' || this.userRole === 'both') {
-          fields.push('preferredMentorSkills', 'preferredMentorGoals');
+      });
+    } else if (role === 'both') {
+      // For 'both' role, check if they have either profile
+      this.profileService.getMenteeById(userId).subscribe({
+        next: (menteeProfile) => {
+          if (menteeProfile) {
+            // Has mentee profile, go to mentee dashboard (they can switch roles later)
+            this.router.navigate(['/mentee-dashboard']);
+          } else {
+            // Check if they have mentor profile
+            this.profileService.getMentorById(userId).subscribe({
+              next: (mentorProfile) => {
+                if (mentorProfile) {
+                  // Has mentor profile only, still show form to complete mentee profile
+                  this.updateFormValidators();
+                } else {
+                  // No profiles yet, show form
+                  this.updateFormValidators();
+                }
+              },
+              error: () => {
+                // Show form even if error
+                this.updateFormValidators();
+              }
+            });
+          }
+        },
+        error: () => {
+          // Show form even if error
+          this.updateFormValidators();
         }
-        return fields;
-      }
-      default: return [];
+      });
     }
   }
 
@@ -174,79 +265,164 @@ export class ProfileCompletion implements OnInit, OnDestroy {
       if (currentUser) {
         const { name, photoUrl, bio, location, skills, expertise, interests, goals, availability, preferredLanguage, preferredMentorSkills, preferredMentorGoals } = this.profileForm.value;
 
-          if (this.userRole === 'mentee' || this.userRole === 'both') {
-            const menteeProfile: MenteeProfile = {
-              id: currentUser.uid, 
-              userId: currentUser.uid,
-              name,
-              email: currentUser.email!,
-              photoUrl,
-              bio,
-              location,
-              skills: skills.split(',').map((s: string) => s.trim()),
-              interests: interests.split(',').map((i: string) => i.trim()),
-              goals: goals.split(',').map((g: string) => g.trim()),
-              availability: availability.split(',').map((a: string) => a.trim()),
-              preferredLanguage,
-              preferredMentorSkills: preferredMentorSkills.split(',').map((s: string) => s.trim()),
-              preferredMentorGoals: preferredMentorGoals.split(',').map((g: string) => g.trim()),
-              role: 'mentee' 
-            };
-            this.profileService.createMenteeProfile(menteeProfile).subscribe({
-              next: () => {
-                this.successMessage = 'Mentee profile created successfully!';
-                if (this.userRole === 'mentee') {
+        const commonProfile = {
+          id: currentUser.uid,
+          userId: currentUser.uid,
+          name,
+          email: currentUser.email!,
+          photoUrl,
+          bio,
+          location,
+          skills: skills.split(',').map((s: string) => s.trim()),
+          goals: goals.split(',').map((g: string) => g.trim()),
+          availability: availability.split(',').map((a: string) => a.trim()),
+          preferredLanguage,
+        };
+
+        if (this.userRole === 'both') {
+          // For 'both' role, create both mentee and mentor profiles
+          let menteeCreated = false;
+          let mentorCreated = false;
+
+          const menteeProfile: MenteeProfile = {
+            ...commonProfile,
+            interests: interests.split(',').map((i: string) => i.trim()),
+            preferredMentorSkills: preferredMentorSkills.split(',').map((s: string) => s.trim()),
+            preferredMentorGoals: preferredMentorGoals.split(',').map((g: string) => g.trim()),
+            role: 'mentee'
+          };
+
+          const mentorProfile: MentorProfile = {
+            ...commonProfile,
+            expertise: expertise.split(',').map((e: string) => e.trim()),
+            ratings: 0,
+            activeMentees: 0,
+            maxMentees: 3,
+            role: 'mentor'
+          };
+
+          this.profileService.createMenteeProfile(menteeProfile).subscribe({
+            next: () => {
+              menteeCreated = true;
+              if (mentorCreated) {
+                // Mark profile as completed
+                this.profileService.markProfileCompleted(currentUser.uid, 'both').subscribe({
+                  next: () => {
+                    this.successMessage = 'Both mentee and mentor profiles created successfully!';
+                    this.router.navigate(['/mentee-dashboard']);
+                  },
+                  error: (err: any) => {
+                    console.error('Error marking profile completed:', err);
+                    this.successMessage = 'Both profiles created successfully!';
+                    this.router.navigate(['/mentee-dashboard']);
+                  }
+                });
+              }
+            },
+            error: (err: any) => {
+              this.errorMessage = 'Error creating mentee profile.';
+              console.error(err);
+              this.loading = false;
+            }
+          });
+
+          this.profileService.createMentorProfile(mentorProfile).subscribe({
+            next: () => {
+              mentorCreated = true;
+              if (menteeCreated) {
+                // Mark profile as completed
+                this.profileService.markProfileCompleted(currentUser.uid, 'both').subscribe({
+                  next: () => {
+                    this.successMessage = 'Both mentee and mentor profiles created successfully!';
+                    this.router.navigate(['/mentee-dashboard']);
+                  },
+                  error: (err: any) => {
+                    console.error('Error marking profile completed:', err);
+                    this.successMessage = 'Both profiles created successfully!';
+                    this.router.navigate(['/mentee-dashboard']);
+                  }
+                });
+              }
+            },
+            error: (err: any) => {
+              this.errorMessage = 'Error creating mentor profile.';
+              console.error(err);
+              this.loading = false;
+            }
+          });
+
+        } else if (this.userRole === 'mentee') {
+          const menteeProfile: MenteeProfile = {
+            ...commonProfile,
+            interests: interests.split(',').map((i: string) => i.trim()),
+            preferredMentorSkills: preferredMentorSkills.split(',').map((s: string) => s.trim()),
+            preferredMentorGoals: preferredMentorGoals.split(',').map((g: string) => g.trim()),
+            role: 'mentee'
+          };
+          this.profileService.createMenteeProfile(menteeProfile).subscribe({
+            next: () => {
+              // Mark profile as completed
+              this.profileService.markProfileCompleted(currentUser.uid, 'mentee').subscribe({
+                next: () => {
+                  this.successMessage = 'Mentee profile created successfully!';
+                  this.loading = false;
+                  this.router.navigate(['/mentee-dashboard']);
+                },
+                error: (err: any) => {
+                  console.error('Error marking profile completed:', err);
+                  this.successMessage = 'Mentee profile created successfully!';
+                  this.loading = false;
                   this.router.navigate(['/mentee-dashboard']);
                 }
-              },
-              error: (err) => {
-                this.errorMessage = 'Error creating mentee profile.';
-                console.error(err);
-              }
-            });
-          }
+              });
+            },
+            error: (err: any) => {
+              this.errorMessage = 'Error creating mentee profile.';
+              console.error(err);
+              this.loading = false;
+            }
+          });
 
-          if (this.userRole === 'mentor' || this.userRole === 'both') {
-            const mentorProfile: MentorProfile = {
-              id: currentUser.uid, // Use currentUser.uid as id
-              userId: currentUser.uid,
-              name,
-              email: currentUser.email!,
-              photoUrl,
-              bio,
-              location,
-              skills: skills.split(',').map((s: string) => s.trim()),
-              expertise: expertise.split(',').map((e: string) => e.trim()),
-              goals: goals.split(',').map((g: string) => g.trim()),
-              availability: availability.split(',').map((a: string) => a.trim()),
-              preferredLanguage,
-              ratings: 0, // Default rating
-              activeMentees: 0, // Default
-              maxMentees: 3, // Default
-              role: 'mentor' // Set role for mentor profile
-            };
-            this.profileService.createMentorProfile(mentorProfile).subscribe({
-              next: () => {
-                this.successMessage = 'Mentor profile created successfully!';
-                if (this.userRole === 'mentor') {
+        } else if (this.userRole === 'mentor') {
+          const mentorProfile: MentorProfile = {
+            ...commonProfile,
+            expertise: expertise.split(',').map((e: string) => e.trim()),
+            ratings: 0,
+            activeMentees: 0,
+            maxMentees: 3,
+            role: 'mentor'
+          };
+          this.profileService.createMentorProfile(mentorProfile).subscribe({
+            next: () => {
+              // Mark profile as completed
+              this.profileService.markProfileCompleted(currentUser.uid, 'mentor').subscribe({
+                next: () => {
+                  this.successMessage = 'Mentor profile created successfully!';
+                  this.loading = false;
                   this.router.navigate(['/mentor-dashboard']);
-                } else if (this.userRole === 'both') {
-                  this.router.navigate(['/mentee-dashboard']); // Redirect to mentee dashboard if both
+                },
+                error: (err: any) => {
+                  console.error('Error marking profile completed:', err);
+                  this.successMessage = 'Mentor profile created successfully!';
+                  this.loading = false;
+                  this.router.navigate(['/mentor-dashboard']);
                 }
-              },
-              error: (err) => {
-                this.errorMessage = 'Error creating mentor profile.';
-                console.error(err);
-              }
-            });
-          }
-          this.loading = false;
-        } else {
-          this.errorMessage = 'User not logged in.';
-          this.loading = false;
+              });
+            },
+            error: (err: any) => {
+              this.errorMessage = 'Error creating mentor profile.';
+              console.error(err);
+              this.loading = false;
+            }
+          });
         }
       } else {
-        this.errorMessage = 'Please fill in all required fields.';
+        this.errorMessage = 'User not logged in.';
+        this.loading = false;
       }
+    } else {
+      this.errorMessage = 'Please fill in all required fields.';
+      this.profileForm.markAllAsTouched();
     }
   }
+}

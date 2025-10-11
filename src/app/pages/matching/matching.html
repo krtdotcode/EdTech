@@ -1,66 +1,289 @@
-<div class="p-5 font-sans">
-  <h1 class="text-5xl font-extrabold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 tracking-tight">Mentor Matching</h1>
-
-  <div class="flex flex-wrap justify-center gap-4 mb-8">
-    <input type="text" [(ngModel)]="searchTerm" placeholder="Search by keyword..." (input)="applyFilters()" class="input input-bordered input-primary rounded-lg w-full md:w-auto flex-grow shadow-sm focus:ring-2 focus:ring-blue-300">
-
-    <select [(ngModel)]="selectedSkill" (change)="applyFilters()" class="select select-bordered select-primary rounded-lg w-full md:w-auto flex-grow shadow-sm focus:ring-2 focus:ring-blue-300">
-      <option value="">Filter by Skill</option>
-      <option *ngFor="let skill of uniqueSkills" [value]="skill">{{ skill }}</option>
-    </select>
-
-    <select [(ngModel)]="selectedGoal" (change)="applyFilters()" class="select select-bordered select-primary rounded-lg w-full md:w-auto flex-grow shadow-sm focus:ring-2 focus:ring-blue-300">
-      <option value="">Filter by Goal</option>
-      <option *ngFor="let goal of uniqueGoals" [value]="goal">{{ goal }}</option>
-    </select>
-
-
-    <select [(ngModel)]="selectedLocation" (change)="applyFilters()" class="select select-bordered select-primary rounded-lg w-full md:w-auto flex-grow shadow-sm focus:ring-2 focus:ring-blue-300">
-      <option value="">Filter by Location</option>
-      <option *ngFor="let location of uniqueLocations" [value]="location">{{ location }}</option>
-    </select>
-
-    <select [(ngModel)]="selectedAvailability" (change)="applyFilters()" class="select select-bordered select-primary rounded-lg w-full md:w-auto flex-grow shadow-sm focus:ring-2 focus:ring-blue-300">
-      <option value="">Filter by Availability</option>
-      <option *ngFor="let availability of uniqueAvailabilities" [value]="availability">{{ availability }}</option>
-    </select>
-
-    <input type="number" [(ngModel)]="minRating" placeholder="Min Rating" (input)="applyFilters()" class="input input-bordered input-primary rounded-lg w-full md:w-auto flex-grow shadow-sm focus:ring-2 focus:ring-blue-300">
+<!-- Main Container -->
+<div class="h-auto bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Find Your Mentor</h1>
+          <p class="text-gray-600 mt-1">Discover experienced professionals to guide your career growth</p>
+        </div>
+        <button
+          (click)="clearFilters()"
+          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
+        >
+          🔄 Clear Filters
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div class="mentor-list">
-    <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 mt-12 mb-6 pb-3 border-b-2 border-blue-400 tracking-tight">Recommended Mentors</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div *ngFor="let mentor of recommendedMentors" class="card bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 shadow-2xl border border-blue-300 rounded-3xl p-8 transform transition duration-500 hover:scale-105 hover:shadow-3xl flex flex-col items-center text-center">
-        <h3 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-900 via-purple-900 to-pink-900 mb-4">{{ mentor.name }}</h3>
-        <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Skills:</strong> {{ mentor.skills.join(', ') }}</p>
-        <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Goals:</strong> {{ mentor.goals.join(', ') }}</p>
-        <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Location:</strong> {{ mentor.location }}</p>
-        <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Availability:</strong> {{ mentor.availability.join(', ') }}</p>
-        <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Ratings:</strong> {{ mentor.ratings }}</p>
-        <p class="text-gray-700 mb-6 leading-relaxed text-base">{{ mentor.bio }}</p>
-        <button (click)="sendRequest(mentor.id)" class="btn bg-gradient-to-r from-blue-600 via-purple-700 to-pink-700 text-white btn-lg mt-5 shadow-xl hover:shadow-2xl border-none">Send Mentorship Request</button>
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Search & Filters Section -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+
+        <!-- Search Input -->
+        <div class="lg:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Name, bio, skills..."
+            (input)="applyFilters()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <!-- Skill Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Skill Focus</label>
+          <select
+            [(ngModel)]="selectedSkill"
+            (change)="applyFilters()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Skills</option>
+            <option *ngFor="let skill of uniqueSkills" [value]="skill">{{ skill }}</option>
+          </select>
+        </div>
+
+        <!-- Industry Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+          <select
+            [(ngModel)]="selectedIndustry"
+            (change)="applyFilters()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Industries</option>
+            <option *ngFor="let industry of uniqueIndustries" [value]="industry">{{ industry }}</option>
+          </select>
+        </div>
+
+        <!-- Location Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+          <select
+            [(ngModel)]="selectedLocation"
+            (change)="applyFilters()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Locations</option>
+            <option *ngFor="let location of uniqueLocations" [value]="location">{{ location }}</option>
+          </select>
+        </div>
+
       </div>
-    </div>
-    <div *ngIf="recommendedMentors.length === 0" class="text-center text-gray-600 mt-12 text-2xl">
-      <p>No recommended mentors found for your profile. Try adjusting your filters.</p>
+
+      <!-- Additional Filters Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+
+        <!-- Career Goal Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Career Goal</label>
+          <select
+            [(ngModel)]="selectedGoal"
+            (change)="applyFilters()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Goals</option>
+            <option *ngFor="let goal of uniqueGoals" [value]="goal">{{ goal }}</option>
+          </select>
+        </div>
+
+        <!-- Availability Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Availability</label>
+          <select
+            [(ngModel)]="selectedAvailability"
+            (change)="applyFilters()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Schedules</option>
+            <option *ngFor="let availability of uniqueAvailabilities" [value]="availability">{{ availability }}</option>
+          </select>
+        </div>
+
+        <!-- Rating Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Min Rating</label>
+          <select
+            [(ngModel)]="minRating"
+            (change)="applyFilters()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option [value]="null">Any Rating</option>
+            <option [value]="1">1+ Stars</option>
+            <option [value]="2">2+ Stars</option>
+            <option [value]="3">3+ Stars</option>
+            <option [value]="4">4+ Stars</option>
+            <option [value]="5">5 Stars</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Active Filters Display -->
+      <div *ngIf="getActiveFiltersCount() > 0" class="mt-4 pt-4 border-t border-gray-200">
+        <div class="flex flex-wrap gap-2">
+          <span class="text-sm font-medium text-gray-600">Active filters:</span>
+          <span *ngIf="searchTerm" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            Search: "{{searchTerm}}"
+          </span>
+          <span *ngIf="selectedSkill" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Skill: {{selectedSkill}}
+          </span>
+          <span *ngIf="selectedIndustry" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+            Industry: {{selectedIndustry}}
+          </span>
+          <span *ngIf="selectedLocation" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+            Location: {{selectedLocation}}
+          </span>
+          <span *ngIf="selectedGoal" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
+            Goal: {{selectedGoal}}
+          </span>
+          <span *ngIf="selectedAvailability" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+            Availability: {{selectedAvailability}}
+          </span>
+          <span *ngIf="minRating" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            Rating: {{minRating}}+
+          </span>
+        </div>
+      </div>
     </div>
 
-    <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 mt-16 mb-6 pb-3 border-b-2 border-blue-400 tracking-tight">All Mentors (Filtered)</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div *ngFor="let mentor of filteredMentors" class="card bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 shadow-2xl border border-blue-300 rounded-3xl p-8 transform transition duration-500 hover:scale-105 hover:shadow-3xl flex flex-col items-center text-center">
-        <h3 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-900 via-purple-900 to-pink-900 mb-4">{{ mentor.name }}</h3>
-        <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Skills:</strong> {{ mentor.skills.join(', ') }}</p>
-        <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Goals:</strong> {{ mentor.goals.join(', ') }}</p>
-        <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Location:</strong> {{ mentor.location }}</p>
-        <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Availability:</strong> {{ mentor.availability.join(', ') }}</p>
-        <p class="text-gray-800 text-lg mb-1"><strong class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700">Ratings:</strong> {{ mentor.ratings }}</p>
-        <p class="text-gray-700 mb-6 leading-relaxed text-base">{{ mentor.bio }}</p>
-        <button (click)="sendRequest(mentor.id)" class="btn bg-gradient-to-r from-blue-600 via-purple-700 to-pink-700 text-white btn-lg mt-5 shadow-xl hover:shadow-2xl border-none">Send Mentorship Request</button>
+    <!-- Results Summary -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between">
+        <div class="text-sm text-gray-600">
+          Showing {{ filteredMentors.length }} of {{ allMentors.length }} mentors
+        </div>
       </div>
     </div>
-    <div *ngIf="filteredMentors.length === 0 && recommendedMentors.length > 0" class="text-center text-gray-500 mt-8 text-lg">
-      <p>No other mentors found matching your criteria. Expand your search!</p>
+
+    <!-- Recommended Mentors (if any) -->
+    <div *ngIf="recommendedMentors.length > 0" class="mb-12">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">🎯 Recommended for You</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          *ngFor="let mentor of recommendedMentors"
+          class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+        >
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold text-gray-900">{{ mentor.name }}</h3>
+              <p class="text-sm text-gray-600">{{ mentor.location }}</p>
+            </div>
+            <div class="flex items-center">
+              <span class="text-yellow-400">⭐</span>
+              <span class="ml-1 text-sm font-medium text-gray-900">{{ mentor.ratings }}/5</span>
+            </div>
+          </div>
+
+          <p class="text-gray-700 text-sm mb-4 line-clamp-3">{{ mentor.bio }}</p>
+
+          <div class="space-y-2 mb-4">
+            <div class="flex flex-wrap gap-1">
+              <span class="text-xs font-medium text-gray-600">Skills:</span>
+              <span *ngFor="let skill of mentor.skills.slice(0,3)" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {{ skill }}
+              </span>
+            </div>
+
+            <div class="flex flex-wrap gap-1">
+              <span class="text-xs font-medium text-gray-600">Goals:</span>
+              <span *ngFor="let goal of mentor.goals.slice(0,2)" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                {{ goal }}
+              </span>
+            </div>
+          </div>
+
+          <button
+            (click)="sendRequest(mentor.id)"
+            class="w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+          >
+            Send Mentorship Request
+          </button>
+        </div>
+      </div>
     </div>
+
+    <!-- All Mentors Section -->
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">All Available Mentors</h2>
+
+      <!-- No results state -->
+      <div *ngIf="filteredMentors.length === 0 && allMentors.length > 0" class="text-center py-12">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span class="text-2xl">🔍</span>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No mentors match your criteria</h3>
+        <p class="text-gray-600 mb-4">Try adjusting your search filters or clearing them to see more options.</p>
+        <button
+          (click)="clearFilters()"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          Clear All Filters
+        </button>
+      </div>
+
+      <!-- Loading state -->
+      <div *ngIf="allMentors.length === 0" class="text-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p class="text-gray-600">Loading mentors...</p>
+      </div>
+
+      <!-- Mentors grid -->
+      <div *ngIf="filteredMentors.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          *ngFor="let mentor of filteredMentors"
+          class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-gray-300 transition-all"
+        >
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold text-gray-900">{{ mentor.name }}</h3>
+              <p class="text-sm text-gray-600">{{ mentor.location }}</p>
+            </div>
+            <div class="flex items-center">
+              <span class="text-yellow-400">⭐</span>
+              <span class="ml-1 text-sm font-medium text-gray-900">{{ mentor.ratings }}/5</span>
+            </div>
+          </div>
+
+          <p class="text-gray-700 text-sm mb-4 line-clamp-3">{{ mentor.bio }}</p>
+
+          <div class="space-y-2 mb-4">
+            <div class="flex flex-wrap gap-1">
+              <span class="text-xs font-medium text-gray-600">Skills:</span>
+              <span *ngFor="let skill of mentor.skills.slice(0,3)" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {{ skill }}
+              </span>
+            </div>
+
+            <div class="flex flex-wrap gap-1">
+              <span class="text-xs font-medium text-gray-600">Goals:</span>
+              <span *ngFor="let goal of mentor.goals.slice(0,2)" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                {{ goal }}
+              </span>
+            </div>
+
+            <div class="text-xs text-gray-600">
+              Available: {{ mentor.availability.join(', ') }}
+            </div>
+          </div>
+
+          <button
+            (click)="sendRequest(mentor.id)"
+            class="w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+          >
+            Send Mentorship Request
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>

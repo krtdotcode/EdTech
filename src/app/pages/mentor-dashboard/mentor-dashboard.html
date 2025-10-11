@@ -1,0 +1,129 @@
+<!-- Loading State -->
+<div *ngIf="loading" class="min-h-screen bg-gray-50 flex items-center justify-center">
+  <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+</div>
+
+<!-- Main Dashboard Content -->
+<div *ngIf="!loading" class="h-auto bg-gray-50">
+  <!-- Header -->
+  <app-header></app-header>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Welcome Section -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center text-2xl">
+            👨‍🏫
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Welcome back, {{ currentMentor?.name }}</h1>
+            <p class="text-gray-600">Guide the next generation of professionals</p>
+          </div>
+        </div>
+        <button
+          (click)="logout()"
+          class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
+        >
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Stats/Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+          <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center text-blue-600">
+            📬
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">Pending Requests</p>
+            <p class="text-2xl font-bold text-gray-900">{{ mentorshipRequests.length }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+          <div class="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center text-green-600">
+            👥
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">Active Mentees</p>
+            <p class="text-2xl font-bold text-gray-900">{{ currentMentor?.activeMentees || 0 }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+          <div class="w-8 h-8 bg-purple-100 rounded-md flex items-center justify-center text-purple-600">
+            ⭐
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">Average Rating</p>
+            <p class="text-2xl font-bold text-gray-900">{{ currentMentor?.ratings || 0 }}/5</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Requests Section (if any) -->
+    <div *ngIf="mentorshipRequests.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Recent Mentorship Requests</h2>
+      <div class="space-y-4">
+        <div
+          *ngFor="let request of mentorshipRequests"
+          class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          <div>
+            <p class="font-medium text-gray-900">Request from Mentee ID: {{ request.menteeId }}</p>
+            <p class="text-sm text-gray-600">Received {{ request.requestDate | date:'mediumDate' }}</p>
+          </div>
+          <div class="flex space-x-2">
+            <button
+              (click)="acceptRequest(request.id)"
+              [disabled]="request.status !== 'pending'"
+              class="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Accept
+            </button>
+            <button
+              (click)="rejectRequest(request.id)"
+              [disabled]="request.status !== 'pending'"
+              class="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Reject
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="mt-4">
+        <a routerLink="/mentor-requests" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+          View all requests →
+        </a>
+      </div>
+    </div>
+
+    <!-- Action Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div
+        *ngFor="let card of dashboardCards"
+        (click)="navigateTo(card.route)"
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-gray-300 transition-all cursor-pointer group"
+      >
+        <div class="flex flex-col items-center text-center">
+          <div class="w-12 h-12 rounded-lg {{ card.color }} flex items-center justify-center text-white text-xl mb-4 group-hover:scale-110 transition-transform">
+            {{ card.icon }}
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ card.title }}</h3>
+          <p class="text-gray-600 text-sm leading-relaxed">{{ card.description }}</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

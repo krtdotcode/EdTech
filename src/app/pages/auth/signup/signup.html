@@ -28,7 +28,7 @@
             <div class="mb-4">
               <label class="block text-sm text-gray-600 mb-2">E-mail or phone number</label>
               <input
-                type="text"
+                type="email"
                 formControlName="email"
                 placeholder="Type your e-mail or phone number"
                 class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition"
@@ -39,7 +39,7 @@
             </div>
 
             <!-- Password Input -->
-            <div class="mb-2">
+            <div class="mb-4">
               <label class="block text-sm text-gray-600 mb-2">Password</label>
               <input
                 type="password"
@@ -49,6 +49,40 @@
               />
               @if (signupForm.get('password')?.invalid && signupForm.get('password')?.touched) {
                 <p class="text-red-500 text-xs mt-1">Password must be at least 6 characters</p>
+              }
+            </div>
+
+            <!-- Confirm Password Input -->
+            <div class="mb-4">
+              <label class="block text-sm text-gray-600 mb-2">Confirm Password</label>
+              <input
+                type="password"
+                formControlName="confirmPassword"
+                placeholder="Confirm your password"
+                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition"
+              />
+              @if (signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched) {
+                <p class="text-red-500 text-xs mt-1">Please confirm your password</p>
+              }
+              @if (signupForm.errors?.['passwordMismatch'] && (signupForm.get('confirmPassword')?.touched || signupForm.get('confirmPassword')?.dirty)) {
+                <p class="text-red-500 text-xs mt-1">Passwords do not match</p>
+              }
+            </div>
+
+            <!-- Role Selection -->
+            <div class="mb-6">
+              <label class="block text-sm text-gray-600 mb-2">I want to be a</label>
+              <select
+                formControlName="role"
+                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition"
+              >
+                <option value="">Select your role</option>
+                <option value="mentee">Mentee (Student)</option>
+                <option value="mentor">Mentor</option>
+                <option value="both">Both</option>
+              </select>
+              @if (signupForm.get('role')?.invalid && signupForm.get('role')?.touched) {
+                <p class="text-red-500 text-xs mt-1">Please select your role</p>
               }
             </div>
 

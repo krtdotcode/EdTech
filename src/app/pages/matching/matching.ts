@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ProfileService } from '../../shared/services/profile.service';
 import { MentorProfile, MenteeProfile } from '../../shared/models/profile.model';
 import { RecommendationService } from '../../shared/services/recommendation.service';
+import { AuthService } from '../../core/auth/auth.service';
+import { Header } from '../../shared/components/header/header';
 
 @Component({
   selector: 'app-matching',
@@ -17,6 +20,7 @@ export class Matching implements OnInit {
   selectedGoal: string = '';
   selectedLocation: string = '';
   selectedAvailability: string = '';
+  selectedIndustry: string = '';
   minRating: number | null = null;
 
   allMentors: MentorProfile[] = [];
@@ -27,6 +31,7 @@ export class Matching implements OnInit {
   uniqueGoals: string[] = [];
   uniqueLocations: string[] = [];
   uniqueAvailabilities: string[] = [];
+  uniqueIndustries: string[] = [];
 
   // For demonstration, a hardcoded mentee profile
   currentMentee: MenteeProfile = {
@@ -49,15 +54,40 @@ export class Matching implements OnInit {
 
   constructor(
     private profileService: ProfileService,
-    private recommendationService: RecommendationService
+    private recommendationService: RecommendationService,
+    private authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
-    this.profileService.getMentors().subscribe(mentors => {
-      this.allMentors = mentors;
-      this.populateFilterOptions();
-      this.applyFilters();
-      this.getRecommendations();
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    // Load current user's mentee profile
+    this.profileService.getMenteeById(currentUser.uid).subscribe({
+      next: (mentee) => {
+        if (mentee) {
+          this.currentMentee = mentee;
+
+          // Now load mentors
+          this.profileService.getMentors().subscribe(mentors => {
+            this.allMentors = mentors;
+            this.populateFilterOptions();
+            this.applyFilters();
+            this.getRecommendations();
+          });
+        } else {
+          // No mentee profile found, redirect to profile completion
+          this.router.navigate(['/profile-completion']);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading mentee profile:', error);
+        this.router.navigate(['/profile-completion']);
+      }
     });
   }
 
@@ -66,6 +96,36 @@ export class Matching implements OnInit {
     this.uniqueGoals = [...new Set(this.allMentors.flatMap(mentor => mentor.goals))];
     this.uniqueLocations = [...new Set(this.allMentors.map(mentor => mentor.location))];
     this.uniqueAvailabilities = [...new Set(this.allMentors.flatMap(mentor => mentor.availability))];
+    // For now, derive industries from existing skills (could be made more sophisticated later)
+    this.uniqueIndustries = [...new Set(this.allMentors.flatMap(mentor => {
+      // Simple mapping of skills to potential industries
+      return mentor.skills.map(skill => this.skillToIndustry(skill));
+    }).filter(industry => industry !== ''))];
+  }
+
+  skillToIndustry(skill: string): string {
+    const skillToIndustryMap: {[key: string]: string} = {
+      'Web Development': 'Technology',
+      'Angular': 'Technology',
+      'TypeScript': 'Technology',
+      'Project Management': 'Business',
+      'Leadership': 'Business',
+      'Machine Learning': 'Technology',
+      'UI/UX': 'Design',
+      'Frontend': 'Technology',
+      'Backend': 'Technology',
+      'DevOps': 'Technology',
+      'Data Science': 'Technology',
+      'Marketing': 'Business',
+      'Sales': 'Business',
+      'Finance': 'Business',
+      'HR': 'Business',
+      'Consulting': 'Business',
+      'Teaching': 'Education',
+      'Research': 'Technology',
+      'Product Management': 'Business'
+    };
+    return skillToIndustryMap[skill] || '';
   }
 
   applyFilters(): void {
@@ -82,7 +142,12 @@ export class Matching implements OnInit {
       const matchesAvailability = this.selectedAvailability === '' || mentor.availability.includes(this.selectedAvailability);
       const matchesRating = this.minRating === null || (mentor.ratings !== undefined && mentor.ratings >= this.minRating);
 
-      return matchesSearchTerm && matchesSkill && matchesGoal && matchesLocation && matchesAvailability && matchesRating;
+      // Check if mentor's industry matches selected industry
+      const matchesIndustry = this.selectedIndustry === '' ||
+        mentor.skills.some(skill => this.skillToIndustry(skill) === this.selectedIndustry);
+
+      return matchesSearchTerm && matchesSkill && matchesGoal && matchesLocation &&
+             matchesAvailability && matchesRating && matchesIndustry;
     });
   }
 
@@ -95,23 +160,72 @@ export class Matching implements OnInit {
   }
 
   sendRequest(mentorId: string): void {
-    // For demonstration, assuming current mentee is 'mentee1'
+    // For the new profile system, the mentor ID passed from the UI is the mentor's id,
+    // but requests should use the mentor's userId (extracted from the full document ID)
+    const mentorUserId = mentorId.includes('_mentor') ? mentorId.replace('_mentor', '') : mentorId;
+
+    // Find mentor by their document ID
+    const mentor = this.allMentors.find(m => m.id === mentorId);
+    if (!mentor) {
+      alert('Mentor not found.');
+      return;
+    }
+
+    // Check mentor capacity
+    const maxMentees = mentor.maxMentees || 3;
+    const activeMentees = mentor.activeMentees || 0;
+
+    if (activeMentees >= maxMentees) {
+      alert(`This mentor has reached their maximum capacity of ${maxMentees} mentees. Please choose another mentor.`);
+      return;
+    }
+
     const menteeId = this.currentMentee.id;
     this.profileService.sendMentorshipRequest(menteeId, mentorId).subscribe(
       response => {
         console.log('Mentorship request sent:', response);
         alert('Mentorship request sent successfully!');
-        // Optionally, update the mentor's active mentees count or refresh the list
-        this.profileService.getMentors().subscribe(mentors => {
-          this.allMentors = mentors;
-          this.applyFilters();
-          this.getRecommendations();
+
+        // Update mentor's active mentees count
+        mentor.activeMentees = (mentor.activeMentees || 0) + 1;
+        this.profileService.updateMentorProfile(mentor).subscribe({
+          next: () => {
+            // Refresh data
+            this.applyFilters();
+            this.getRecommendations();
+          },
+          error: (error) => {
+            console.error('Failed to update mentor profile:', error);
+          }
         });
       },
       error => {
         console.error('Error sending mentorship request:', error);
-        alert('Failed to send mentorship request.');
+        alert('Failed to send mentorship request. Please try again.');
       }
     );
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.selectedSkill = '';
+    this.selectedGoal = '';
+    this.selectedLocation = '';
+    this.selectedAvailability = '';
+    this.selectedIndustry = '';
+    this.minRating = null;
+    this.applyFilters();
+  }
+
+  getActiveFiltersCount(): number {
+    let count = 0;
+    if (this.searchTerm) count++;
+    if (this.selectedSkill) count++;
+    if (this.selectedGoal) count++;
+    if (this.selectedIndustry) count++;
+    if (this.selectedLocation) count++;
+    if (this.selectedAvailability) count++;
+    if (this.minRating) count++;
+    return count;
   }
 }

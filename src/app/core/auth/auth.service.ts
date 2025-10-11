@@ -10,7 +10,7 @@ import {
   User,
 } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
-import { Observable, from, map, tap } from 'rxjs';
+import { Observable, from, map, tap, concatMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -29,11 +29,11 @@ export class AuthService {
   register(email: string, password: string, role: 'mentee' | 'mentor' | 'both'): Observable<any> {
     const promise = createUserWithEmailAndPassword(this.auth, email, password);
     return from(promise).pipe(
-      tap((userCredential) => this.saveUserRole(userCredential.user.uid, role).subscribe()),
-      map((userCredential) => {
-        // Return the user credential and role
-        return { user: userCredential.user, role };
-      })
+      concatMap((userCredential) =>
+        this.saveUserRole(userCredential.user.uid, role).pipe(
+          map(() => ({ user: userCredential.user, role }))
+        )
+      )
     );
   }
 

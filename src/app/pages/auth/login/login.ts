@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ProfileService } from '../../../shared/services/profile.service';
 
 @Component({
   selector: 'app-login',
@@ -20,9 +21,10 @@ export class Login {
   errorMessage = ''; // Shows error messages
 
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private profileService: ProfileService
   ) {
     // Create form with validation rules
     this.loginForm = this.fb.group({
@@ -46,22 +48,7 @@ export class Login {
         next: (result) => {
           // SUCCESS: User signed in
           console.log('Login successful:', result);
-          // Get user role and redirect accordingly
-          this.authService.getUserRole(result.user.uid).subscribe({
-            next: (role) => {
-              this.loading = false;
-              if (role === 'mentor') {
-                this.router.navigate(['/mentor-dashboard']);
-              } else {
-                this.router.navigate(['/mentee-dashboard']); // For 'mentee' or 'both'
-              }
-            },
-            error: (error) => {
-              console.error('Failed to get user role:', error);
-              this.loading = false;
-              this.errorMessage = 'Failed to load user profile. Please try again.';
-            }
-          });
+          this.checkProfileAndRedirect(result.user.uid);
         },
         error: (error) => {
           // ERROR: Something went wrong
@@ -89,6 +76,50 @@ export class Login {
       default:
         return 'An error occurred during login. Please try again.';
     }
+  }
+
+  // CHECK IF USER HAS COMPLETED PROFILE AND REDIRECT ACCORDINGLY
+  private checkProfileAndRedirect(userId: string): void {
+    console.log('Login - Checking profile completion status for user:', userId);
+
+    // First check if user has completed their profile (simple one-time check)
+    this.profileService.hasUserCompletedProfile(userId).subscribe({
+      next: (hasCompleted: boolean) => {
+        this.loading = false;
+
+        if (hasCompleted) {
+          // User has completed profile before, skip profile completion
+          // Get role to determine which dashboard to show
+          this.authService.getUserRole(userId).subscribe({
+            next: (role) => {
+              if (role === 'mentor') {
+                console.log('Login - User is mentor, redirecting to mentor dashboard');
+                this.router.navigate(['/mentor-dashboard']);
+              } else {
+                // Both mentees and 'both' role users go to mentee dashboard
+                console.log('Login - User is mentee/both, redirecting to mentee dashboard');
+                this.router.navigate(['/mentee-dashboard']);
+              }
+            },
+            error: (error) => {
+              console.error('Error getting user role after completion check:', error);
+              // Fall back to mentee dashboard
+              this.router.navigate(['/mentee-dashboard']);
+            }
+          });
+        } else {
+          // User has never completed a profile, go to profile completion
+          console.log('Login - User has not completed profile, redirecting to profile completion');
+          this.router.navigate(['/profile-completion']);
+        }
+      },
+      error: (error) => {
+        console.error('Error checking profile completion status:', error);
+        this.loading = false;
+        // On error, fall back to profile completion
+        this.router.navigate(['/profile-completion']);
+      }
+    });
   }
 
   // NAVIGATE TO SIGNUP PAGE

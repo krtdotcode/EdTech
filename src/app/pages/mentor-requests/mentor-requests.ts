@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { ProfileService } from '../../shared/services/profile.service';
 import { MentorshipRequest, MentorProfile } from '../../shared/models/profile.model';
-import { Observable, of } from 'rxjs';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-mentor-requests',
@@ -12,12 +13,37 @@ import { Observable, of } from 'rxjs';
 })
 export class MentorRequests implements OnInit {
   mentorshipRequests: MentorshipRequest[] = [];
-  currentMentorId: string = 'mentor1'; // Hardcoded for demonstration
+  currentMentorId: string = '';
 
-  constructor(private profileService: ProfileService) { }
+  constructor(
+    private profileService: ProfileService,
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
-    this.loadMentorshipRequests();
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    // Load current user's mentor profile to get mentor ID
+    this.profileService.getMentorById(currentUser.uid).subscribe({
+      next: (mentor) => {
+        if (mentor) {
+          this.currentMentorId = mentor.id;
+          this.loadMentorshipRequests();
+        } else {
+          // No mentor profile found, redirect to profile completion
+          this.router.navigate(['/profile-completion']);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading mentor profile:', error);
+        this.router.navigate(['/profile-completion']);
+      }
+    });
   }
 
   loadMentorshipRequests(): void {
