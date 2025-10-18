@@ -112,6 +112,10 @@ export class MenteeDashboard implements OnInit {
     this.router.navigate([route]);
   }
 
+  getUserAvatar(): string {
+    return this.currentMentee?.photoUrl || 'https://api.dicebear.com/7.x/personas/svg?seed=' + (this.currentMentee?.name || 'default');
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);

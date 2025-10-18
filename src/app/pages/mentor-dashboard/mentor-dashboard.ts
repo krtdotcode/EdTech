@@ -164,6 +164,10 @@ export class MentorDashboard implements OnInit, OnDestroy {
     this.router.navigate([route]);
   }
 
+  getUserAvatar(): string {
+    return this.currentMentor?.photoUrl || 'https://api.dicebear.com/7.x/personas/svg?seed=' + (this.currentMentor?.name || 'default');
+  }
+
   acceptRequest(requestId: string): void {
     this.profileService.updateMentorshipRequestStatus(requestId, 'accepted').subscribe({
       next: () => {

@@ -13,22 +13,18 @@
 
     <!-- Welcome Section -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-2xl">
-            🎓
-          </div>
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900">Welcome back, {{ currentMentee?.name }}</h1>
-            <p class="text-gray-600">Ready for your next learning milestone?</p>
-          </div>
+      <div class="flex items-center space-x-4">
+        <div class="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+          <img
+            [src]="getUserAvatar()"
+            [alt]="currentMentee?.name"
+            class="w-full h-full object-cover"
+          />
         </div>
-        <button
-          (click)="logout()"
-          class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
-        >
-          Sign Out
-        </button>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Welcome back, {{ currentMentee?.name }}</h1>
+          <p class="text-gray-600">Ready for your next learning milestone?</p>
+        </div>
       </div>
     </div>
 
