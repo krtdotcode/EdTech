@@ -6,7 +6,10 @@ import { ProfileService } from '../../shared/services/profile.service';
 import { MentorProfile, MenteeProfile } from '../../shared/models/profile.model';
 import { RecommendationService } from '../../shared/services/recommendation.service';
 import { AuthService } from '../../core/auth/auth.service';
+import { NotificationService } from '../../shared/services/notification.service';
 import { Header } from '../../shared/components/header/header';
+
+declare var window: any;
 
 @Component({
   selector: 'app-matching',
@@ -56,6 +59,7 @@ export class Matching implements OnInit {
     private profileService: ProfileService,
     private recommendationService: RecommendationService,
     private authService: AuthService,
+    private notificationService: NotificationService,
     private router: Router
   ) { }
 
@@ -70,10 +74,13 @@ export class Matching implements OnInit {
     this.profileService.getMenteeById(currentUser.uid).subscribe({
       next: (mentee) => {
         if (mentee) {
+          // Use the actual mentee profile from database
           this.currentMentee = mentee;
 
           // Now load mentors
           this.profileService.getMentors().subscribe(mentors => {
+            console.log('Loaded mentors:', mentors);
+            console.log('Mentor userIds:', mentors.map(m => m.userId));
             this.allMentors = mentors;
             this.populateFilterOptions();
             this.applyFilters();
@@ -160,16 +167,17 @@ export class Matching implements OnInit {
   }
 
   sendRequest(mentorId: string): void {
-    // For the new profile system, the mentor ID passed from the UI is the mentor's id,
-    // but requests should use the mentor's userId (extracted from the full document ID)
-    const mentorUserId = mentorId.includes('_mentor') ? mentorId.replace('_mentor', '') : mentorId;
-
     // Find mentor by their document ID
     const mentor = this.allMentors.find(m => m.id === mentorId);
     if (!mentor) {
       alert('Mentor not found.');
       return;
     }
+
+    // For the notification system, we need the mentor's userId
+    // Extract from the document ID if userId doesn't exist
+    const mentorUserId = mentor.userId || mentor.id.replace('_mentor', '');
+    console.log('Sending request to mentor:', mentor.name, 'with userId:', mentorUserId);
 
     // Check mentor capacity
     const maxMentees = mentor.maxMentees || 3;
@@ -184,6 +192,28 @@ export class Matching implements OnInit {
     this.profileService.sendMentorshipRequest(menteeId, mentorId).subscribe(
       response => {
         console.log('Mentorship request sent:', response);
+
+        // Create notification for mentor about the new request
+        this.notificationService.createMentorshipRequestNotification(
+          mentorUserId,
+          this.currentMentee.name,
+          response.id // Request ID from response
+        ).then(() => {
+          console.log('Notification created for mentor');
+
+          // Show push notification if supported
+          if ('Notification' in window) {
+            if (Notification.permission === 'granted') {
+              new Notification('Request Sent! 📬', {
+                body: `Your mentorship request has been sent to ${mentor.name}`,
+                icon: 'edtech-logo.png'
+              });
+            } else if (Notification.permission !== 'denied') {
+              Notification.requestPermission();
+            }
+          }
+        }).catch(error => console.error('Failed to create notification:', error));
+
         alert('Mentorship request sent successfully!');
 
         // Update mentor's active mentees count
@@ -227,5 +257,9 @@ export class Matching implements OnInit {
     if (this.selectedAvailability) count++;
     if (this.minRating) count++;
     return count;
+  }
+
+  goBackToDashboard(): void {
+    this.router.navigate(['/mentee-dashboard']);
   }
 }

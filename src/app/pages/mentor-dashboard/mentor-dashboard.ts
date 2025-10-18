@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { ProfileService } from '../../shared/services/profile.service';
+import { NotificationService, Notification } from '../../shared/services/notification.service';
 import { MentorProfile, MentorshipRequest } from '../../shared/models/profile.model';
 import { Header } from '../../shared/components/header/header';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-mentor-dashboard',
@@ -12,10 +14,13 @@ import { Header } from '../../shared/components/header/header';
   imports: [CommonModule, Header],
   templateUrl: './mentor-dashboard.html',
 })
-export class MentorDashboard implements OnInit {
+export class MentorDashboard implements OnInit, OnDestroy {
   currentMentor: MentorProfile | null = null;
   mentorshipRequests: MentorshipRequest[] = [];
+  notifications: Notification[] = [];
+  unreadNotificationsCount = 0;
   loading = true;
+  private subscriptions: Subscription[] = [];
 
   // Navigation cards for mentor features
   dashboardCards = [
@@ -80,6 +85,7 @@ export class MentorDashboard implements OnInit {
   constructor(
     private authService: AuthService,
     private profileService: ProfileService,
+    private notificationService: NotificationService,
     private router: Router
   ) {}
 
@@ -108,6 +114,33 @@ export class MentorDashboard implements OnInit {
     } else {
       this.router.navigate(['/login']);
     }
+
+    // Load notifications
+    this.loadNotifications();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  loadNotifications(): void {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) return;
+
+    console.log('Loading notifications for user:', currentUser.uid);
+    const notificationsSub = this.notificationService.getUserNotifications().subscribe({
+      next: (notifications) => {
+        console.log('Received notifications:', notifications);
+        this.notifications = notifications;
+        this.unreadNotificationsCount = notifications.filter(n => !n.read).length;
+        console.log('Unread notifications count:', this.unreadNotificationsCount);
+      },
+      error: (error) => {
+        console.error('Error loading notifications:', error);
+      }
+    });
+
+    this.subscriptions.push(notificationsSub);
   }
 
   loadMentorshipRequests(): void {
@@ -152,8 +185,26 @@ export class MentorDashboard implements OnInit {
     });
   }
 
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+
+
+  markAllNotificationsAsRead(): void {
+    this.notificationService.markAllNotificationsAsRead().then(() => {
+      this.notifications.forEach(n => n.read = true);
+      this.unreadNotificationsCount = 0;
+    }).catch(error => {
+      console.error('Error marking all notifications as read:', error);
+    });
+  }
+
+  markNotificationAsRead(notificationId: string): void {
+    this.notificationService.markNotificationAsRead(notificationId).then(() => {
+      const notification = this.notifications.find(n => n.id === notificationId);
+      if (notification) {
+        notification.read = true;
+        this.unreadNotificationsCount--;
+      }
+    }).catch(error => {
+      console.error('Error marking notification as read:', error);
+    });
   }
 }

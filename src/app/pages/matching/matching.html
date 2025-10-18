@@ -1,13 +1,28 @@
 <!-- Main Container -->
 <div class="h-auto bg-gray-50">
-  <!-- Header -->
+  <!-- Page Header with Navigation -->
   <div class="bg-white shadow-sm border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div class="flex items-center justify-between">
-        <div>
+        <div class="flex items-center space-x-4">
+          <button
+            (click)="goBackToDashboard()"
+            class="flex items-center text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+            title="Back to Dashboard"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Dashboard
+          </button>
+          <div class="border-l border-gray-300 h-8"></div>
+        </div>
+
+        <div class="flex-1">
           <h1 class="text-3xl font-bold text-gray-900">Find Your Mentor</h1>
           <p class="text-gray-600 mt-1">Discover experienced professionals to guide your career growth</p>
         </div>
+
         <button
           (click)="clearFilters()"
           class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"

@@ -13,22 +13,12 @@
 
     <!-- Welcome Section -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-          <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center text-2xl">
-            👨‍🏫
-          </div>
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900">Welcome back, {{ currentMentor?.name }}</h1>
-            <p class="text-gray-600">Guide the next generation of professionals</p>
-          </div>
+      <div class="text-center">
+        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+          👨‍🏫
         </div>
-        <button
-          (click)="logout()"
-          class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
-        >
-          Sign Out
-        </button>
+        <h1 class="text-2xl font-bold text-gray-900">Welcome back, {{ currentMentor?.name }}</h1>
+        <p class="text-gray-600">Guide the next generation of professionals</p>
       </div>
     </div>
 
@@ -66,6 +56,44 @@
           <div class="ml-4">
             <p class="text-sm font-medium text-gray-600">Average Rating</p>
             <p class="text-2xl font-bold text-gray-900">{{ currentMentor?.ratings || 0 }}/5</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications Section -->
+    <div *ngIf="notifications.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+          <span class="mr-2">🔔</span>
+          Recent Notifications
+          <span *ngIf="unreadNotificationsCount > 0" class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+            {{ unreadNotificationsCount }} new
+          </span>
+        </h2>
+        <button *ngIf="unreadNotificationsCount > 0"
+                (click)="markAllNotificationsAsRead()"
+                class="text-sm bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition-colors">
+          Mark all read
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div *ngFor="let notification of notifications.slice(0, 5)"
+             [class.bg-blue-50]="!notification.read"
+             class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+             (click)="markNotificationAsRead(notification.id)">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center mb-2">
+                <h3 class="font-semibold text-gray-900 mr-2">{{ notification.title }}</h3>
+                <span class="text-sm text-gray-500">{{ notification.createdAt | date:'short' }}</span>
+              </div>
+              <p class="text-gray-700 text-sm leading-relaxed">{{ notification.message }}</p>
+            </div>
+            <div class="ml-3 flex-shrink-0">
+              <span *ngIf="!notification.read" class="inline-block w-3 h-3 bg-blue-500 rounded-full"></span>
+            </div>
           </div>
         </div>
       </div>

@@ -2,8 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProfileService } from '../../shared/services/profile.service';
+import { NotificationService } from '../../shared/services/notification.service';
+import { MessagingService } from '../../shared/services/messaging.service';
 import { MentorshipRequest, MentorProfile } from '../../shared/models/profile.model';
 import { AuthService } from '../../core/auth/auth.service';
+
+declare var window: any;
 
 @Component({
   selector: 'app-mentor-requests',
@@ -17,6 +21,8 @@ export class MentorRequests implements OnInit {
 
   constructor(
     private profileService: ProfileService,
+    private notificationService: NotificationService,
+    private messagingService: MessagingService,
     private authService: AuthService,
     private router: Router
   ) { }
@@ -52,31 +58,133 @@ export class MentorRequests implements OnInit {
     });
   }
 
-  acceptRequest(requestId: string): void {
-    this.profileService.updateMentorshipRequestStatus(requestId, 'accepted').subscribe(
-      response => {
-        console.log('Request accepted:', response);
-        alert('Mentorship request accepted!');
-        this.loadMentorshipRequests(); // Refresh the list
-      },
-      error => {
-        console.error('Error accepting request:', error);
-        alert('Failed to accept mentorship request.');
+  async acceptRequest(requestId: string): Promise<void> {
+    try {
+      // Get request details to find mentee ID
+      const requests = await this.profileService.getMentorshipRequests().toPromise();
+      const request = requests?.find(r => r.id === requestId);
+
+      if (!request) {
+        alert('Request not found.');
+        return;
       }
-    );
+
+      // Extract mentee user ID
+      const menteeUserId = request.menteeId.replace('_mentee', '');
+
+      // Get mentor name for notifications
+      const currentUser = this.authService.getCurrentUser();
+      let mentorName = 'Your mentor';
+      if (currentUser) {
+        const mentorProfile = await this.profileService.getMentorById(currentUser.uid).toPromise();
+        if (mentorProfile) {
+          mentorName = mentorProfile.name;
+        }
+      }
+
+      // Update request status
+      this.profileService.updateMentorshipRequestStatus(requestId, 'accepted').subscribe({
+        next: async () => {
+          console.log('Request accepted');
+
+          try {
+            // Create approval notification for mentee
+            await this.notificationService.createMentorshipApprovalNotification(
+              menteeUserId,
+              mentorName
+            );
+
+            // Show push notification
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('✅ Request Accepted!', {
+                body: 'You can now connect and start learning together!',
+                icon: 'edtech-logo.png'
+              });
+            }
+
+            alert('Mentorship request accepted! The mentee has been notified.');
+            this.loadMentorshipRequests(); // Refresh the list
+          } catch (error) {
+            console.error('Error creating notification:', error);
+            alert('Request accepted, but there was an issue with the notification.');
+          }
+        },
+        error: (error: any) => {
+          console.error('Error accepting request:', error);
+          alert('Failed to accept mentorship request.');
+        }
+      });
+
+    } catch (error) {
+      console.error('Error in acceptRequest:', error);
+      alert('Failed to accept mentorship request.');
+    }
   }
 
-  rejectRequest(requestId: string): void {
-    this.profileService.updateMentorshipRequestStatus(requestId, 'rejected').subscribe(
-      response => {
-        console.log('Request rejected:', response);
-        alert('Mentorship request rejected!');
-        this.loadMentorshipRequests(); // Refresh the list
-      },
-      error => {
-        console.error('Error rejecting request:', error);
-        alert('Failed to reject mentorship request.');
+  async rejectRequest(requestId: string): Promise<void> {
+    try {
+      // Get request details to find mentee ID
+      const requests = await this.profileService.getMentorshipRequests().toPromise();
+      const request = requests?.find(r => r.id === requestId);
+
+      if (!request) {
+        alert('Request not found.');
+        return;
       }
-    );
+
+      // Extract mentee user ID
+      const menteeUserId = request.menteeId.replace('_mentee', '');
+
+      // Get mentor name for notifications
+      const currentUser = this.authService.getCurrentUser();
+      let mentorName = 'Your mentor';
+      if (currentUser) {
+        const mentorProfile = await this.profileService.getMentorById(currentUser.uid).toPromise();
+        if (mentorProfile) {
+          mentorName = mentorProfile.name;
+        }
+      }
+
+      // Update request status
+      this.profileService.updateMentorshipRequestStatus(requestId, 'rejected').subscribe({
+        next: async () => {
+          console.log('Request rejected');
+
+          try {
+            // Create rejection notification for mentee
+            await this.notificationService.createMentorshipRejectionNotification(
+              menteeUserId,
+              mentorName
+            );
+
+            // Show push notification
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('❌ Request Declined', {
+                body: 'The mentee has been notified of your decision.',
+                icon: 'edtech-logo.png'
+              });
+            }
+
+            alert('Mentorship request declined. The mentee has been notified.');
+            this.loadMentorshipRequests(); // Refresh the list
+          } catch (error) {
+            console.error('Error creating notification:', error);
+            alert('Request declined, but there was an issue with the notification.');
+          }
+        },
+        error: (error: any) => {
+          console.error('Error rejecting request:', error);
+          alert('Failed to reject mentorship request.');
+        }
+      });
+
+    } catch (error) {
+      console.error('Error in rejectRequest:', error);
+      alert('Failed to reject mentorship request.');
+    }
+  }
+
+  goBackToDashboard(): void {
+    this.router.navigate(['/mentor-dashboard']);
   }
 }

@@ -126,4 +126,10 @@ export class Profile implements OnInit {
       });
     }
   }
+
+  goBackToDashboard(): void {
+    // For now, navigate to mentee dashboard as default
+    // In a full implementation, this would check user role
+    this.router.navigate(['/mentee-dashboard']);
+  }
 }
