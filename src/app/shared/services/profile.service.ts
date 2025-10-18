@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, from, map, tap, catchError } from 'rxjs';
-import { Firestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateDoc, onSnapshot } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateDoc, onSnapshot, query, where, orderBy } from '@angular/fire/firestore';
 
-import { MentorProfile, MenteeProfile, MentorshipRequest } from '../models/profile.model';
+import { MentorProfile, MenteeProfile, MentorshipRequest, Review } from '../models/profile.model';
 
 @Injectable({
   providedIn: 'root',
@@ -455,5 +455,156 @@ constructor(private firestore: Firestore) {
       observer.next();
       observer.complete();
     });
+  }
+
+  // REVIEWS FUNCTIONALITY
+  // Submit a review for a mentor or mentee
+  submitReview(review: Omit<Review, 'id' | 'createdAt'>): Observable<string> {
+    const reviewsRef = collection(this.firestore, 'reviews');
+    const newReview = {
+      ...review,
+      createdAt: new Date()
+    };
+
+    return from(addDoc(reviewsRef, newReview)).pipe(
+      map((docRef) => docRef.id),
+      tap((reviewId) => {
+        // Update the reviewee's average rating if they're a mentor
+        if (review.revieweeRole === 'mentor') {
+          this.updateMentorAverageRating(review.revieweeId);
+        }
+      }),
+      catchError((error) => {
+        console.error('Error submitting review:', error);
+        throw error;
+      })
+    );
+  }
+
+  // Get all reviews for a specific user (received reviews)
+  getReviewsForUser(userId: string): Observable<Review[]> {
+    const reviewsRef = collection(this.firestore, 'reviews');
+    const q = query(reviewsRef, where('revieweeId', '==', userId), orderBy('createdAt', 'desc'));
+
+    return from(getDocs(q)).pipe(
+      map((querySnapshot) => {
+        const reviews: Review[] = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data() as any;
+          reviews.push({
+            id: doc.id,
+            reviewerId: data.reviewerId,
+            reviewerRole: data.reviewerRole,
+            revieweeId: data.revieweeId,
+            revieweeRole: data.revieweeRole,
+            rating: data.rating,
+            comment: data.comment,
+            createdAt: data.createdAt.toDate(),
+            mentorshipId: data.mentorshipId,
+            isVerified: data.isVerified
+          });
+        });
+        return reviews;
+      }),
+      catchError((error) => {
+        console.error('Error getting reviews for user:', error);
+        throw error;
+      })
+    );
+  }
+
+  // Get all reviews submitted by a specific user (given reviews)
+  getReviewsByUser(userId: string): Observable<Review[]> {
+    const reviewsRef = collection(this.firestore, 'reviews');
+    const q = query(reviewsRef, where('reviewerId', '==', userId), orderBy('createdAt', 'desc'));
+
+    return from(getDocs(q)).pipe(
+      map((querySnapshot) => {
+        const reviews: Review[] = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data() as any;
+          reviews.push({
+            id: doc.id,
+            reviewerId: data.reviewerId,
+            reviewerRole: data.reviewerRole,
+            revieweeId: data.revieweeId,
+            revieweeRole: data.revieweeRole,
+            rating: data.rating,
+            comment: data.comment,
+            createdAt: data.createdAt.toDate(),
+            mentorshipId: data.mentorshipId,
+            isVerified: data.isVerified
+          });
+        });
+        return reviews;
+      }),
+      catchError((error) => {
+        console.error('Error getting reviews by user:', error);
+        throw error;
+      })
+    );
+  }
+
+  // Get reviews with reviewer details populated (for displaying review lists)
+  getReviewsForUserWithDetails(userId: string): Observable<(Review & { reviewerName?: string; reviewerPhotoUrl?: string })[]> {
+    return this.getReviewsForUser(userId).pipe(
+      // Enhance with reviewer profile details
+      map(reviews => {
+        return reviews.map(review => {
+          // Don't synchronously fetch here to avoid complexity
+          // Return reviews and let component handle populating details asynchronously
+          return {
+            ...review,
+            reviewerName: 'Loading...',
+            reviewerPhotoUrl: undefined
+          };
+        });
+      })
+    );
+  }
+
+  // Update mentor's average rating after a new review
+  private updateMentorAverageRating(mentorId: string): void {
+    this.getReviewsForUser(mentorId).subscribe({
+      next: (reviews) => {
+        if (reviews.length === 0) return;
+
+        const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+        const averageRating = totalRating / reviews.length;
+
+        // Update mentor profile with new average rating
+        this.getMentorById(mentorId).subscribe(mentor => {
+          if (mentor) {
+            const updatedMentor: MentorProfile = {
+              ...mentor,
+              ratings: Math.round(averageRating * 10) / 10 // Round to 1 decimal place
+            };
+            this.updateMentorProfile(updatedMentor).subscribe({
+              next: () => console.log('Mentor rating updated successfully'),
+              error: (error) => console.error('Error updating mentor rating:', error)
+            });
+          }
+        });
+      },
+      error: (error) => console.error('Error updating mentor average rating:', error)
+    });
+  }
+
+  // Check if a mentor-mentee pair has already been reviewed
+  hasUserReviewed(reviewerId: string, revieweeId: string): Observable<boolean> {
+    const reviewsRef = collection(this.firestore, 'reviews');
+    const q = query(
+      reviewsRef,
+      where('reviewerId', '==', reviewerId),
+      where('revieweeId', '==', revieweeId)
+    );
+
+    return from(getDocs(q)).pipe(
+      map((querySnapshot) => !querySnapshot.empty),
+      catchError((error) => {
+        console.error('Error checking if user has reviewed:', error);
+        return of(false);
+      })
+    );
   }
 }

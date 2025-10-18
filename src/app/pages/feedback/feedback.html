@@ -1,15 +1,321 @@
-<app-coming-soon
-  pageTitle="Feedback & Reviews"
-  featureTitle="Feedback & Reviews Coming Soon"
-  description="Help us improve by sharing your experience and rating mentorship relationships."
-  icon="⭐"
-  [features]="[
-    { icon: '📝', title: 'Rate Sessions', description: 'Rate completed mentoring sessions' },
-    { icon: '💬', title: 'Leave Reviews', description: 'Write detailed feedback for mentors/mentees' },
-    { icon: '📊', title: 'View Ratings', description: 'See your mentorship ratings and reviews' }
-  ]"
-  [actions]="[
-    { label: 'Explore Mentors', route: '/matching' },
-    { label: 'View Profile', route: '/profile' }
-  ]">
-</app-coming-soon>
+<!-- Loading State -->
+<div *ngIf="!userRole" class="min-h-screen bg-gray-50 flex items-center justify-center">
+  <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+</div>
+
+<!-- Main Content -->
+<div *ngIf="userRole" class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <app-header></app-header>
+
+  <!-- Navigation and Title -->
+  <div class="bg-white border-b border-gray-200 px-4 py-4">
+    <div class="max-w-6xl mx-auto">
+      <button
+        (click)="goBackToDashboard()"
+        class="flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-4"
+      >
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Dashboard
+      </button>
+
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Feedback & Reviews</h1>
+          <p class="text-gray-600 mt-1">View reviews and provide feedback</p>
+        </div>
+
+        <!-- Submit Review Button -->
+        <button
+          (click)="openSubmitModal()"
+          class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          *ngIf="availableTargets.length > 0"
+        >
+          <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          Write Review
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Rating Summary (for received reviews) -->
+    <div class="bg-white rounded-lg shadow-sm border p-6 mb-8"
+         *ngIf="activeTab === 'received' && receivedReviews.length > 0">
+      <div class="text-center">
+        <div class="text-5xl font-bold text-purple-600 mb-2">{{ getAverageRating() }}</div>
+        <div class="flex items-center justify-center mb-2">
+          <!-- Star Rating Display -->
+          <div class="flex">
+            <span *ngFor="let star of getStarRating(getAverageRating())"
+                  class="text-yellow-400 text-xl">
+              {{ isStarFilled(getAverageRating(), star) ? '★' : '☆' }}
+            </span>
+          </div>
+        </div>
+        <p class="text-gray-600">Based on {{ receivedReviews.length }} review{{ receivedReviews.length !== 1 ? 's' : '' }}</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="bg-white rounded-lg shadow-sm border mb-6">
+      <div class="border-b border-gray-200">
+        <nav class="flex">
+          <button
+            (click)="setActiveTab('received')"
+            [class.bg-purple-50]="activeTab === 'received'"
+            [class.border-purple-500]="activeTab === 'received'"
+            class="flex-1 py-4 px-8 text-center border-b-2 border-transparent text-sm font-medium transition-colors"
+            [class.text-purple-600]="activeTab === 'received'"
+            [class.text-gray-500]="activeTab !== 'received'"
+          >
+            Reviews Received ({{ receivedReviews.length }})
+          </button>
+          <button
+            (click)="setActiveTab('given')"
+            [class.bg-purple-50]="activeTab === 'given'"
+            [class.border-purple-500]="activeTab === 'given'"
+            class="flex-1 py-4 px-8 text-center border-b-2 border-transparent text-sm font-medium transition-colors"
+            [class.text-purple-600]="activeTab === 'given'"
+            [class.text-gray-500]="activeTab !== 'given'"
+          >
+            Reviews Given ({{ givenReviews.length }})
+          </button>
+        </nav>
+      </div>
+
+      <!-- Received Reviews Tab -->
+      <div *ngIf="activeTab === 'received'" class="p-6">
+        <div *ngIf="loadingReceived" class="text-center py-8">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+          <p class="text-gray-600 mt-2">Loading reviews...</p>
+        </div>
+
+        <div *ngIf="!loadingReceived && receivedReviews.length === 0" class="text-center py-12">
+          <svg class="mx-auto h-16 w-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">No Reviews Yet</h3>
+          <p class="text-gray-600">
+            You haven't received any reviews yet. Continue building great mentorship relationships!
+          </p>
+        </div>
+
+        <div *ngIf="!loadingReceived && receivedReviews.length > 0" class="space-y-6">
+          <div *ngFor="let review of receivedReviews" class="border border-gray-200 rounded-lg p-6">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                  <img
+                    [src]="review.reviewerPhotoUrl || 'https://api.dicebear.com/7.x/personas/svg?seed=user'"
+                    [alt]="review.reviewerName"
+                    class="w-full h-full object-cover rounded-full"
+                    onerror="this.style.display='none'"
+                  >
+                  <span *ngIf="!review.reviewerPhotoUrl" class="text-gray-600 text-sm">
+                    {{ (review.reviewerName || 'User')[0] }}
+                  </span>
+                </div>
+                <div>
+                  <h4 class="font-medium text-gray-900">{{ review.reviewerName || 'Anonymous User' }}</h4>
+                  <p class="text-sm text-gray-600">{{ review.createdAt | date:'MMM dd, yyyy' }}</p>
+                  <div class="flex items-center mt-1">
+                    <span *ngFor="let star of getStarRating(review.rating)"
+                          class="text-yellow-400 text-sm mr-1">
+                      {{ isStarFilled(review.rating, star) ? '★' : '☆' }}
+                    </span>
+                    <span class="text-sm text-gray-600 ml-2">({{ review.rating }}/5)</span>
+                  </div>
+                </div>
+              </div>
+
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    [class]="review.reviewerRole === 'mentor' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'">
+                {{ review.reviewerRole === 'mentor' ? 'Mentor' : 'Mentee' }}
+              </span>
+            </div>
+
+            <div class="text-gray-700 leading-relaxed">
+              {{ review.comment }}
+            </div>
+
+            <div *ngIf="review.isVerified" class="mt-3 flex items-center text-green-600 text-sm">
+              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+              Verified Review
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Given Reviews Tab -->
+      <div *ngIf="activeTab === 'given'" class="p-6">
+        <div *ngIf="loadingGiven" class="text-center py-8">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+          <p class="text-gray-600 mt-2">Loading reviews...</p>
+        </div>
+
+        <div *ngIf="!loadingGiven && givenReviews.length === 0" class="text-center py-12">
+          <svg class="mx-auto h-16 w-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">No Reviews Given</h3>
+          <p class="text-gray-600 mb-4">
+            You haven't written any reviews yet. Share your experiences with mentors or mentees you've worked with!
+          </p>
+          <button
+            (click)="openSubmitModal()"
+            class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            *ngIf="availableTargets.length > 0"
+          >
+            Write Your First Review
+          </button>
+        </div>
+
+        <div *ngIf="!loadingGiven && givenReviews.length > 0" class="space-y-6">
+          <div *ngFor="let review of givenReviews" class="border border-gray-200 rounded-lg p-6">
+            <div class="flex items-start justify-between mb-4">
+              <div>
+                <h4 class="font-medium text-gray-900">{{ review.revieweeRole === 'mentor' ? 'Mentor Review' : 'Mentee Review' }}</h4>
+                <p class="text-sm text-gray-600">{{ review.createdAt | date:'MMM dd, yyyy' }}</p>
+                <div class="flex items-center mt-1">
+                  <span *ngFor="let star of getStarRating(review.rating)"
+                        class="text-yellow-400 text-sm mr-1">
+                    {{ isStarFilled(review.rating, star) ? '★' : '☆' }}
+                  </span>
+                  <span class="text-sm text-gray-600 ml-2">({{ review.rating }}/5)</span>
+                </div>
+              </div>
+
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                Given
+              </span>
+            </div>
+
+            <div class="text-gray-700 leading-relaxed">
+              {{ review.comment }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Review Modal -->
+  <div *ngIf="showSubmitModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-lg mx-4 w-full">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">Write a Review</h3>
+        <button
+          (click)="closeSubmitModal()"
+          class="text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <form (ngSubmit)="submitReview()" class="p-6 space-y-6">
+        <!-- Select Person to Review -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Who would you like to review?
+          </label>
+          <select
+            [(ngModel)]="submitReviewForm.revieweeId"
+            (change)="onRevieweeChange($event)"
+            name="reviewee"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+            required
+          >
+            <option value="">Select someone...</option>
+            <option *ngFor="let target of availableTargets" [value]="target.id">
+              {{ target.name }} ({{ target.role === 'mentor' ? 'Mentor' : 'Mentee' }})
+            </option>
+          </select>
+        </div>
+
+        <!-- Star Rating -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-3">
+            Rating
+          </label>
+          <div class="flex items-center space-x-1">
+            <button
+              type="button"
+              *ngFor="let star of [1,2,3,4,5]"
+              (click)="submitReviewForm.rating = star"
+              class="text-2xl focus:outline-none transition-colors"
+              [class.text-yellow-400]="star <= submitReviewForm.rating"
+              [class.text-gray-300]="star > submitReviewForm.rating"
+            >
+              ★
+            </button>
+            <span class="ml-2 text-sm text-gray-600">{{ submitReviewForm.rating }}/5 stars</span>
+          </div>
+        </div>
+
+        <!-- Comment -->
+        <div>
+          <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">
+            Your Review
+          </label>
+          <textarea
+            id="comment"
+            [(ngModel)]="submitReviewForm.comment"
+            name="comment"
+            rows="4"
+            placeholder="Share your experience and feedback..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+            required
+          ></textarea>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="submitError" class="p-3 bg-red-50 border border-red-200 rounded-lg">
+          <p class="text-sm text-red-800">{{ submitError }}</p>
+        </div>
+
+        <!-- Success Message -->
+        <div *ngIf="submitSuccess" class="p-3 bg-green-50 border border-green-200 rounded-lg">
+          <p class="text-sm text-green-800">{{ submitSuccess }}</p>
+        </div>
+      </form>
+
+      <!-- Modal Footer -->
+      <div class="flex justify-end gap-3 p-6 border-t border-gray-200">
+        <button
+          type="button"
+          (click)="closeSubmitModal()"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="submitReview()"
+          [disabled]="submitLoading"
+          class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <span *ngIf="submitLoading" class="flex items-center">
+            <svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Submitting...
+          </span>
+          <span *ngIf="!submitLoading">Submit Review</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <app-footer></app-footer>
+</div>

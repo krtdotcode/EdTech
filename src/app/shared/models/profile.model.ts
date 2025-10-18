@@ -35,3 +35,16 @@ export interface MentorshipRequest {
   status: 'pending' | 'accepted' | 'rejected';
   requestDate: Date;
 }
+
+export interface Review {
+  id: string;
+  reviewerId: string;
+  reviewerRole: 'mentee' | 'mentor';
+  revieweeId: string;
+  revieweeRole: 'mentee' | 'mentor';
+  rating: number; // 1-5 stars
+  comment: string;
+  createdAt: Date;
+  mentorshipId?: string; // Reference to the mentorship relationship
+  isVerified?: boolean; // Whether this was a real mentorship
+}
