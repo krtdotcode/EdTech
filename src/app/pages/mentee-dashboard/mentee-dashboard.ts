@@ -5,11 +5,12 @@ import { AuthService } from '../../core/auth/auth.service';
 import { ProfileService } from '../../shared/services/profile.service';
 import { MenteeProfile } from '../../shared/models/profile.model';
 import { Header } from '../../shared/components/header/header';
+import { Footer } from '../../shared/components/footer/footer';
 
 @Component({
   selector: 'app-mentee-dashboard',
   standalone: true,
-  imports: [CommonModule, Header],
+  imports: [CommonModule, Header, Footer],
   templateUrl: './mentee-dashboard.html',
 })
 export class MenteeDashboard implements OnInit {

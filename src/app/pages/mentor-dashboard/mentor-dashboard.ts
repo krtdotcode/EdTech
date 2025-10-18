@@ -6,12 +6,13 @@ import { ProfileService } from '../../shared/services/profile.service';
 import { NotificationService, Notification } from '../../shared/services/notification.service';
 import { MentorProfile, MentorshipRequest } from '../../shared/models/profile.model';
 import { Header } from '../../shared/components/header/header';
+import { Footer } from '../../shared/components/footer/footer';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-mentor-dashboard',
   standalone: true,
-  imports: [CommonModule, Header],
+  imports: [CommonModule, Header, Footer],
   templateUrl: './mentor-dashboard.html',
 })
 export class MentorDashboard implements OnInit, OnDestroy {
