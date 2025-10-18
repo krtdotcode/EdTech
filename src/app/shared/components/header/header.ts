@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ProfileService } from '../../services/profile.service';
 
 @Component({
   selector: 'app-header',

@@ -10,12 +10,11 @@
 
       <!-- Desktop Navigation -->
       <div class="hidden lg:flex items-center space-x-6">
-        <a routerLink="/home" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-          Home
-        </a>
-
-        <!-- Public Navigation -->
+        <!-- Public Navigation (When NOT logged in) -->
         <div *ngIf="!isLoggedIn()" class="flex items-center space-x-4">
+          <a routerLink="/home" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+            Home
+          </a>
           <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
             How it Works
           </a>
@@ -30,7 +29,7 @@
           </a>
         </div>
 
-        <!-- Authenticated User Menu -->
+        <!-- Authenticated User Navigation (When logged in) -->
         <div *ngIf="isLoggedIn()" class="flex items-center space-x-4">
           <button (click)="goToDashboard()" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
             Dashboard
@@ -41,16 +40,25 @@
           <a routerLink="/messages" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
             Messages
           </a>
+          <a routerLink="/matching" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+            Matching
+          </a>
+          <!-- Show Mentor Requests for mentors -->
+          <a *ngIf="getUserRole() !== 'mentee'" routerLink="/mentor-requests" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+            Requests
+          </a>
           <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
             Resources
           </a>
-          <span class="text-sm text-gray-600">{{ getUserEmail() }}</span>
-          <button
-            (click)="logout()"
-            class="bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
-          >
-            Logout
-          </button>
+          <div class="border-l border-gray-300 pl-4 flex items-center space-x-3">
+            <span class="text-sm text-gray-600 font-medium">{{ getUserEmail() }}</span>
+            <button
+              (click)="logout()"
+              class="bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
 
@@ -69,12 +77,11 @@
   <!-- Mobile menu -->
   <div class="lg:hidden" [ngClass]="{'hidden': !isMenuOpen}">
     <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
-      <a routerLink="/home" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
-        Home
-      </a>
-
       <!-- Public Mobile Navigation -->
       <div *ngIf="!isLoggedIn()">
+        <a routerLink="/home" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
+          Home
+        </a>
         <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
           How it Works
         </a>
@@ -99,6 +106,13 @@
         </a>
         <a routerLink="/messages" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
           Messages
+        </a>
+        <a routerLink="/matching" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
+          Matching
+        </a>
+        <!-- Show Mentor Requests for mentors -->
+        <a *ngIf="getUserRole() !== 'mentee'" routerLink="/mentor-requests" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
+          Requests
         </a>
         <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
           Resources

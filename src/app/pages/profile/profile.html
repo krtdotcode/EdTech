@@ -1,13 +1,12 @@
-<div class="min-h-screen bg-base-200" *ngIf="profile">
-  <!-- Navigation Header -->
-  <div class="bg-white shadow-sm border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="min-h-screen bg-gray-50" *ngIf="profile">
+  <!-- Back Navigation -->
+  <div class="bg-white border-b border-gray-200 px-4 py-4">
+    <div class="mx-auto">
       <button
         (click)="goBackToDashboard()"
-        class="flex items-center text-gray-600 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
-        title="Back to Dashboard"
+        class="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
       >
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
         </svg>
         Back to Dashboard
@@ -15,310 +14,381 @@
     </div>
   </div>
 
-  <div class="hero-content flex-col lg:flex-row py-8">
-  <div class="hero-content flex-col lg:flex-row">
-    <!-- Profile Card -->
-    <div class="card w-full max-w-4xl shadow-2xl bg-base-100">
-      <!-- Cover Image -->
-      <figure class="h-48 bg-gradient-to-r from-primary via-secondary to-accent relative overflow-hidden">
-        <div class="absolute inset-0 bg-black bg-opacity-30"></div>
-        <div class="absolute top-4 right-4">
-          <button class="btn btn-sm btn-circle btn-ghost text-white" *ngIf="!editMode" (click)="toggleEdit()">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-            </svg>
-          </button>
-        </div>
-      </figure>
-
-      <div class="card-body">
-        <!-- Profile Avatar and Info -->
-        <div class="flex flex-col md:flex-row gap-6">
+  <div class="mx-auto px-4 py-8">
+    <!-- Header Card -->
+    <div class="bg-white rounded-lg shadow-sm border mb-8">
+      <div class="p-6">
+        <div class="flex flex-col lg:flex-row items-center lg:items-start gap-6">
           <!-- Avatar -->
-          <div class="flex flex-col items-center">
-            <div class="avatar">
-              <div class="w-32 rounded-2xl ring-4 ring-primary ring-offset-4 ring-offset-base-100">
-                <img [src]="profile.photoUrl || 'https://api.dicebear.com/7.x/personas/svg?seed=' + profile.name" [alt]="profile.name" />
-              </div>
+          <div class="avatar">
+            <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
+              <img
+                [src]="profile.photoUrl || getDefaultAvatar()"
+                [alt]="profile.name"
+                class="w-full h-full object-cover rounded-full"
+                (error)="onImageError($event)"
+              />
             </div>
           </div>
 
-          <!-- User Details -->
-          <div class="flex-1">
-            <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
-              <div>
-                <h1 class="card-title text-4xl">{{ profile.name }}</h1>
-                <p class="text-lg text-base-content/70">{{ profile.email }}</p>
-                <div class="flex flex-wrap gap-2 mt-4">
-                  <div class="badge badge-primary badge-lg">{{ profile.role === 'mentee' ? 'Mentee' : 'Mentor' }}</div>
-                  <div class="badge badge-outline badge-lg">Member since {{ '2024-01-01' | date:'MMMM yyyy' }}</div>
-                </div>
-              </div>
-
-              <div class="flex gap-2" *ngIf="!editMode">
-                <button class="btn btn-outline btn-sm" (click)="toggleEdit()">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                  </svg>
-                  Edit Profile
-                </button>
-              </div>
-              <div class="flex gap-2" *ngIf="editMode">
-                <button class="btn btn-primary btn-sm" (click)="saveProfile()" [disabled]="editForm.invalid || loading">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  Save Changes
-                </button>
-                <button class="btn btn-ghost btn-sm" (click)="toggleEdit()">
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="divider my-8">Profile Information</div>
-
-        <!-- View Mode -->
-        <div *ngIf="!editMode" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <!-- Personal Info -->
-          <div class="space-y-4">
-            <h3 class="text-xl font-semibold">Personal Information</h3>
-            <div class="space-y-3">
-              <div class="flex justify-between items-center py-2 px-4 bg-base-200 rounded-lg">
-                <span class="font-medium">Full Name:</span>
-                <span class="text-primary font-semibold">{{ profile.name }}</span>
-              </div>
-              <div class="flex justify-between items-center py-2 px-4 bg-base-200 rounded-lg">
-                <span class="font-medium">Email:</span>
-                <span class="text-primary font-semibold">{{ profile.email }}</span>
-              </div>
-              <div class="flex justify-between items-center py-2 px-4 bg-base-200 rounded-lg">
-                <span class="font-medium">Location:</span>
-                <span class="text-primary font-semibold">{{ profile.location }}</span>
-              </div>
-              <div class="flex justify-between items-center py-2 px-4 bg-base-200 rounded-lg">
-                <span class="font-medium">Preferred Language:</span>
-                <span class="text-primary font-semibold">{{ profile.preferredLanguage || 'Not specified' }}</span>
-              </div>
+          <!-- Info -->
+          <div class="flex-1 text-center lg:text-left">
+            <h1 class="text-2xl font-bold text-gray-900">{{ profile.name }}</h1>
+            <p class="text-gray-600 mt-1">{{ profile.email }}</p>
+            <div class="flex justify-center lg:justify-start mt-3">
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                    [class]="getRoleBadgeClasses(profile.role)">
+                {{ profile.role === 'mentee' ? 'Learning' : profile.role === 'mentor' ? 'Teaching' : 'Both' }}
+              </span>
             </div>
           </div>
 
-          <!-- Bio and Mentee Interests -->
-          <div class="space-y-6">
-            <!-- Bio -->
-            <div>
-              <h3 class="text-xl font-semibold mb-3">About Me</h3>
-              <p class="text-base-content/80 leading-relaxed">
-                {{ profile.bio }}
-              </p>
-            </div>
-
-            <!-- Skills -->
-            <div *ngIf="getSkills().length > 0">
-              <h3 class="text-xl font-semibold mb-3">Skills</h3>
-              <div class="flex flex-wrap gap-2">
-                <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" *ngFor="let skill of getSkills()">{{ skill }}</span>
-              </div>
-            </div>
-
-            <!-- Expertise (for mentors) -->
-            <div *ngIf="getExpertise().length > 0">
-              <h3 class="text-xl font-semibold mb-3">Expertise</h3>
-              <div class="flex flex-wrap gap-2">
-                <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm" *ngFor="let exp of getExpertise()">{{ exp }}</span>
-              </div>
-            </div>
-
-            <!-- Interests -->
-            <div *ngIf="getInterests().length > 0">
-              <h3 class="text-xl font-semibold mb-3">Interests</h3>
-              <div class="flex flex-wrap gap-2">
-                <span class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm" *ngFor="let interest of getInterests()">{{ interest }}</span>
-              </div>
-            </div>
-
-            <!-- Goals -->
-            <div *ngIf="getGoals().length > 0">
-              <h3 class="text-xl font-semibold mb-3">Goals</h3>
-              <div class="flex flex-wrap gap-2">
-                <span class="inline-flex items-center px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm" *ngFor="let goal of getGoals()">{{ goal }}</span>
-              </div>
-            </div>
-
-            <!-- Availability -->
-            <div *ngIf="getAvailability().length > 0">
-              <h3 class="text-xl font-semibold mb-3">Availability</h3>
-              <div class="flex flex-wrap gap-2">
-                <span class="inline-flex items-center px-3 py-1 bg-cyan-100 text-cyan-800 rounded-full text-sm" *ngFor="let avail of getAvailability()">{{ avail }}</span>
-              </div>
-            </div>
-
-            <!-- Preferred Mentor Skills (for mentees) -->
-            <div *ngIf="getPreferredMentorSkills().length > 0">
-              <h3 class="text-xl font-semibold mb-3">Preferred Mentor Skills</h3>
-              <div class="flex flex-wrap gap-2">
-                <span class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm" *ngFor="let skill of getPreferredMentorSkills()">{{ skill }}</span>
-              </div>
-            </div>
-
-            <!-- Preferred Mentor Goals (for mentees) -->
-            <div *ngIf="getPreferredMentorGoals().length > 0">
-              <h3 class="text-xl font-semibold mb-3">Preferred Mentor Goals</h3>
-              <div class="flex flex-wrap gap-2">
-                <span class="inline-flex items-center px-3 py-1 bg-pink-100 text-pink-800 rounded-full text-sm" *ngFor="let goal of getPreferredMentorGoals()">{{ goal }}</span>
-              </div>
-            </div>
-
-            <!-- Stats -->
-            <div>
-              <h3 class="text-xl font-semibold mb-4">Learning Statistics</h3>
-              <div class="grid grid-cols-2 gap-4">
-                <div class="stat bg-primary/10 rounded-lg p-4">
-                  <div class="stat-value text-primary text-2xl">0</div>
-                  <div class="stat-label text-primary/70">Courses</div>
-                </div>
-                <div class="stat bg-secondary/10 rounded-lg p-4">
-                  <div class="stat-value text-secondary text-2xl">0</div>
-                  <div class="stat-label text-secondary/70">Completed</div>
-                </div>
-                <div class="stat bg-accent/10 rounded-lg p-4">
-                  <div class="stat-value text-accent text-2xl">0</div>
-                  <div class="stat-label text-accent/70">Certificates</div>
-                </div>
-                <div class="stat bg-neutral/10 rounded-lg p-4">
-                  <div class="stat-value text-neutral text-2xl">0</div>
-                  <div class="stat-label text-neutral/70">Hours Learned</div>
-                </div>
-              </div>
-            </div>
+          <!-- Edit Button -->
+          <div class="flex-shrink-0" *ngIf="!editMode">
+            <button
+              (click)="toggleEdit()"
+              class="btn btn-primary btn-sm"
+            >
+              Edit Profile
+            </button>
           </div>
-        </div>
-
-        <!-- Edit Mode -->
-        <form *ngIf="editMode" [formGroup]="editForm" class="space-y-6">
-          <h3 class="text-xl font-semibold">Edit Profile Information</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Name -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Name</span>
-              </label>
-              <input type="text" formControlName="name" class="input input-bordered" required>
-            </div>
-
-            <!-- Location -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Location</span>
-              </label>
-              <input type="text" formControlName="location" class="input input-bordered" required>
-            </div>
-
-            <!-- Photo URL -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Photo URL</span>
-              </label>
-              <input type="text" formControlName="photoUrl" class="input input-bordered">
-            </div>
-
-            <!-- Preferred Language -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Preferred Language</span>
-              </label>
-              <input type="text" formControlName="preferredLanguage" class="input input-bordered">
-            </div>
-          </div>
-
-          <!-- Bio -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Bio</span>
-            </label>
-            <textarea formControlName="bio" class="textarea textarea-bordered h-24" required></textarea>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Skills -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Experienced Skills (comma-separated)</span>
-              </label>
-              <input type="text" formControlName="skills" class="input input-bordered" required placeholder="e.g. Web Development, Angular">
-            </div>
-
-            <!-- Expertise (for mentors) -->
-            <div *ngIf="userRole === 'mentor' || userRole === 'both'" class="form-control">
-              <label class="label">
-                <span class="label-text">Expertise (comma-separated)</span>
-              </label>
-              <input type="text" formControlName="expertise" class="input input-bordered" required placeholder="e.g. Web Development, Angular, Leadership">
-            </div>
-
-            <!-- Interests -->
-            <div *ngIf="userRole === 'mentee' || userRole === 'both'" class="form-control">
-              <label class="label">
-                <span class="label-text">Interests (comma-separated)</span>
-              </label>
-              <input type="text" formControlName="interests" class="input input-bordered" placeholder="e.g. Machine Learning, UI/UX">
-            </div>
-
-            <!-- Goals -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Goals (comma-separated)</span>
-              </label>
-              <input type="text" formControlName="goals" class="input input-bordered" required placeholder="e.g. Career Growth, Learn New Tech">
-            </div>
-
-            <!-- Availability -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Availability (comma-separated)</span>
-              </label>
-              <input type="text" formControlName="availability" class="input input-bordered" required placeholder="e.g. Weekdays, Evenings">
-            </div>
-
-            <!-- Preferred Mentor Skills -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Preferred Mentor Skills (comma-separated)</span>
-              </label>
-              <input type="text" formControlName="preferredMentorSkills" class="input input-bordered" placeholder="e.g. Leadership, Project Management">
-            </div>
-
-            <!-- Preferred Mentor Goals -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Preferred Mentor Goals (comma-separated)</span>
-              </label>
-              <input type="text" formControlName="preferredMentorGoals" class="input input-bordered" placeholder="e.g. Career Growth, Technical Skills">
-            </div>
-          </div>
-        </form>
-
-        <div class="divider mt-8"></div>
-
-        <!-- Action Buttons -->
-        <div class="card-actions justify-center pt-6">
-          <button class="btn btn-primary btn-lg flex-1 max-w-xs">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-            </svg>
-            Edit Profile
-          </button>
-          <button class="btn btn-outline btn-lg flex-1 max-w-xs">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-            View Certificates
-          </button>
         </div>
       </div>
+    </div>
+
+    <!-- View Mode -->
+    <div *ngIf="!editMode" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Main Content -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- About -->
+        <div class="bg-white rounded-lg shadow-sm border p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">About</h3>
+          <p class="text-gray-700 leading-relaxed">{{ profile.bio }}</p>
+        </div>
+
+        <!-- Skills -->
+        <div class="bg-white rounded-lg shadow-sm border p-6" *ngIf="getSkills().length > 0">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Skills</h3>
+          <div class="flex flex-wrap gap-2">
+            <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                  *ngFor="let skill of getSkills()">
+              {{ skill }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Interests/Goals (for mentees) -->
+        <div *ngIf="userRole === 'mentee' || userRole === 'both'">
+          <div class="bg-white rounded-lg shadow-sm border p-6" *ngIf="getInterests().length > 0">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Learning Interests</h3>
+            <div class="flex flex-wrap gap-2">
+              <span class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
+                    *ngFor="let interest of getInterests()">
+                {{ interest }}
+              </span>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm border p-6" *ngIf="getGoals().length > 0">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Learning Goals</h3>
+            <div class="flex flex-wrap gap-2">
+              <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+                    *ngFor="let goal of getGoals()">
+                {{ goal }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expertise (for mentors) -->
+        <div class="bg-white rounded-lg shadow-sm border p-6" *ngIf="(userRole === 'mentor' || userRole === 'both') && getExpertise().length > 0">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Expertise Areas</h3>
+          <div class="flex flex-wrap gap-2">
+            <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+                  *ngFor="let exp of getExpertise()">
+              {{ exp }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Availability -->
+        <div class="bg-white rounded-lg shadow-sm border p-6" *ngIf="getAvailability().length > 0">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Availability</h3>
+          <div class="flex flex-wrap gap-2">
+            <span class="inline-flex items-center px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm"
+                  *ngFor="let avail of getAvailability()">
+              {{ avail }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <!-- Quick Info -->
+        <div class="bg-white rounded-lg shadow-sm border p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Contact Info</h3>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center py-1">
+              <span class="text-sm text-gray-600 font-medium">Location</span>
+              <span class="text-sm text-gray-900">{{ profile.location }}</span>
+            </div>
+            <div class="flex justify-between items-center py-1">
+              <span class="text-sm text-gray-600 font-medium">Language</span>
+              <span class="text-sm text-gray-900">{{ profile.preferredLanguage || 'Not specified' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Mode -->
+    <div *ngIf="editMode" class="bg-white rounded-lg shadow-sm border p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-gray-900">Edit Profile</h2>
+        <button
+          (click)="toggleEdit()"
+          class="btn btn-ghost btn-sm"
+        >
+          Cancel
+        </button>
+      </div>
+
+      <form [formGroup]="editForm" class="space-y-6">
+        <!-- Avatar Selection -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-3">Profile Avatar</label>
+          <div class="grid grid-cols-4 sm:grid-cols-6 gap-3">
+            <div
+              *ngFor="let avatar of predefinedAvatars; let i = index"
+              class="cursor-pointer rounded-full border-2 transition-all hover:scale-105"
+              [class.border-blue-500]="selectedAvatar === avatar"
+              [class.border-gray-300]="selectedAvatar !== avatar"
+              (click)="selectAvatar(avatar)"
+            >
+              <img
+                [src]="avatar"
+                [alt]="'Avatar ' + (i + 1)"
+                class="w-12 h-12 rounded-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Basic Info -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Full Name *</span>
+            </label>
+            <input type="text" formControlName="name" class="input input-bordered" required>
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Location *</span>
+            </label>
+            <input type="text" formControlName="location" class="input input-bordered" required>
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Preferred Language</span>
+            </label>
+            <input type="text" formControlName="preferredLanguage" class="input input-bordered" placeholder="e.g. English">
+          </div>
+        </div>
+
+        <!-- Bio -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">About Me *</span>
+          </label>
+          <textarea formControlName="bio" class="textarea textarea-bordered h-24" required></textarea>
+        </div>
+
+        <!-- Skills -->
+        <div>
+          <label class="label">
+            <span class="label-text">Skills *</span>
+          </label>
+          <div class="flex gap-2 mb-3">
+            <input
+              type="text"
+              #skillInput
+              placeholder="Add a skill..."
+              class="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+            />
+            <button
+              type="button"
+              (click)="addSkill(skillInput.value); skillInput.value = ''"
+              class="px-3 py-2 bg-blue-600 text-white rounded-lg"
+            >
+              Add
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2" *ngIf="editFormSkillsArray().length > 0">
+            <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" *ngFor="let skill of editFormSkillsArray(); let i = index">
+              {{ skill }}
+              <button
+                type="button"
+                (click)="removeSkill(i)"
+                class="ml-2 text-blue-600"
+              >
+                ×
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <!-- Interests (for mentees) -->
+        <div *ngIf="userRole === 'mentee' || userRole === 'both'">
+          <label class="label">
+            <span class="label-text">Learning Interests</span>
+          </label>
+          <div class="flex gap-2 mb-3">
+            <input
+              type="text"
+              #interestInput
+              placeholder="Add an interest..."
+              class="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+            />
+            <button
+              type="button"
+              (click)="addInterest(interestInput.value); interestInput.value = ''"
+              class="px-3 py-2 bg-purple-600 text-white rounded-lg"
+            >
+              Add
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2" *ngIf="editFormInterestsArray().length > 0">
+            <span class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm" *ngFor="let interest of editFormInterestsArray(); let i = index">
+              {{ interest }}
+              <button
+                type="button"
+                (click)="removeInterest(i)"
+                class="ml-2 text-purple-600"
+              >
+                ×
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <!-- Expertise (for mentors) -->
+        <div *ngIf="userRole === 'mentor' || userRole === 'both'">
+          <label class="label">
+            <span class="label-text">Expertise Areas *</span>
+          </label>
+          <div class="flex gap-2 mb-3">
+            <input
+              type="text"
+              #expertiseInput
+              placeholder="Add expertise..."
+              class="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+            />
+            <button
+              type="button"
+              (click)="addExpertise(expertiseInput.value); expertiseInput.value = ''"
+              class="px-3 py-2 bg-green-600 text-white rounded-lg"
+            >
+              Add
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2" *ngIf="editFormExpertiseArray().length > 0">
+            <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm" *ngFor="let exp of editFormExpertiseArray(); let i = index">
+              {{ exp }}
+              <button
+                type="button"
+                (click)="removeExpertise(i)"
+                class="ml-2 text-green-600"
+              >
+                ×
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <!-- Goals (for mentees) -->
+        <div *ngIf="userRole === 'mentee' || userRole === 'both'">
+          <label class="label">
+            <span class="label-text">Learning Goals *</span>
+          </label>
+          <div class="flex gap-2 mb-3">
+            <input
+              type="text"
+              #goalInput
+              placeholder="Add a learning goal..."
+              class="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+            />
+            <button
+              type="button"
+              (click)="addGoal(goalInput.value); goalInput.value = ''"
+              class="px-3 py-2 bg-orange-600 text-white rounded-lg"
+            >
+              Add
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2" *ngIf="editFormGoalsArray().length > 0">
+            <span class="inline-flex items-center px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm" *ngFor="let goal of editFormGoalsArray(); let i = index">
+              {{ goal }}
+              <button
+                type="button"
+                (click)="removeGoal(i)"
+                class="ml-2 text-orange-600"
+              >
+                ×
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <!-- Availability -->
+        <div>
+          <label class="label">
+            <span class="label-text">Availability *</span>
+          </label>
+          <div class="flex gap-2 mb-3">
+            <input
+              type="text"
+              #availabilityInput
+              placeholder="Add availability..."
+              class="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+            />
+            <button
+              type="button"
+              (click)="addAvailability(availabilityInput.value); availabilityInput.value = ''"
+              class="px-3 py-2 bg-cyan-600 text-white rounded-lg"
+            >
+              Add
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2" *ngIf="editFormAvailabilityArray().length > 0">
+            <span class="inline-flex items-center px-3 py-1 bg-cyan-100 text-cyan-800 rounded-full text-sm" *ngFor="let avail of editFormAvailabilityArray(); let i = index">
+              {{ avail }}
+              <button
+                type="button"
+                (click)="removeAvailability(i)"
+                class="ml-2 text-cyan-600"
+              >
+                ×
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-4 pt-6 border-t border-gray-200">
+          <button
+            type="button"
+            (click)="saveProfile()"
+            [disabled]="editForm.invalid || loading"
+            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {{ loading ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
