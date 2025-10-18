@@ -1,20 +1,58 @@
-<div class="bg-[linear-gradient(245deg,#430F97_30.48%,#730BDA_58.47%)] h-screen w-full overflow-hidden">
-<app-header></app-header>
+<div class="min-h-screen bg-white flex flex-col">
+  <app-header></app-header>
 
-<div class="flex items-center w-full h-[calc(100vh-64px)] relative overflow-hidden">
-  <!-- Map on the left with more negative margin -->
-  <div class="flex-shrink-0 -ml-21">
-    <img src="map.png" alt="Map" class="w-[900px] h-[850px] object-contain"/>
-  </div>
-  
-  <!-- Text content on the right with negative left margin -->
-  <div class="flex-1 flex flex-col justify-center items-start text-left -ml-15 pr-30">
-    <h1 class="text-white text-[135px] leading-none font-black" style="font-family: 'Archivo', sans-serif; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);">EdTech</h1>
-    <h2 class="text-white text-6xl font-bold mt-4 tracking-wide" style="font-family: 'Archivo', sans-serif; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);">Connecting Mentors & Mentees</h2>
-    <p class="text-white text-xl mt-6 max-w-2xl opacity-60 tracking-wide" style="font-family: 'Archivo', sans-serif;">Mentoring made easy: Smart matching, secure messaging, and guided progress—all crafted for your success.</p>
-  </div>
-</div>
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-br from-purple-600 to-blue-600 py-20 px-4 relative overflow-hidden">
+    <!-- Particles Background -->
+    <ngx-particles
+      [id]="'tsparticles'"
+      [particlesInit]="particlesInit"
+      [options]="particlesOptions"
+      class="absolute top-0 left-0 w-full h-full"
+    ></ngx-particles>
 
-<app-footer></app-footer>
+    <div class="container mx-auto max-w-6xl text-center relative z-10">
+      <h1 class="text-5xl md:text-7xl font-black text-white mb-6 leading-tight">EdTech</h1>
+      <p class="text-xl md:text-2xl text-white mb-8 leading-relaxed">Where Mentors and Mentees Connect for Growth</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a routerLink="/signup" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors text-center">Get Started</a>
+        <a routerLink="/login" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-purple-600 transition-colors text-center">Login</a>
+      </div>
+    </div>
+  </section>
 
+  <!-- Features Section -->
+  <section class="py-16 px-4 bg-gray-50">
+    <div class="container mx-auto max-w-6xl">
+      <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">What Makes EdTech Special</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-white p-6 rounded-lg shadow-sm border text-center hover:shadow-md transition-shadow">
+          <div class="text-4xl mb-4">🎯</div>
+          <h3 class="text-xl font-semibold mb-2 text-gray-800">Smart Matching</h3>
+          <p class="text-gray-600">AI-powered algorithms connect mentors and mentees based on skills, goals, and goals for optimal partnerships.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-sm border text-center hover:shadow-md transition-shadow">
+          <div class="text-4xl mb-4">💬</div>
+          <h3 class="text-xl font-semibold mb-2 text-gray-800">Secure Messaging</h3>
+          <p class="text-gray-600">Private, secure chat system for meaningful conversations and knowledge sharing between mentors and mentees.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-sm border text-center hover:shadow-md transition-shadow">
+          <div class="text-4xl mb-4">📈</div>
+          <h3 class="text-xl font-semibold mb-2 text-gray-800">Progress Tracking</h3>
+          <p class="text-gray-600">Monitor learning milestones with guided objectives and measurable achievements.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action Section -->
+  <section class="py-16 px-4 bg-white">
+    <div class="container mx-auto max-w-4xl text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Ready to Transform Your Career?</h2>
+      <p class="text-xl text-gray-600 mb-8">Join our mentoring community today and unlock your potential.</p>
+      <a routerLink="/signup" class="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">Sign Up Now</a>
+    </div>
+  </section>
+
+  <app-footer></app-footer>
 </div>

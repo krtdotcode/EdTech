@@ -1,1 +1,15 @@
-<p>resources works!</p>
+<app-coming-soon
+  pageTitle="Resources"
+  featureTitle="Learning Resources Coming Soon"
+  description="Access a comprehensive library of learning materials, tutorials, and educational content."
+  icon="📚"
+  [features]="[
+    { icon: '📖', title: 'Tutorials', description: 'Step-by-step guides and tutorials' },
+    { icon: '🎥', title: 'Videos', description: 'Educational videos and webinars' },
+    { icon: '📄', title: 'Articles', description: 'In-depth articles and documentation' }
+  ]"
+  [actions]="[
+    { label: 'View Profile', route: '/profile' },
+    { label: 'Find Mentor', route: '/matching' }
+  ]">
+</app-coming-soon>

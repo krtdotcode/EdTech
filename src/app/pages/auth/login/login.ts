@@ -6,11 +6,13 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ProfileService } from '../../../shared/services/profile.service';
+import { NgxParticlesModule } from "@tsparticles/angular";
+import { loadSlim } from "@tsparticles/slim";
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, Header],
+  imports: [ReactiveFormsModule, CommonModule, Header, NgxParticlesModule],
   templateUrl: './login.html',
   styleUrl: './login.scss'
 })
@@ -19,6 +21,55 @@ export class Login {
   loginForm: FormGroup;
   loading = false; // Shows loading spinner
   errorMessage = ''; // Shows error messages
+
+  particlesInit = async (engine: any) => {
+    await loadSlim(engine);
+  };
+
+  particlesOptions: any = {
+    background: {
+      color: {
+        value: "transparent"
+      }
+    },
+    fpsLimit: 60,
+    particles: {
+      color: {
+        value: ["#ffffff", "#a855f7", "#8b5cf6", "#7c3aed"]
+      },
+      links: {
+        color: "#ffffff",
+        distance: 120,
+        enable: true,
+        opacity: 0.2,
+        width: 1
+      },
+      move: {
+        enable: true,
+        outModes: {
+          default: "bounce"
+        },
+        speed: 1
+      },
+      number: {
+        density: {
+          enable: true,
+          area: 500
+        },
+        value: 120
+      },
+      opacity: {
+        value: 0.4
+      },
+      shape: {
+        type: "circle"
+      },
+      size: {
+        value: { min: 2, max: 6 }
+      }
+    },
+    detectRetina: true
+  };
 
   constructor(
     private fb: FormBuilder,

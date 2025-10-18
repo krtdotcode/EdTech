@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -9,6 +10,9 @@ import { CommonModule } from '@angular/common';
   templateUrl: './header.html',
 })
 export class Header {
+  private authService = inject(AuthService);
+  isMenuOpen = false;
+
   constructor(private router: Router) {}
 
   // Navigate to login page
@@ -18,37 +22,57 @@ export class Header {
 
   // Navigate to register page
   goToRegister() {
-    this.router.navigate(['/register']);
+    this.router.navigate(['/signup']);
   }
 
   // Navigate back to home
   goToHome() {
-    this.router.navigate(['/']);
+    this.router.navigate(['/home']);
   }
 
   // Sign out user
   logout() {
-    // For now, navigate to login page
-    // In a full implementation, this would call auth service
-    this.router.navigate(['/login']);
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(['/home']);
+    });
   }
 
   // Check if user is logged in (simplified for demo)
   isLoggedIn(): boolean {
-    // Check for authentication token or session
-    return localStorage.getItem('user') !== null ||
-           sessionStorage.getItem('user') !== null;
+    return this.authService.isAuthenticated();
   }
 
   // Get user email (simplified for demo)
   getUserEmail(): string {
+    const user = this.authService.getCurrentUser();
+    return user?.email || 'user@example.com';
+  }
+
+  // Get user role
+  getUserRole(): string {
+    // For now, simplified - in real app would fetch from profile
     try {
       const user = localStorage.getItem('user') || sessionStorage.getItem('user');
       if (user) {
         const userData = JSON.parse(user);
-        return userData.email || 'user@example.com';
+        return userData.role || 'mentee';
       }
     } catch (e) {}
-    return 'user@example.com';
+    return 'mentee';
+  }
+
+  // Navigate to appropriate dashboard based on role
+  goToDashboard() {
+    const role = this.getUserRole();
+    if (role === 'mentor' || role === 'both') {
+      this.router.navigate(['/mentor-dashboard']);
+    } else {
+      this.router.navigate(['/mentee-dashboard']);
+    }
+  }
+
+  // Toggle mobile menu
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
   }
 }

@@ -1,1 +1,15 @@
-<p>scheduling works!</p>
+<app-coming-soon
+  pageTitle="Scheduling"
+  featureTitle="Scheduling Coming Soon"
+  description="Schedule and manage mentoring sessions with built-in calendar integration and reminders."
+  icon="📅"
+  [features]="[
+    { icon: '🗓️', title: 'Calendar View', description: 'Visual calendar for session planning' },
+    { icon: '⏰', title: 'Reminders', description: 'Automated notifications and reminders' },
+    { icon: '🔄', title: 'Availability', description: 'Set and manage your availability preferences' }
+  ]"
+  [actions]="[
+    { label: 'View Profile', route: '/profile' },
+    { label: 'Find Mentor', route: '/matching' }
+  ]">
+</app-coming-soon>

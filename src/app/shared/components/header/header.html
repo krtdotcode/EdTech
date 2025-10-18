@@ -10,30 +10,53 @@
 
       <!-- Desktop Navigation -->
       <div class="hidden lg:flex items-center space-x-6">
-        <a routerLink="/" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+        <a routerLink="/home" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
           Home
         </a>
+
+        <!-- Public Navigation -->
+        <div *ngIf="!isLoggedIn()" class="flex items-center space-x-4">
+          <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+            How it Works
+          </a>
+          <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+            Resources
+          </a>
+          <a routerLink="/login" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+            Login
+          </a>
+          <a routerLink="/signup" class="bg-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors">
+            Sign Up
+          </a>
+        </div>
+
         <!-- Authenticated User Menu -->
         <div *ngIf="isLoggedIn()" class="flex items-center space-x-4">
+          <button (click)="goToDashboard()" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+            Dashboard
+          </button>
+          <a routerLink="/profile" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+            Profile
+          </a>
+          <a routerLink="/messages" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+            Messages
+          </a>
+          <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+            Resources
+          </a>
           <span class="text-sm text-gray-600">{{ getUserEmail() }}</span>
           <button
             (click)="logout()"
-            class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
+            class="bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
           >
-            Sign Out
+            Logout
           </button>
-        </div>
-        <!-- Unauthenticated Menu -->
-        <div *ngIf="!isLoggedIn()">
-          <a routerLink="/login" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
-            Login
-          </a>
         </div>
       </div>
 
       <!-- Mobile menu button -->
       <div class="lg:hidden">
-        <button class="bg-gray-200 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+        <button (click)="toggleMenu()" class="bg-gray-200 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500">
           <span class="sr-only">Open main menu</span>
           <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -44,14 +67,49 @@
   </div>
 
   <!-- Mobile menu -->
-  <div class="lg:hidden hidden">
+  <div class="lg:hidden" [ngClass]="{'hidden': !isMenuOpen}">
     <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
-      <a routerLink="/" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+      <a routerLink="/home" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
         Home
       </a>
-      <a routerLink="/login" class="bg-blue-600 text-white block px-3 py-2 rounded-md text-base font-medium">
-        Login
-      </a>
+
+      <!-- Public Mobile Navigation -->
+      <div *ngIf="!isLoggedIn()">
+        <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
+          How it Works
+        </a>
+        <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
+          Resources
+        </a>
+        <a routerLink="/login" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
+          Login
+        </a>
+        <a routerLink="/signup" class="bg-purple-600 text-white block px-3 py-2 rounded-md text-base font-medium">
+          Sign Up
+        </a>
+      </div>
+
+      <!-- Authenticated Mobile Menu -->
+      <div *ngIf="isLoggedIn()">
+        <button (click)="goToDashboard()" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium text-left">
+          Dashboard
+        </button>
+        <a routerLink="/profile" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
+          Profile
+        </a>
+        <a routerLink="/messages" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
+          Messages
+        </a>
+        <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
+          Resources
+        </a>
+        <div class="border-t border-gray-200 mt-2 pt-2">
+          <span class="block px-3 py-1 text-sm text-gray-600">{{ getUserEmail() }}</span>
+          <button (click)="logout()" class="bg-red-600 text-white block w-full text-left px-3 py-2 rounded-md text-base font-medium mt-1">
+            Logout
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </nav>

@@ -1,1 +1,15 @@
-<p>progress works!</p>
+<app-coming-soon
+  pageTitle="Progress Tracking"
+  featureTitle="Progress Tracking Coming Soon"
+  description="Monitor your learning journey and mentorship achievements with detailed analytics."
+  icon="📊"
+  [features]="[
+    { icon: '📈', title: 'Track Goals', description: 'Monitor progress towards your learning goals' },
+    { icon: '🏆', title: 'View Achievements', description: 'Celebrate completed milestones and certifications' },
+    { icon: '💬', title: 'Session Logs', description: 'Review past mentoring session notes and outcomes' }
+  ]"
+  [actions]="[
+    { label: 'View Profile', route: '/profile' },
+    { label: 'Browse Resources', route: '/resources' }
+  ]">
+</app-coming-soon>

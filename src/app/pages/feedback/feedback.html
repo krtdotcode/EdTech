@@ -1,1 +1,15 @@
-<p>feedback works!</p>
+<app-coming-soon
+  pageTitle="Feedback & Reviews"
+  featureTitle="Feedback & Reviews Coming Soon"
+  description="Help us improve by sharing your experience and rating mentorship relationships."
+  icon="⭐"
+  [features]="[
+    { icon: '📝', title: 'Rate Sessions', description: 'Rate completed mentoring sessions' },
+    { icon: '💬', title: 'Leave Reviews', description: 'Write detailed feedback for mentors/mentees' },
+    { icon: '📊', title: 'View Ratings', description: 'See your mentorship ratings and reviews' }
+  ]"
+  [actions]="[
+    { label: 'Explore Mentors', route: '/matching' },
+    { label: 'View Profile', route: '/profile' }
+  ]">
+</app-coming-soon>

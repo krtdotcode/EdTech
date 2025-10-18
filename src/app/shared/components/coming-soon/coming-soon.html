@@ -1,0 +1,87 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Navigation Header -->
+  <div class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex items-center justify-between">
+        <button
+          (click)="goBackToDashboard()"
+          class="flex items-center text-gray-600 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
+          title="Back to Dashboard"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Back to Dashboard
+        </button>
+
+        <div class="flex-1 text-center">
+          <h1 class="text-2xl font-bold text-gray-900">{{ pageTitle }}</h1>
+        </div>
+
+        <div class="w-36 flex justify-end">
+          <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-sm">
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentStroke" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Coming Soon
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Coming Soon Section -->
+    <div class="max-w-4xl mx-auto">
+      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 p-8 text-white text-center relative overflow-hidden">
+          <!-- Decorative elements -->
+          <div class="absolute inset-0 bg-black bg-opacity-10"></div>
+          <div class="absolute top-0 right-0 w-32 h-32 bg-white bg-opacity-10 rounded-full -translate-y-16 translate-x-16"></div>
+          <div class="absolute bottom-0 left-0 w-24 h-24 bg-white bg-opacity-10 rounded-full translate-y-12 -translate-x-12"></div>
+
+          <!-- Icon -->
+          <div class="relative z-10 w-20 h-20 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
+            <span class="text-4xl">{{ icon }}</span>
+          </div>
+
+          <!-- Title -->
+          <h2 class="relative z-10 text-3xl font-bold mb-4">{{ featureTitle }}</h2>
+          <p class="relative z-10 text-blue-100 text-lg max-w-2xl mx-auto leading-relaxed">{{ description }}</p>
+        </div>
+
+        <!-- Content Section -->
+        <div class="p-8 text-center">
+          <div class="bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl p-8 mb-8">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">What to Expect</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div *ngFor="let item of features" class="text-center">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <span class="text-2xl">{{ item.icon }}</span>
+                </div>
+                <h4 class="font-medium text-gray-900 mb-1">{{ item.title }}</h4>
+                <p class="text-sm text-gray-600">{{ item.description }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alternative Actions -->
+          <div class="border-t border-gray-200 pt-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Meanwhile, you can...</h3>
+            <div class="flex flex-wrap justify-center gap-4">
+              <button *ngFor="let action of actions"
+                      routerLink="{{ action.route }}"
+                      class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                {{ action.label }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <app-footer></app-footer>
+</div>
