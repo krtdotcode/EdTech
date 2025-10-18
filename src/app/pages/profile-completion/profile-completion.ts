@@ -1,7 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { NgxParticlesModule } from "@tsparticles/angular";
+import { loadSlim } from "@tsparticles/slim";
 import { AuthService } from '../../core/auth/auth.service';
 import { ProfileService } from '../../shared/services/profile.service';
 import { MenteeProfile, MentorProfile } from '../../shared/models/profile.model';
@@ -11,7 +13,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-profile-completion',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, NgxParticlesModule],
   templateUrl: './profile-completion.html'
 })
 export class ProfileCompletion implements OnInit, OnDestroy {
@@ -23,6 +25,55 @@ export class ProfileCompletion implements OnInit, OnDestroy {
   userRole: 'mentee' | 'mentor' | 'both' | null = null;
   showRoleSelection = false;
   private authSub: Subscription = new Subscription();
+
+  particlesInit = async (engine: any) => {
+    await loadSlim(engine);
+  };
+
+  particlesOptions: any = {
+    background: {
+      color: {
+        value: "transparent"
+      }
+    },
+    fpsLimit: 60,
+    particles: {
+      color: {
+        value: ["#ffffff", "#a855f7", "#8b5cf6", "#7c3aed"]
+      },
+      links: {
+        color: "#ffffff",
+        distance: 120,
+        enable: true,
+        opacity: 0.2,
+        width: 1
+      },
+      move: {
+        enable: true,
+        outModes: {
+          default: "bounce"
+        },
+        speed: 1
+      },
+      number: {
+        density: {
+          enable: true,
+          area: 500
+        },
+        value: 120
+      },
+      opacity: {
+        value: 0.4
+      },
+      shape: {
+        type: "circle"
+      },
+      size: {
+        value: { min: 2, max: 6 }
+      }
+    },
+    detectRetina: true
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -39,15 +90,110 @@ export class ProfileCompletion implements OnInit, OnDestroy {
       photoUrl: [''],
       bio: ['', Validators.required],
       location: ['', Validators.required],
-      skills: ['', Validators.required],
-      expertise: [''],
-      interests: [''],
-      goals: ['', Validators.required],
-      availability: ['', Validators.required],
+      skills: this.fb.array([], Validators.required),
+      expertise: this.fb.array([]),
+      interests: this.fb.array([]),
+      goals: this.fb.array([], Validators.required),
+      availability: this.fb.array([], Validators.required),
       preferredLanguage: [''],
-      preferredMentorSkills: [''],
-      preferredMentorGoals: ['']
+      preferredMentorSkills: this.fb.array([]),
+      preferredMentorGoals: this.fb.array([])
     });
+  }
+
+  // Helper methods for form arrays
+  getSkillsArray(): FormArray {
+    return this.profileForm.get('skills') as FormArray;
+  }
+
+  getExpertiseArray(): FormArray {
+    return this.profileForm.get('expertise') as FormArray;
+  }
+
+  getInterestsArray(): FormArray {
+    return this.profileForm.get('interests') as FormArray;
+  }
+
+  getGoalsArray(): FormArray {
+    return this.profileForm.get('goals') as FormArray;
+  }
+
+  getAvailabilityArray(): FormArray {
+    return this.profileForm.get('availability') as FormArray;
+  }
+
+  getPreferredMentorSkillsArray(): FormArray {
+    return this.profileForm.get('preferredMentorSkills') as FormArray;
+  }
+
+  getPreferredMentorGoalsArray(): FormArray {
+    return this.profileForm.get('preferredMentorGoals') as FormArray;
+  }
+
+  addItem(array: FormArray, value: string): void {
+    if (value && value.trim()) {
+      array.push(this.fb.control(value.trim()));
+    }
+  }
+
+  removeItem(array: FormArray, index: number): void {
+    array.removeAt(index);
+  }
+
+  addSkill(skill: string): void {
+    this.addItem(this.getSkillsArray(), skill);
+  }
+
+  removeSkill(index: number): void {
+    this.removeItem(this.getSkillsArray(), index);
+  }
+
+  addExpertise(expertise: string): void {
+    this.addItem(this.getExpertiseArray(), expertise);
+  }
+
+  removeExpertise(index: number): void {
+    this.removeItem(this.getExpertiseArray(), index);
+  }
+
+  addInterest(interest: string): void {
+    this.addItem(this.getInterestsArray(), interest);
+  }
+
+  removeInterest(index: number): void {
+    this.removeItem(this.getInterestsArray(), index);
+  }
+
+  addGoal(goal: string): void {
+    this.addItem(this.getGoalsArray(), goal);
+  }
+
+  removeGoal(index: number): void {
+    this.removeItem(this.getGoalsArray(), index);
+  }
+
+  addAvailability(availability: string): void {
+    this.addItem(this.getAvailabilityArray(), availability);
+  }
+
+  removeAvailability(index: number): void {
+    this.removeItem(this.getAvailabilityArray(), index);
+  }
+
+  addPreferredMentorSkill(skill: string): void {
+    this.addItem(this.getPreferredMentorSkillsArray(), skill);
+  }
+
+  removePreferredMentorSkill(index: number): void {
+    this.removeItem(this.getPreferredMentorSkillsArray(), index);
+  }
+
+  addPreferredMentorGoal(goal: string): void {
+    this.addItem(this.getPreferredMentorGoalsArray(), goal);
+  }
+
+  removePreferredMentorGoal(index: number): void {
+    this.removeItem(this.getPreferredMentorGoalsArray(), index);
   }
 
   ngOnInit(): void {
@@ -255,6 +401,34 @@ export class ProfileCompletion implements OnInit, OnDestroy {
     }
   }
 
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      if (!validTypes.includes(file.type)) {
+        this.errorMessage = 'Please select a valid image file (JPG, PNG, GIF only).';
+        return;
+      }
+
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        this.errorMessage = 'File size must be less than 5MB.';
+        return;
+      }
+
+      this.errorMessage = '';
+
+      // Convert to base64 for profile storage
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64String = reader.result as string;
+        this.profileForm.patchValue({ photoUrl: base64String });
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   onProfileSubmit(): void {
     if (this.profileForm.valid) {
       this.loading = true;
@@ -273,9 +447,9 @@ export class ProfileCompletion implements OnInit, OnDestroy {
           photoUrl,
           bio,
           location,
-          skills: skills.split(',').map((s: string) => s.trim()),
-          goals: goals.split(',').map((g: string) => g.trim()),
-          availability: availability.split(',').map((a: string) => a.trim()),
+          skills,
+          goals,
+          availability,
           preferredLanguage,
         };
 
@@ -286,15 +460,15 @@ export class ProfileCompletion implements OnInit, OnDestroy {
 
           const menteeProfile: MenteeProfile = {
             ...commonProfile,
-            interests: interests.split(',').map((i: string) => i.trim()),
-            preferredMentorSkills: preferredMentorSkills.split(',').map((s: string) => s.trim()),
-            preferredMentorGoals: preferredMentorGoals.split(',').map((g: string) => g.trim()),
+            interests,
+            preferredMentorSkills,
+            preferredMentorGoals,
             role: 'mentee'
           };
 
           const mentorProfile: MentorProfile = {
             ...commonProfile,
-            expertise: expertise.split(',').map((e: string) => e.trim()),
+            expertise,
             ratings: 0,
             activeMentees: 0,
             maxMentees: 3,
@@ -354,9 +528,9 @@ export class ProfileCompletion implements OnInit, OnDestroy {
         } else if (this.userRole === 'mentee') {
           const menteeProfile: MenteeProfile = {
             ...commonProfile,
-            interests: interests.split(',').map((i: string) => i.trim()),
-            preferredMentorSkills: preferredMentorSkills.split(',').map((s: string) => s.trim()),
-            preferredMentorGoals: preferredMentorGoals.split(',').map((g: string) => g.trim()),
+            interests,
+            preferredMentorSkills,
+            preferredMentorGoals,
             role: 'mentee'
           };
           this.profileService.createMenteeProfile(menteeProfile).subscribe({
@@ -386,7 +560,7 @@ export class ProfileCompletion implements OnInit, OnDestroy {
         } else if (this.userRole === 'mentor') {
           const mentorProfile: MentorProfile = {
             ...commonProfile,
-            expertise: expertise.split(',').map((e: string) => e.trim()),
+            expertise,
             ratings: 0,
             activeMentees: 0,
             maxMentees: 3,
