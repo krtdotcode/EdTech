@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/auth/auth.service';
 import { Router } from '@angular/router';
 import { ProfileService } from '../../shared/services/profile.service';
@@ -9,7 +10,7 @@ import { MenteeProfile, MentorProfile } from '../../shared/models/profile.model'
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './profile.html',
   styleUrl: './profile.scss'
 })
@@ -61,6 +62,57 @@ export class Profile implements OnInit {
       preferredMentorSkills: [''],
       preferredMentorGoals: [''],
       expertise: [''] // For mentors, but we'll hide for mentees
+    });
+  }
+
+  // DELETE ACCOUNT METHODS
+  openDeleteAccountModal(): void {
+    this.showDeleteAccountModal = true;
+    this.deleteAccountError = '';
+    this.deleteConfirmation = '';
+  }
+
+  closeDeleteAccountModal(): void {
+    this.showDeleteAccountModal = false;
+    this.deleteAccountError = '';
+    this.deleteConfirmation = '';
+  }
+
+  deleteAccount(): void {
+    if (this.deleteConfirmation !== 'DELETE') {
+      this.deleteAccountError = 'Please type "DELETE" to confirm account deletion.';
+      return;
+    }
+
+    this.deleteAccountLoading = true;
+    this.deleteAccountError = '';
+
+    this.authService.deleteUserAccount().subscribe({
+      next: () => {
+        // Account deleted successfully
+        console.log('Account deleted successfully');
+        // Redirect to home page after successful deletion
+        this.router.navigate(['/home']).then(() => {
+          // Optional: Show a confirmation message or toast
+          if (typeof window !== 'undefined' && window.alert) {
+            window.alert('Your account has been permanently deleted. We\'re sorry to see you go!');
+          }
+        });
+      },
+      error: (error: any) => {
+        this.deleteAccountLoading = false;
+
+        // Handle different error cases
+        if (error.code === 'auth/requires-recent-login') {
+          this.deleteAccountError = 'This operation requires recent authentication. Please log out and log back in before deleting your account.';
+        } else if (error.code === 'auth/too-many-requests') {
+          this.deleteAccountError = 'Too many deletion attempts. Please wait before trying again.';
+        } else {
+          this.deleteAccountError = 'Failed to delete account. Please try again later.';
+        }
+
+        console.error('Account deletion error:', error);
+      }
     });
   }
 
@@ -315,6 +367,12 @@ export class Profile implements OnInit {
   passwordResetLoading = false;
   passwordResetSuccess = false;
   passwordResetError = '';
+
+  // DELETE ACCOUNT FUNCTIONALITY
+  deleteAccountLoading = false;
+  deleteAccountError = '';
+  showDeleteAccountModal = false;
+  deleteConfirmation = '';
 
   resetPassword(): void {
     const user = this.authService.getCurrentUser();

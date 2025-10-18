@@ -7,6 +7,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
+  deleteUser,
   user,
   User,
 } from '@angular/fire/auth';
@@ -92,6 +93,17 @@ export class AuthService {
   // SEND PASSWORD RESET EMAIL
   sendPasswordResetEmail(email: string): Observable<void> {
     const promise = sendPasswordResetEmail(this.auth, email);
+    return from(promise);
+  }
+
+  // DELETE USER ACCOUNT
+  // Permanently deletes the current user account and signs them out
+  deleteUserAccount(): Observable<void> {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) {
+      throw new Error('No user is currently signed in');
+    }
+    const promise = deleteUser(currentUser);
     return from(promise);
   }
 }
