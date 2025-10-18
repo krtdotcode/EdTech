@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, from, map } from 'rxjs';
+import { Observable, of, from, map, tap, catchError } from 'rxjs';
 import { Firestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateDoc } from '@angular/fire/firestore';
 
 import { MentorProfile, MenteeProfile, MentorshipRequest } from '../models/profile.model';
@@ -8,20 +8,67 @@ import { MentorProfile, MenteeProfile, MentorshipRequest } from '../models/profi
   providedIn: 'root',
 })
 export class ProfileService {
-  constructor(private firestore: Firestore) {}
+constructor(private firestore: Firestore) {
+  console.log('🔥 ProfileService initialized');
+  console.log('🔥 Firestore instance:', firestore);
+}
 
   // Create a new mentee profile in Firestore
   createMenteeProfile(profile: MenteeProfile): Observable<MenteeProfile> {
-    const profileDocRef = doc(this.firestore, 'profiles', `${profile.userId}_mentee`);
-    const profileWithDocId = { ...profile, id: `${profile.userId}_mentee` };
-    return from(setDoc(profileDocRef, profileWithDocId)).pipe(map(() => profileWithDocId));
+    console.log('🔥 Creating mentee profile in Firestore:', profile);
+
+    try {
+      const profileDocRef = doc(this.firestore, 'profiles', `${profile.userId}_mentee`);
+      const profileWithDocId = { ...profile, id: `${profile.userId}_mentee` };
+      console.log('🔥 Document path:', profileDocRef.path);
+      console.log('🔥 Profile data to save:', profileWithDocId);
+
+      return from(setDoc(profileDocRef, profileWithDocId)).pipe(
+        tap(() => console.log('✅ Firestore setDoc succeeded')),
+        map(() => {
+          console.log('✅ Mentee profile created successfully');
+          return profileWithDocId;
+        }),
+        catchError((error) => {
+          console.error('❌ Firestore setDoc failed:', error);
+          console.error('❌ Error code:', error.code);
+          console.error('❌ Error message:', error.message);
+          throw error;
+        })
+      );
+    } catch (error) {
+      console.error('❌ Error before Firestore call:', error);
+      throw error;
+    }
   }
 
   // Create a new mentor profile in Firestore
   createMentorProfile(profile: MentorProfile): Observable<MentorProfile> {
-    const profileDocRef = doc(this.firestore, 'profiles', `${profile.userId}_mentor`);
-    const profileWithDocId = { ...profile, id: `${profile.userId}_mentor` };
-    return from(setDoc(profileDocRef, profileWithDocId)).pipe(map(() => profileWithDocId));
+    console.log('🔥 Creating mentor profile in Firestore:', profile);
+
+    try {
+      const profileDocRef = doc(this.firestore, 'profiles', `${profile.userId}_mentor`);
+      const profileWithDocId = { ...profile, id: `${profile.userId}_mentor` };
+      console.log('🔥 Document path:', profileDocRef.path);
+      console.log('🔥 Profile data to save:', profileWithDocId);
+
+      return from(setDoc(profileDocRef, profileWithDocId)).pipe(
+        tap(() => console.log('✅ Firestore setDoc succeeded')),
+        map(() => {
+          console.log('✅ Mentor profile created successfully');
+          return profileWithDocId;
+        }),
+        catchError((error) => {
+          console.error('❌ Firestore setDoc failed:', error);
+          console.error('❌ Error code:', error.code);
+          console.error('❌ Error message:', error.message);
+          throw error;
+        })
+      );
+    } catch (error) {
+      console.error('❌ Error before Firestore call:', error);
+      throw error;
+    }
   }
 
   // Get all mentors from Firestore

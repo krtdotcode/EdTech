@@ -26,15 +26,22 @@ export class AuthService {
 
   // CREATE NEW ACCOUNT
   // Takes email and password, creates account in Firebase
-  register(email: string, password: string, role: 'mentee' | 'mentor' | 'both'): Observable<any> {
+  register(email: string, password: string, role?: 'mentee' | 'mentor' | 'both'): Observable<any> {
     const promise = createUserWithEmailAndPassword(this.auth, email, password);
-    return from(promise).pipe(
-      concatMap((userCredential) =>
-        this.saveUserRole(userCredential.user.uid, role).pipe(
-          map(() => ({ user: userCredential.user, role }))
+
+    if (role) {
+      return from(promise).pipe(
+        concatMap((userCredential) =>
+          this.saveUserRole(userCredential.user.uid, role).pipe(
+            map(() => ({ user: userCredential.user, role }))
+          )
         )
-      )
-    );
+      );
+    } else {
+      return from(promise).pipe(
+        map((userCredential) => ({ user: userCredential.user, role: null }))
+      );
+    }
   }
 
   // SIGN IN TO EXISTING ACCOUNT
@@ -60,7 +67,9 @@ export class AuthService {
   // CHECK IF USER IS SIGNED IN
   // Returns true if someone is signed in, false if not
   isAuthenticated(): boolean {
-    return !!this.auth.currentUser; // !! converts to boolean
+    const authenticated = !!this.auth.currentUser;
+    console.log('🔐 User authentication status:', authenticated, 'User:', this.auth.currentUser?.email);
+    return authenticated;
   }
 
   // SAVE USER ROLE TO FIRESTORE

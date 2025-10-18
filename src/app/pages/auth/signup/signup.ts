@@ -80,8 +80,7 @@ export class Signup {
     this.signupForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]], // Required + valid email
       password: ['', [Validators.required, Validators.minLength(6)]], // Required + min 6 chars
-      confirmPassword: ['', [Validators.required]], // Required password confirmation
-      role: ['', [Validators.required]] // Required role selection
+      confirmPassword: ['', [Validators.required]] // Required password confirmation
     }, { validators: this.passwordMatchValidator }); // Custom validation for matching passwords
   }
 
@@ -107,10 +106,10 @@ export class Signup {
       this.successMessage = '';
 
       // Get values from form
-      const { email, password, role } = this.signupForm.value;
+      const { email, password } = this.signupForm.value;
 
-      // Call auth service to create account with role
-      this.authService.register(email, password, role).subscribe({
+      // Call auth service to create account (role will be selected during profile completion)
+      this.authService.register(email, password).subscribe({
         next: (result) => {
           // SUCCESS: Account created
           console.log('Registration successful:', result);

@@ -116,19 +116,59 @@
               </p>
             </div>
 
-            <!-- Interests -->
-            <div *ngIf="profile.interests && profile.interests.length > 0">
-              <h3 class="text-xl font-semibold mb-3">Interests</h3>
+            <!-- Skills -->
+            <div *ngIf="getSkills().length > 0">
+              <h3 class="text-xl font-semibold mb-3">Skills</h3>
               <div class="flex flex-wrap gap-2">
-                <span class="badge badge-outline" *ngFor="let interest of profile.interests">{{ interest }}</span>
+                <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" *ngFor="let skill of getSkills()">{{ skill }}</span>
               </div>
             </div>
 
-            <!-- Preferred Mentor Skills -->
-            <div *ngIf="profile.preferredMentorSkills && profile.preferredMentorSkills.length > 0">
+            <!-- Expertise (for mentors) -->
+            <div *ngIf="getExpertise().length > 0">
+              <h3 class="text-xl font-semibold mb-3">Expertise</h3>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm" *ngFor="let exp of getExpertise()">{{ exp }}</span>
+              </div>
+            </div>
+
+            <!-- Interests -->
+            <div *ngIf="getInterests().length > 0">
+              <h3 class="text-xl font-semibold mb-3">Interests</h3>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm" *ngFor="let interest of getInterests()">{{ interest }}</span>
+              </div>
+            </div>
+
+            <!-- Goals -->
+            <div *ngIf="getGoals().length > 0">
+              <h3 class="text-xl font-semibold mb-3">Goals</h3>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm" *ngFor="let goal of getGoals()">{{ goal }}</span>
+              </div>
+            </div>
+
+            <!-- Availability -->
+            <div *ngIf="getAvailability().length > 0">
+              <h3 class="text-xl font-semibold mb-3">Availability</h3>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center px-3 py-1 bg-cyan-100 text-cyan-800 rounded-full text-sm" *ngFor="let avail of getAvailability()">{{ avail }}</span>
+              </div>
+            </div>
+
+            <!-- Preferred Mentor Skills (for mentees) -->
+            <div *ngIf="getPreferredMentorSkills().length > 0">
               <h3 class="text-xl font-semibold mb-3">Preferred Mentor Skills</h3>
               <div class="flex flex-wrap gap-2">
-                <span class="badge badge-primary" *ngFor="let skill of profile.preferredMentorSkills">{{ skill }}</span>
+                <span class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm" *ngFor="let skill of getPreferredMentorSkills()">{{ skill }}</span>
+              </div>
+            </div>
+
+            <!-- Preferred Mentor Goals (for mentees) -->
+            <div *ngIf="getPreferredMentorGoals().length > 0">
+              <h3 class="text-xl font-semibold mb-3">Preferred Mentor Goals</h3>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center px-3 py-1 bg-pink-100 text-pink-800 rounded-full text-sm" *ngFor="let goal of getPreferredMentorGoals()">{{ goal }}</span>
               </div>
             </div>
 
@@ -211,8 +251,16 @@
               <input type="text" formControlName="skills" class="input input-bordered" required placeholder="e.g. Web Development, Angular">
             </div>
 
+            <!-- Expertise (for mentors) -->
+            <div *ngIf="userRole === 'mentor' || userRole === 'both'" class="form-control">
+              <label class="label">
+                <span class="label-text">Expertise (comma-separated)</span>
+              </label>
+              <input type="text" formControlName="expertise" class="input input-bordered" required placeholder="e.g. Web Development, Angular, Leadership">
+            </div>
+
             <!-- Interests -->
-            <div class="form-control">
+            <div *ngIf="userRole === 'mentee' || userRole === 'both'" class="form-control">
               <label class="label">
                 <span class="label-text">Interests (comma-separated)</span>
               </label>

@@ -23,7 +23,29 @@ export class ProfileCompletion implements OnInit, OnDestroy {
   errorMessage = '';
   successMessage = '';
   userRole: 'mentee' | 'mentor' | 'both' | null = null;
-  showRoleSelection = false;
+  showRoleSelection = true;
+
+  // Predefined avatars (using free avatar services)
+  predefinedAvatars = [
+    'https://avatar.iran.liara.run/public/1',   // Random avatar 1
+    'https://avatar.iran.liara.run/public/2',   // Random avatar 2
+    'https://avatar.iran.liara.run/public/3',   // Random avatar 3
+    'https://avatar.iran.liara.run/public/4',   // Random avatar 4
+    'https://avatar.iran.liara.run/public/5',   // Random avatar 5
+    'https://avatar.iran.liara.run/public/6',   // Random avatar 6
+    'https://avatar.iran.liara.run/public/7',   // Random avatar 7
+    'https://avatar.iran.liara.run/public/8',   // Random avatar 8
+    'https://avatar.iran.liara.run/public/9',   // Random avatar 9
+    'https://avatar.iran.liara.run/public/10',  // Random avatar 10
+    'https://avatar.iran.liara.run/public/11',  // Random avatar 11
+    'https://avatar.iran.liara.run/public/12',  // Random avatar 12
+    'https://avatar.iran.liara.run/public/13',  // Random avatar 13
+    'https://avatar.iran.liara.run/public/14',  // Random avatar 14
+    'https://avatar.iran.liara.run/public/15',  // Random avatar 15
+    'https://avatar.iran.liara.run/public/16',  // Random avatar 16
+  ];
+
+  selectedAvatar: string = ''; // Track selected avatar
   private authSub: Subscription = new Subscription();
 
   particlesInit = async (engine: any) => {
@@ -87,7 +109,7 @@ export class ProfileCompletion implements OnInit, OnDestroy {
 
     this.profileForm = this.fb.group({
       name: ['', Validators.required],
-      photoUrl: [''],
+      photoUrl: [''], // Optional now due to size limit
       bio: ['', Validators.required],
       location: ['', Validators.required],
       skills: this.fb.array([], Validators.required),
@@ -401,32 +423,9 @@ export class ProfileCompletion implements OnInit, OnDestroy {
     }
   }
 
-  onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      // Validate file type
-      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-      if (!validTypes.includes(file.type)) {
-        this.errorMessage = 'Please select a valid image file (JPG, PNG, GIF only).';
-        return;
-      }
-
-      // Validate file size (5MB max)
-      if (file.size > 5 * 1024 * 1024) {
-        this.errorMessage = 'File size must be less than 5MB.';
-        return;
-      }
-
-      this.errorMessage = '';
-
-      // Convert to base64 for profile storage
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64String = reader.result as string;
-        this.profileForm.patchValue({ photoUrl: base64String });
-      };
-      reader.readAsDataURL(file);
-    }
+  selectAvatar(avatarUrl: string): void {
+    this.selectedAvatar = avatarUrl;
+    this.profileForm.patchValue({ photoUrl: avatarUrl });
   }
 
   onProfileSubmit(): void {
@@ -437,21 +436,25 @@ export class ProfileCompletion implements OnInit, OnDestroy {
 
       const currentUser = this.authService.getCurrentUser();
       if (currentUser) {
-        const { name, photoUrl, bio, location, skills, expertise, interests, goals, availability, preferredLanguage, preferredMentorSkills, preferredMentorGoals } = this.profileForm.value;
+        // Get form values properly - FormArrays return arrays directly
+        const formValue = this.profileForm.value;
 
         const commonProfile = {
           id: currentUser.uid,
           userId: currentUser.uid,
-          name,
+          name: formValue.name,
           email: currentUser.email!,
-          photoUrl,
-          bio,
-          location,
-          skills,
-          goals,
-          availability,
-          preferredLanguage,
+          photoUrl: formValue.photoUrl, // Now using selected avatar URL
+          bio: formValue.bio,
+          location: formValue.location,
+          skills: formValue.skills, // This is already an array from FormArray
+          goals: formValue.goals, // This is already an array from FormArray
+          availability: formValue.availability, // This is already an array from FormArray
+          preferredLanguage: formValue.preferredLanguage || '',
         };
+
+        console.log('Creating profile with role:', this.userRole);
+        console.log('Profile data:', commonProfile);
 
         if (this.userRole === 'both') {
           // For 'both' role, create both mentee and mentor profiles
@@ -460,23 +463,38 @@ export class ProfileCompletion implements OnInit, OnDestroy {
 
           const menteeProfile: MenteeProfile = {
             ...commonProfile,
-            interests,
-            preferredMentorSkills,
-            preferredMentorGoals,
+            interests: formValue.interests,
+            preferredMentorSkills: formValue.preferredMentorSkills,
+            preferredMentorGoals: formValue.preferredMentorGoals,
             role: 'mentee'
           };
 
           const mentorProfile: MentorProfile = {
             ...commonProfile,
-            expertise,
+            expertise: formValue.expertise,
             ratings: 0,
             activeMentees: 0,
             maxMentees: 3,
             role: 'mentor'
           };
 
+          console.log('Creating mentee profile:', menteeProfile);
+          console.log('Creating mentor profile:', mentorProfile);
+
+          // Check required fields before creating profile
+          if (!menteeProfile.name || !menteeProfile.bio || !menteeProfile.location ||
+              !menteeProfile.skills || menteeProfile.skills.length === 0 ||
+              !menteeProfile.goals || menteeProfile.goals.length === 0 ||
+              !menteeProfile.availability || menteeProfile.availability.length === 0) {
+            console.error('Missing required fields for mentee profile:', menteeProfile);
+            this.errorMessage = 'Missing required fields. Please fill in all required information.';
+            this.loading = false;
+            return;
+          }
+
           this.profileService.createMenteeProfile(menteeProfile).subscribe({
             next: () => {
+              console.log('Mentee profile created successfully');
               menteeCreated = true;
               if (mentorCreated) {
                 // Mark profile as completed
@@ -495,7 +513,8 @@ export class ProfileCompletion implements OnInit, OnDestroy {
             },
             error: (err: any) => {
               this.errorMessage = 'Error creating mentee profile.';
-              console.error(err);
+              console.error('Detailed mentee profile creation error:', err);
+              console.error('Profile data that failed:', menteeProfile);
               this.loading = false;
             }
           });
@@ -520,7 +539,7 @@ export class ProfileCompletion implements OnInit, OnDestroy {
             },
             error: (err: any) => {
               this.errorMessage = 'Error creating mentor profile.';
-              console.error(err);
+              console.error('Detailed mentor profile creation error:', err);
               this.loading = false;
             }
           });
@@ -528,13 +547,28 @@ export class ProfileCompletion implements OnInit, OnDestroy {
         } else if (this.userRole === 'mentee') {
           const menteeProfile: MenteeProfile = {
             ...commonProfile,
-            interests,
-            preferredMentorSkills,
-            preferredMentorGoals,
+            interests: formValue.interests,
+            preferredMentorSkills: formValue.preferredMentorSkills,
+            preferredMentorGoals: formValue.preferredMentorGoals,
             role: 'mentee'
           };
+
+          console.log('Creating mentee profile:', menteeProfile);
+
+          // Check required fields
+          if (!menteeProfile.name || !menteeProfile.bio || !menteeProfile.location ||
+              !menteeProfile.skills || menteeProfile.skills.length === 0 ||
+              !menteeProfile.goals || menteeProfile.goals.length === 0 ||
+              !menteeProfile.availability || menteeProfile.availability.length === 0) {
+            console.error('Missing required fields for mentee profile:', menteeProfile);
+            this.errorMessage = 'Missing required fields. Please fill in all required information.';
+            this.loading = false;
+            return;
+          }
+
           this.profileService.createMenteeProfile(menteeProfile).subscribe({
             next: () => {
+              console.log('Mentee profile created successfully');
               // Mark profile as completed
               this.profileService.markProfileCompleted(currentUser.uid, 'mentee').subscribe({
                 next: () => {
@@ -552,7 +586,8 @@ export class ProfileCompletion implements OnInit, OnDestroy {
             },
             error: (err: any) => {
               this.errorMessage = 'Error creating mentee profile.';
-              console.error(err);
+              console.error('Detailed mentee profile creation error:', err);
+              console.error('Profile data that failed:', menteeProfile);
               this.loading = false;
             }
           });
@@ -560,14 +595,30 @@ export class ProfileCompletion implements OnInit, OnDestroy {
         } else if (this.userRole === 'mentor') {
           const mentorProfile: MentorProfile = {
             ...commonProfile,
-            expertise,
+            expertise: formValue.expertise,
             ratings: 0,
             activeMentees: 0,
             maxMentees: 3,
             role: 'mentor'
           };
+
+          console.log('Creating mentor profile:', mentorProfile);
+
+          // Check required fields
+          if (!mentorProfile.name || !mentorProfile.bio || !mentorProfile.location ||
+              !mentorProfile.skills || mentorProfile.skills.length === 0 ||
+              !mentorProfile.goals || mentorProfile.goals.length === 0 ||
+              !mentorProfile.availability || mentorProfile.availability.length === 0 ||
+              !mentorProfile.expertise || mentorProfile.expertise.length === 0) {
+            console.error('Missing required fields for mentor profile:', mentorProfile);
+            this.errorMessage = 'Missing required fields. Please fill in all required information.';
+            this.loading = false;
+            return;
+          }
+
           this.profileService.createMentorProfile(mentorProfile).subscribe({
             next: () => {
+              console.log('Mentor profile created successfully');
               // Mark profile as completed
               this.profileService.markProfileCompleted(currentUser.uid, 'mentor').subscribe({
                 next: () => {
@@ -585,7 +636,8 @@ export class ProfileCompletion implements OnInit, OnDestroy {
             },
             error: (err: any) => {
               this.errorMessage = 'Error creating mentor profile.';
-              console.error(err);
+              console.error('Detailed mentor profile creation error:', err);
+              console.error('Profile data that failed:', mentorProfile);
               this.loading = false;
             }
           });
