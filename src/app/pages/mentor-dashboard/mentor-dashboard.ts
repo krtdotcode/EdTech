@@ -168,26 +168,54 @@ export class MentorDashboard implements OnInit, OnDestroy {
     return this.currentMentor?.photoUrl || 'https://api.dicebear.com/7.x/personas/svg?seed=' + (this.currentMentor?.name || 'default');
   }
 
+  getMenteeInitials(menteeId: string): string {
+    // Extract initials from mentee ID (first 2 characters as fallback)
+    if (menteeId && menteeId.length >= 2) {
+      return menteeId.substring(0, 2).toUpperCase();
+    }
+    return menteeId ? menteeId.charAt(0).toUpperCase() : '?';
+  }
+
   acceptRequest(requestId: string): void {
-    this.profileService.updateMentorshipRequestStatus(requestId, 'accepted').subscribe({
+    this.profileService.acceptMentorshipRequest(requestId).subscribe({
       next: () => {
+        console.log('Mentorship request accepted successfully');
         this.loadMentorshipRequests(); // Refresh the list
+        this.loadMentorProfile(); // Refresh mentor data to show updated counts
       },
       error: (error) => {
-        console.error('Error accepting request:', error);
+        console.error('Error accepting mentorship request:', error);
       }
     });
   }
 
   rejectRequest(requestId: string): void {
-    this.profileService.updateMentorshipRequestStatus(requestId, 'rejected').subscribe({
+    this.profileService.rejectMentorshipRequest(requestId).subscribe({
       next: () => {
+        console.log('Mentorship request rejected');
         this.loadMentorshipRequests(); // Refresh the list
       },
       error: (error) => {
-        console.error('Error rejecting request:', error);
+        console.error('Error rejecting mentorship request:', error);
       }
     });
+  }
+
+  // Reload mentor profile to update counts
+  private loadMentorProfile(): void {
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.profileService.getMentorById(currentUser.uid).subscribe({
+        next: (mentor) => {
+          if (mentor) {
+            this.currentMentor = mentor;
+          }
+        },
+        error: (error) => {
+          console.error('Error reloading mentor profile:', error);
+        }
+      });
+    }
   }
 
 

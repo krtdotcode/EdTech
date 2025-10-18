@@ -174,11 +174,6 @@ export class Matching implements OnInit {
       return;
     }
 
-    // For the notification system, we need the mentor's userId
-    // Extract from the document ID if userId doesn't exist
-    const mentorUserId = mentor.userId || mentor.id.replace('_mentor', '');
-    console.log('Sending request to mentor:', mentor.name, 'with userId:', mentorUserId);
-
     // Check mentor capacity
     const maxMentees = mentor.maxMentees || 3;
     const activeMentees = mentor.activeMentees || 0;
@@ -189,7 +184,13 @@ export class Matching implements OnInit {
     }
 
     const menteeId = this.currentMentee.id;
-    this.profileService.sendMentorshipRequest(menteeId, mentorId).subscribe(
+    const mentorUserId = mentor.userId || mentor.id.replace('_mentor', '');
+
+    console.log('Sending mentorship request:');
+    console.log('- From mentee:', menteeId, '(userId:', this.currentMentee.userId, ')');
+    console.log('- To mentor:', mentorId, '(userId:', mentorUserId, ')');
+
+    this.profileService.sendMentorshipRequestWithNotification(menteeId, mentorId).subscribe(
       response => {
         console.log('Mentorship request sent:', response);
 
@@ -200,34 +201,19 @@ export class Matching implements OnInit {
           response.id // Request ID from response
         ).then(() => {
           console.log('Notification created for mentor');
-
-          // Show push notification if supported
-          if ('Notification' in window) {
-            if (Notification.permission === 'granted') {
-              new Notification('Request Sent! 📬', {
-                body: `Your mentorship request has been sent to ${mentor.name}`,
-                icon: 'edtech-logo.png'
-              });
-            } else if (Notification.permission !== 'denied') {
-              Notification.requestPermission();
-            }
-          }
         }).catch(error => console.error('Failed to create notification:', error));
 
+        // Show success message
         alert('Mentorship request sent successfully!');
 
-        // Update mentor's active mentees count
+        // Temporarily increment mentor's active count for UI update
         mentor.activeMentees = (mentor.activeMentees || 0) + 1;
-        this.profileService.updateMentorProfile(mentor).subscribe({
-          next: () => {
-            // Refresh data
-            this.applyFilters();
-            this.getRecommendations();
-          },
-          error: (error) => {
-            console.error('Failed to update mentor profile:', error);
-          }
-        });
+
+        // Refresh data after a short delay to allow backend processing
+        setTimeout(() => {
+          this.applyFilters();
+          this.getRecommendations();
+        }, 500);
       },
       error => {
         console.error('Error sending mentorship request:', error);

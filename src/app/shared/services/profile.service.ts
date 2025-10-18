@@ -206,6 +206,120 @@ constructor(private firestore: Firestore) {
     );
   }
 
+  // Accept mentorship request and establish relationship
+  acceptMentorshipRequest(requestId: string): Observable<boolean> {
+    // First get the request details
+    const requestDocRef = doc(this.firestore, 'mentorshipRequests', requestId);
+
+    return from(getDoc(requestDocRef)).pipe(
+      // Update request status
+      tap((requestDoc) => {
+        if (requestDoc.exists()) {
+          const requestData = requestDoc.data() as any;
+
+          // Update request status to accepted
+          updateDoc(requestDocRef, { status: 'accepted' });
+
+          // Add mentee to mentor's mentees list
+          this.addMenteeToMentor(requestData.mentorId, requestData.menteeId);
+
+          // Add mentor to mentee's mentors list
+          this.addMentorToMentee(requestData.menteeId, requestData.mentorId);
+        }
+      }),
+      map(() => true),
+      catchError((error) => {
+        console.error('Error accepting mentorship request:', error);
+        throw error;
+      })
+    );
+  }
+
+  // Reject mentorship request
+  rejectMentorshipRequest(requestId: string): Observable<boolean> {
+    const requestDocRef = doc(this.firestore, 'mentorshipRequests', requestId);
+    const updateData = { status: 'rejected' };
+
+    return from(updateDoc(requestDocRef, updateData)).pipe(
+      map(() => true),
+      catchError((error) => {
+        console.error('Error rejecting mentorship request:', error);
+        throw error;
+      })
+    );
+  }
+
+  // Add mentee to mentor's mentees array and update active count
+  private addMenteeToMentor(mentorId: string, menteeId: string): void {
+    // Get mentor profile
+    this.getMentorById(mentorId).subscribe(mentor => {
+      if (mentor) {
+        const mentees = mentor.mentees || [];
+        if (!mentees.includes(menteeId)) {
+          mentees.push(menteeId);
+          const updatedMentor: MentorProfile = {
+            ...mentor,
+            mentees: mentees,
+            activeMentees: (mentor.activeMentees || 0) + 1
+          };
+          this.updateMentorProfile(updatedMentor).subscribe();
+        }
+      }
+    });
+  }
+
+  // Add mentor to mentee's mentors array
+  private addMentorToMentee(menteeId: string, mentorId: string): void {
+    // Get mentee profile
+    this.getMenteeById(menteeId).subscribe(mentee => {
+      if (mentee) {
+        const mentors = mentee.mentors || [];
+        if (!mentors.includes(mentorId)) {
+          mentors.push(mentorId);
+          const updatedMentee: MenteeProfile = {
+            ...mentee,
+            mentors: mentors
+          };
+          this.updateMenteeProfile(updatedMentee).subscribe();
+        }
+      }
+    });
+  }
+
+  // Get mentorship requests for a specific mentor
+  getMentorshipRequestsForMentor(mentorId: string): Observable<MentorshipRequest[]> {
+    const requestsRef = collection(this.firestore, 'mentorshipRequests');
+    return from(getDocs(requestsRef)).pipe(
+      map((querySnapshot) => {
+        const requests: MentorshipRequest[] = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data() as any;
+          if (data.mentorId === mentorId && data.status === 'pending') {
+            requests.push({
+              id: doc.id,
+              menteeId: data.menteeId,
+              mentorId: data.mentorId,
+              status: data.status,
+              requestDate: data.requestDate.toDate()
+            });
+          }
+        });
+        return requests;
+      })
+    );
+  }
+
+  // Send mentorship request and create notification
+  sendMentorshipRequestWithNotification(menteeId: string, mentorId: string): Observable<MentorshipRequest> {
+    return this.sendMentorshipRequest(menteeId, mentorId).pipe(
+      tap(request => {
+        // Here you would send notification to mentor
+        // For now, we'll just log it
+        console.log('Mentorship request sent from', menteeId, 'to', mentorId);
+      })
+    );
+  }
+
   // Get user's profile completion status
   getProfileCompletionStatus(userId: string): Observable<any> {
     const statusDocRef = doc(this.firestore, 'userStatus', userId);

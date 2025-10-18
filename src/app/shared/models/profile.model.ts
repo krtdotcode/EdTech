@@ -19,11 +19,13 @@ export interface MentorProfile extends UserProfile {
   ratings?: number;
   activeMentees?: number;
   maxMentees?: number;
+  mentees?: string[]; // Array of mentee user IDs
 }
 
 export interface MenteeProfile extends UserProfile {
   preferredMentorSkills?: string[];
   preferredMentorGoals?: string[];
+  mentors?: string[]; // Array of mentor user IDs
 }
 
 export interface MentorshipRequest {
