@@ -80,5 +80,17 @@ export const routes: Routes = [
       import('./pages/mentor-requests/mentor-requests').then((m) => m.MentorRequests),
     canActivate: [AuthGuard],
   },
+  {
+    path: 'my-mentors',
+    loadComponent: () =>
+      import('./pages/my-mentors/my-mentors').then((m) => m.MyMentors),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'my-mentees',
+    loadComponent: () =>
+      import('./pages/my-mentees/my-mentees').then((m) => m.MyMentees),
+    canActivate: [AuthGuard],
+  },
   { path: '**', redirectTo: '/login' }, // Wildcard route for any unmatched URL
 ];

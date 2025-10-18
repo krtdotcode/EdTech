@@ -36,24 +36,10 @@ export class Matching implements OnInit {
   uniqueAvailabilities: string[] = [];
   uniqueIndustries: string[] = [];
 
-  // For demonstration, a hardcoded mentee profile
-  currentMentee: MenteeProfile = {
-    id: 'mentee1',
-    userId: 'user3',
-    name: 'Pedro Reyes',
-    email: 'pedro.reyes@example.com',
-    skills: ['Web Development', 'Angular'],
-    goals: ['Learn Angular', 'Career Growth'],
-    location: 'Manila',
-    availability: ['Weekdays'],
-    preferredMentorSkills: ['Angular', 'TypeScript'],
-    preferredMentorGoals: ['Career Growth'],
-    bio: 'Aspiring web developer looking for guidance in Angular.',
-    role: 'mentee',
-    photoUrl: '', // Added photoUrl
-    interests: ['Web Development'], // Added interests
-    preferredLanguage: 'English' // Added preferredLanguage
-  };
+  currentMentee: MenteeProfile | null = null;
+
+  // Request status tracking by mentor ID
+  requestStatusMap: Map<string, 'idle' | 'loading' | 'sent'> = new Map();
 
   constructor(
     private profileService: ProfileService,
@@ -103,40 +89,19 @@ export class Matching implements OnInit {
     this.uniqueGoals = [...new Set(this.allMentors.flatMap(mentor => mentor.goals))];
     this.uniqueLocations = [...new Set(this.allMentors.map(mentor => mentor.location))];
     this.uniqueAvailabilities = [...new Set(this.allMentors.flatMap(mentor => mentor.availability))];
-    // For now, derive industries from existing skills (could be made more sophisticated later)
-    this.uniqueIndustries = [...new Set(this.allMentors.flatMap(mentor => {
-      // Simple mapping of skills to potential industries
-      return mentor.skills.map(skill => this.skillToIndustry(skill));
-    }).filter(industry => industry !== ''))];
-  }
-
-  skillToIndustry(skill: string): string {
-    const skillToIndustryMap: {[key: string]: string} = {
-      'Web Development': 'Technology',
-      'Angular': 'Technology',
-      'TypeScript': 'Technology',
-      'Project Management': 'Business',
-      'Leadership': 'Business',
-      'Machine Learning': 'Technology',
-      'UI/UX': 'Design',
-      'Frontend': 'Technology',
-      'Backend': 'Technology',
-      'DevOps': 'Technology',
-      'Data Science': 'Technology',
-      'Marketing': 'Business',
-      'Sales': 'Business',
-      'Finance': 'Business',
-      'HR': 'Business',
-      'Consulting': 'Business',
-      'Teaching': 'Education',
-      'Research': 'Technology',
-      'Product Management': 'Business'
-    };
-    return skillToIndustryMap[skill] || '';
+    // Industries will be populated based on real user data - can be enhanced later
+    this.uniqueIndustries = [];
   }
 
   applyFilters(): void {
     this.filteredMentors = this.allMentors.filter(mentor => {
+      // 🚨 CRITICAL: Exclude mentors already connected with the current mentee
+      const mentorUserId = mentor.userId || mentor.id.replace('_mentor', '');
+      const isAlreadyConnected = this.currentMentee?.mentors?.includes(mentorUserId);
+      if (isAlreadyConnected) {
+        return false; // Hide this mentor
+      }
+
       const matchesSearchTerm = this.searchTerm === '' ||
         mentor.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         mentor.bio.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
@@ -149,9 +114,8 @@ export class Matching implements OnInit {
       const matchesAvailability = this.selectedAvailability === '' || mentor.availability.includes(this.selectedAvailability);
       const matchesRating = this.minRating === null || (mentor.ratings !== undefined && mentor.ratings >= this.minRating);
 
-      // Check if mentor's industry matches selected industry
-      const matchesIndustry = this.selectedIndustry === '' ||
-        mentor.skills.some(skill => this.skillToIndustry(skill) === this.selectedIndustry);
+      // Industry filter not implemented yet - can be added based on real data
+      const matchesIndustry = this.selectedIndustry === '' || true;
 
       return matchesSearchTerm && matchesSkill && matchesGoal && matchesLocation &&
              matchesAvailability && matchesRating && matchesIndustry;
@@ -159,7 +123,15 @@ export class Matching implements OnInit {
   }
 
   getRecommendations(): void {
-    this.recommendationService.getRecommendedMentors(this.currentMentee, this.allMentors).subscribe(
+    if (!this.currentMentee) return;
+
+    // Filter out already-connected mentors from all mentors
+    const availableMentors = this.allMentors.filter(mentor => {
+      const mentorUserId = mentor.userId || mentor.id.replace('_mentor', '');
+      return !this.currentMentee?.mentors?.includes(mentorUserId);
+    });
+
+    this.recommendationService.getRecommendedMentors(this.currentMentee, availableMentors).subscribe(
       recommended => {
         this.recommendedMentors = recommended;
       }
@@ -167,10 +139,15 @@ export class Matching implements OnInit {
   }
 
   sendRequest(mentorId: string): void {
+    if (!this.currentMentee) {
+      this.showErrorMessage('User profile not loaded. Please try again.');
+      return;
+    }
+
     // Find mentor by their document ID
     const mentor = this.allMentors.find(m => m.id === mentorId);
     if (!mentor) {
-      alert('Mentor not found.');
+      this.showErrorMessage('Mentor not found.');
       return;
     }
 
@@ -179,7 +156,7 @@ export class Matching implements OnInit {
     const activeMentees = mentor.activeMentees || 0;
 
     if (activeMentees >= maxMentees) {
-      alert(`This mentor has reached their maximum capacity of ${maxMentees} mentees. Please choose another mentor.`);
+      this.showErrorMessage(`This mentor has reached their maximum capacity of ${maxMentees} mentees. Please choose another mentor.`);
       return;
     }
 
@@ -190,21 +167,26 @@ export class Matching implements OnInit {
     console.log('- From mentee:', menteeId, '(userId:', this.currentMentee.userId, ')');
     console.log('- To mentor:', mentorId, '(userId:', mentorUserId, ')');
 
+    // Set button to loading state
+    this.requestStatusMap.set(mentorId, 'loading');
+
     this.profileService.sendMentorshipRequestWithNotification(menteeId, mentorId).subscribe(
       response => {
         console.log('Mentorship request sent:', response);
 
         // Create notification for mentor about the new request
-        this.notificationService.createMentorshipRequestNotification(
-          mentorUserId,
-          this.currentMentee.name,
-          response.id // Request ID from response
-        ).then(() => {
-          console.log('Notification created for mentor');
-        }).catch(error => console.error('Failed to create notification:', error));
+        if (this.currentMentee) {
+          this.notificationService.createMentorshipRequestNotification(
+            mentorUserId,
+            this.currentMentee.name,
+            response.id // Request ID from response
+          ).then(() => {
+            console.log('Notification created for mentor');
+          }).catch(error => console.error('Failed to create notification:', error));
+        }
 
-        // Show success message
-        alert('Mentorship request sent successfully!');
+        // Update button to sent state
+        this.requestStatusMap.set(mentorId, 'sent');
 
         // Temporarily increment mentor's active count for UI update
         mentor.activeMentees = (mentor.activeMentees || 0) + 1;
@@ -217,9 +199,16 @@ export class Matching implements OnInit {
       },
       error => {
         console.error('Error sending mentorship request:', error);
-        alert('Failed to send mentorship request. Please try again.');
+        // Reset button to idle state on error
+        this.requestStatusMap.set(mentorId, 'idle');
+        this.showErrorMessage('Failed to send mentorship request. Please try again.');
       }
     );
+  }
+
+  showErrorMessage(message: string): void {
+    // For now using alert, could improve with a toast system
+    alert(message);
   }
 
   clearFilters(): void {
@@ -243,6 +232,37 @@ export class Matching implements OnInit {
     if (this.selectedAvailability) count++;
     if (this.minRating) count++;
     return count;
+  }
+
+  // Helper methods for button states
+  isRequestSent(mentorId: string): boolean {
+    return this.requestStatusMap.get(mentorId) === 'sent';
+  }
+
+  isRequestLoading(mentorId: string): boolean {
+    return this.requestStatusMap.get(mentorId) === 'loading';
+  }
+
+  getButtonText(mentorId: string): string {
+    const status = this.requestStatusMap.get(mentorId);
+    switch (status) {
+      case 'sent':
+        return 'Request Sent';
+      default:
+        return 'Send Mentorship Request';
+    }
+  }
+
+  getButtonClasses(mentorId: string): string {
+    const status = this.requestStatusMap.get(mentorId);
+    switch (status) {
+      case 'sent':
+        return 'bg-green-600 hover:bg-green-700 text-white';
+      case 'loading':
+        return 'bg-blue-600 text-white';
+      default:
+        return 'bg-blue-600 hover:bg-blue-700 text-white';
+    }
   }
 
   goBackToDashboard(): void {

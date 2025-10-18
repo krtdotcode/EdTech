@@ -40,7 +40,8 @@
           <a routerLink="/messages" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
             Messages
           </a>
-          <a routerLink="/matching" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+          <!-- Matching link only for mentees -->
+          <a *ngIf="getUserRole() === 'mentee'" routerLink="/matching" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
             Matching
           </a>
           <!-- Show Mentor Requests for mentors -->
@@ -107,7 +108,8 @@
         <a routerLink="/messages" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
           Messages
         </a>
-        <a routerLink="/matching" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
+        <!-- Matching link only for mentees -->
+        <a *ngIf="getUserRole() === 'mentee'" routerLink="/matching" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
           Matching
         </a>
         <!-- Show Mentor Requests for mentors -->

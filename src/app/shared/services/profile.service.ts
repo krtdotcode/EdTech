@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, from, map, tap, catchError } from 'rxjs';
-import { Firestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateDoc } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateDoc, onSnapshot } from '@angular/fire/firestore';
 
 import { MentorProfile, MenteeProfile, MentorshipRequest } from '../models/profile.model';
 
@@ -88,18 +88,26 @@ constructor(private firestore: Firestore) {
     );
   }
 
-  // Get mentor by user ID
+  // Get mentor by user ID with real-time updates
   getMentorById(userId: string): Observable<MentorProfile | undefined> {
     const profileDocRef = doc(this.firestore, 'profiles', `${userId}_mentor`);
-    return from(getDoc(profileDocRef)).pipe(
-      map((docSnap) => {
+    return new Observable<MentorProfile | undefined>((observer) => {
+      const unsubscribe = onSnapshot(profileDocRef, (docSnap) => {
         if (docSnap.exists()) {
           const data = docSnap.data() as any;
-          return data.role === 'mentor' ? (data as MentorProfile) : undefined;
+          const mentor = data.role === 'mentor' ? (data as MentorProfile) : undefined;
+          observer.next(mentor);
+        } else {
+          observer.next(undefined);
         }
-        return undefined;
-      })
-    );
+      }, (error) => {
+        console.error('Error getting mentor profile:', error);
+        observer.error(error);
+      });
+
+      // Return unsubscribe function for cleanup
+      return () => unsubscribe();
+    });
   }
 
   // Update mentor profile in Firestore
@@ -127,18 +135,26 @@ constructor(private firestore: Firestore) {
     );
   }
 
-  // Get mentee by user ID
+  // Get mentee by user ID with real-time updates
   getMenteeById(userId: string): Observable<MenteeProfile | undefined> {
     const profileDocRef = doc(this.firestore, 'profiles', `${userId}_mentee`);
-    return from(getDoc(profileDocRef)).pipe(
-      map((docSnap) => {
+    return new Observable<MenteeProfile | undefined>((observer) => {
+      const unsubscribe = onSnapshot(profileDocRef, (docSnap) => {
         if (docSnap.exists()) {
           const data = docSnap.data() as any;
-          return data.role === 'mentee' ? (data as MenteeProfile) : undefined;
+          const mentee = data.role === 'mentee' ? (data as MenteeProfile) : undefined;
+          observer.next(mentee);
+        } else {
+          observer.next(undefined);
         }
-        return undefined;
-      })
-    );
+      }, (error) => {
+        console.error('Error getting mentee profile:', error);
+        observer.error(error);
+      });
+
+      // Return unsubscribe function for cleanup
+      return () => unsubscribe();
+    });
   }
 
   // Update mentee profile in Firestore
@@ -212,7 +228,7 @@ constructor(private firestore: Firestore) {
     const requestDocRef = doc(this.firestore, 'mentorshipRequests', requestId);
 
     return from(getDoc(requestDocRef)).pipe(
-      // Update request status
+      // Update request status and establish relationships
       tap((requestDoc) => {
         if (requestDoc.exists()) {
           const requestData = requestDoc.data() as any;
@@ -220,11 +236,19 @@ constructor(private firestore: Firestore) {
           // Update request status to accepted
           updateDoc(requestDocRef, { status: 'accepted' });
 
+          // Extract user IDs from document IDs (remove '_mentor' or '_mentee' suffix)
+          const mentorUserId = requestData.mentorId.replace('_mentor', '').replace('_mentee', '');
+          const menteeUserId = requestData.menteeId.replace('_mentor', '').replace('_mentee', '');
+
+          console.log('Establishing mentorship relationship:');
+          console.log('- Mentor userId:', mentorUserId);
+          console.log('- Mentee userId:', menteeUserId);
+
           // Add mentee to mentor's mentees list
-          this.addMenteeToMentor(requestData.mentorId, requestData.menteeId);
+          this.addMenteeToMentorRelation(mentorUserId, menteeUserId);
 
           // Add mentor to mentee's mentors list
-          this.addMentorToMentee(requestData.menteeId, requestData.mentorId);
+          this.addMentorToMenteeRelation(menteeUserId, mentorUserId);
         }
       }),
       map(() => true),
@@ -250,38 +274,62 @@ constructor(private firestore: Firestore) {
   }
 
   // Add mentee to mentor's mentees array and update active count
-  private addMenteeToMentor(mentorId: string, menteeId: string): void {
-    // Get mentor profile
-    this.getMentorById(mentorId).subscribe(mentor => {
+  private addMenteeToMentorRelation(mentorUserId: string, menteeUserId: string): void {
+    console.log('Adding mentee', menteeUserId, 'to mentor', mentorUserId);
+
+    // Get mentor profile by userId
+    this.getMentorById(mentorUserId).subscribe(mentor => {
       if (mentor) {
+        console.log('Current mentor mentees:', mentor.mentees);
         const mentees = mentor.mentees || [];
-        if (!mentees.includes(menteeId)) {
-          mentees.push(menteeId);
+        if (!mentees.includes(menteeUserId)) {
+          mentees.push(menteeUserId);
           const updatedMentor: MentorProfile = {
             ...mentor,
             mentees: mentees,
             activeMentees: (mentor.activeMentees || 0) + 1
           };
-          this.updateMentorProfile(updatedMentor).subscribe();
+
+          console.log('Updating mentor with:', updatedMentor);
+          this.updateMentorProfile(updatedMentor).subscribe({
+            next: () => console.log('✅ Mentor profile updated successfully'),
+            error: (error) => console.error('❌ Error updating mentor profile:', error)
+          });
+        } else {
+          console.log('Mentee already in mentees list');
         }
+      } else {
+        console.error('Mentor not found:', mentorUserId);
       }
     });
   }
 
   // Add mentor to mentee's mentors array
-  private addMentorToMentee(menteeId: string, mentorId: string): void {
-    // Get mentee profile
-    this.getMenteeById(menteeId).subscribe(mentee => {
+  private addMentorToMenteeRelation(menteeUserId: string, mentorUserId: string): void {
+    console.log('Adding mentor', mentorUserId, 'to mentee', menteeUserId);
+
+    // Get mentee profile by userId
+    this.getMenteeById(menteeUserId).subscribe(mentee => {
       if (mentee) {
+        console.log('Current mentee mentors:', mentee.mentors);
         const mentors = mentee.mentors || [];
-        if (!mentors.includes(mentorId)) {
-          mentors.push(mentorId);
+        if (!mentors.includes(mentorUserId)) {
+          mentors.push(mentorUserId);
           const updatedMentee: MenteeProfile = {
             ...mentee,
             mentors: mentors
           };
-          this.updateMenteeProfile(updatedMentee).subscribe();
+
+          console.log('Updating mentee with:', updatedMentee);
+          this.updateMenteeProfile(updatedMentee).subscribe({
+            next: () => console.log('✅ Mentee profile updated successfully'),
+            error: (error) => console.error('❌ Error updating mentee profile:', error)
+          });
+        } else {
+          console.log('Mentor already in mentors list');
         }
+      } else {
+        console.error('Mentee not found:', menteeUserId);
       }
     });
   }
@@ -351,5 +399,61 @@ constructor(private firestore: Firestore) {
     return this.getProfileCompletionStatus(userId).pipe(
       map(status => status.hasCompletedProfile === true)
     );
+  }
+
+  // Get mentees for a specific mentor (from their mentees array) - returns IDs for now
+  getMenteeIdsForMentor(mentorId: string): Observable<string[]> {
+    return this.getMentorById(mentorId).pipe(
+      map(mentor => mentor?.mentees || [])
+    );
+  }
+
+  // Get mentors for a specific mentee (from their mentors array) - returns IDs for now
+  getMentorIdsForMentee(menteeId: string): Observable<string[]> {
+    return this.getMenteeById(menteeId).pipe(
+      map(mentee => mentee?.mentors || [])
+    );
+  }
+
+  // Verify mentorship relationship exists
+  isMentorshipActive(mentorId: string, menteeId: string): Observable<boolean> {
+    return this.getMenteeById(menteeId).pipe(
+      map(mentee => mentee?.mentors?.includes(mentorId) || false)
+    );
+  }
+
+  // Remove relationship (useful for future features)
+  removeMentorshipRelationship(mentorId: string, menteeId: string): Observable<void> {
+    return new Observable<void>(observer => {
+      // Remove from mentor's mentees array
+      this.getMentorById(mentorId).subscribe(mentor => {
+        if (mentor) {
+          const mentees = mentor.mentees || [];
+          const updatedMentees = mentees.filter(id => id !== menteeId);
+          const updatedMentor: MentorProfile = {
+            ...mentor,
+            mentees: updatedMentees,
+            activeMentees: (mentor.activeMentees || 1) - 1
+          };
+          this.updateMentorProfile(updatedMentor).subscribe();
+        }
+      });
+
+      // Remove from mentee's mentors array
+      this.getMenteeById(menteeId).subscribe(mentee => {
+        if (mentee) {
+          const mentors = mentee.mentors || [];
+          const updatedMentors = mentors.filter(id => id !== mentorId);
+          const updatedMentee: MenteeProfile = {
+            ...mentee,
+            mentors: updatedMentors
+          };
+          this.updateMenteeProfile(updatedMentee).subscribe();
+        }
+      });
+
+      observer.next();
+      observer.complete();
+    });
   }
 }

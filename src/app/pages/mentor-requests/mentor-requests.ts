@@ -19,6 +19,11 @@ export class MentorRequests implements OnInit {
   mentorshipRequests: MentorshipRequest[] = [];
   currentMentorId: string = '';
 
+  // Immediately remove a request from the UI list
+  private removeRequestFromList(requestId: string): void {
+    this.mentorshipRequests = this.mentorshipRequests.filter(req => req.id !== requestId);
+  }
+
   constructor(
     private profileService: ProfileService,
     private notificationService: NotificationService,
@@ -54,7 +59,9 @@ export class MentorRequests implements OnInit {
 
   loadMentorshipRequests(): void {
     this.profileService.getMentorshipRequests().subscribe(requests => {
-      this.mentorshipRequests = requests.filter(req => req.mentorId === this.currentMentorId);
+      this.mentorshipRequests = requests.filter(req =>
+        req.mentorId === this.currentMentorId && req.status === 'pending'
+      );
     });
   }
 
@@ -87,6 +94,9 @@ export class MentorRequests implements OnInit {
         next: async () => {
           console.log('Request accepted');
 
+          // Immediately remove the request from the UI
+          this.removeRequestFromList(requestId);
+
           try {
             // Create approval notification for mentee
             await this.notificationService.createMentorshipApprovalNotification(
@@ -103,7 +113,8 @@ export class MentorRequests implements OnInit {
             }
 
             alert('Mentorship request accepted! The mentee has been notified.');
-            this.loadMentorshipRequests(); // Refresh the list
+            // Reload in background to ensure sync (optional)
+            setTimeout(() => this.loadMentorshipRequests(), 100);
           } catch (error) {
             console.error('Error creating notification:', error);
             alert('Request accepted, but there was an issue with the notification.');
@@ -150,6 +161,9 @@ export class MentorRequests implements OnInit {
         next: async () => {
           console.log('Request rejected');
 
+          // Immediately remove the request from the UI
+          this.removeRequestFromList(requestId);
+
           try {
             // Create rejection notification for mentee
             await this.notificationService.createMentorshipRejectionNotification(
@@ -166,7 +180,8 @@ export class MentorRequests implements OnInit {
             }
 
             alert('Mentorship request declined. The mentee has been notified.');
-            this.loadMentorshipRequests(); // Refresh the list
+            // Reload in background to ensure sync (optional)
+            setTimeout(() => this.loadMentorshipRequests(), 100);
           } catch (error) {
             console.error('Error creating notification:', error);
             alert('Request declined, but there was an issue with the notification.');

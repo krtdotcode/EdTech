@@ -23,6 +23,9 @@ export class MentorDashboard implements OnInit, OnDestroy {
   loading = true;
   private subscriptions: Subscription[] = [];
 
+  // Request operation status tracking by request ID and operation type
+  requestOperationStatusMap: Map<string, {accept: 'idle' | 'loading' | 'completed', reject: 'idle' | 'loading' | 'completed'}> = new Map();
+
   // Navigation cards for mentor features
   dashboardCards = [
     {
@@ -150,8 +153,10 @@ export class MentorDashboard implements OnInit, OnDestroy {
       // For now, get all requests and filter to this mentor
       this.profileService.getMentorshipRequests().subscribe({
         next: (requests) => {
-          // Filter requests for this mentor (will need to update service to store mentor document ID properly)
-          this.mentorshipRequests = requests.filter(req => req.mentorId === this.currentMentor?.id);
+          // Filter requests for this mentor and only show pending requests
+          this.mentorshipRequests = requests.filter(req =>
+            req.mentorId === this.currentMentor?.id && req.status === 'pending'
+          );
         },
         error: (error) => {
           console.error('Error loading mentorship requests:', error);
@@ -177,28 +182,127 @@ export class MentorDashboard implements OnInit, OnDestroy {
   }
 
   acceptRequest(requestId: string): void {
+    // Set loading state
+    this.setRequestOperationStatus(requestId, 'accept', 'loading');
+
     this.profileService.acceptMentorshipRequest(requestId).subscribe({
       next: () => {
         console.log('Mentorship request accepted successfully');
-        this.loadMentorshipRequests(); // Refresh the list
+        this.setRequestOperationStatus(requestId, 'accept', 'completed');
+
+        // Immediately remove the request from the UI
+        this.removeRequestFromList(requestId);
+
+        // Delete the notification for this request
+        this.removeMentorshipRequestNotification(requestId);
+
+        // Reload in background to ensure sync (optional)
+        setTimeout(() => this.loadMentorshipRequests(), 100);
         this.loadMentorProfile(); // Refresh mentor data to show updated counts
       },
       error: (error) => {
         console.error('Error accepting mentorship request:', error);
+        this.setRequestOperationStatus(requestId, 'accept', 'idle'); // Reset on error
       }
     });
   }
 
   rejectRequest(requestId: string): void {
+    // Set loading state
+    this.setRequestOperationStatus(requestId, 'reject', 'loading');
+
     this.profileService.rejectMentorshipRequest(requestId).subscribe({
       next: () => {
         console.log('Mentorship request rejected');
-        this.loadMentorshipRequests(); // Refresh the list
+        this.setRequestOperationStatus(requestId, 'reject', 'completed');
+
+        // Immediately remove the request from the UI
+        this.removeRequestFromList(requestId);
+
+        // Reload in background to ensure sync (optional)
+        setTimeout(() => this.loadMentorshipRequests(), 100);
       },
       error: (error) => {
         console.error('Error rejecting mentorship request:', error);
+        this.setRequestOperationStatus(requestId, 'reject', 'idle'); // Reset on error
       }
     });
+  }
+
+  // Helper methods for request operation states
+  private setRequestOperationStatus(requestId: string, operation: 'accept' | 'reject', status: 'idle' | 'loading' | 'completed'): void {
+    const currentStatus = this.requestOperationStatusMap.get(requestId) || {accept: 'idle' as const, reject: 'idle' as const};
+    currentStatus[operation] = status;
+    this.requestOperationStatusMap.set(requestId, currentStatus);
+  }
+
+  isRequestOperationLoading(requestId: string, operation: 'accept' | 'reject'): boolean {
+    const status = this.requestOperationStatusMap.get(requestId);
+    return status ? status[operation] === 'loading' : false;
+  }
+
+  getAcceptButtonText(requestId: string): string {
+    const status = this.requestOperationStatusMap.get(requestId);
+    return status?.accept === 'completed' ? 'Accepted' : 'Accept';
+  }
+
+  getRejectButtonText(requestId: string): string {
+    const status = this.requestOperationStatusMap.get(requestId);
+    return status?.reject === 'completed' ? 'Rejected' : 'Reject';
+  }
+
+  getAcceptButtonClasses(requestId: string): string {
+    const status = this.requestOperationStatusMap.get(requestId);
+    const baseClasses = 'px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed';
+
+    switch (status?.accept) {
+      case 'loading':
+        return `${baseClasses} bg-blue-600 text-white`;
+      case 'completed':
+        return `${baseClasses} bg-green-600 hover:bg-green-700 text-white`;
+      default:
+        return `${baseClasses} bg-green-600 hover:bg-green-700 text-white`;
+    }
+  }
+
+  getRejectButtonClasses(requestId: string): string {
+    const status = this.requestOperationStatusMap.get(requestId);
+    const baseClasses = 'px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed';
+
+    switch (status?.reject) {
+      case 'loading':
+        return `${baseClasses} bg-blue-600 text-white`;
+      case 'completed':
+        return `${baseClasses} bg-red-500 hover:bg-red-600 text-white`;
+      default:
+        return `${baseClasses} bg-red-600 hover:bg-red-700 text-white`;
+    }
+  }
+
+  // Immediately remove a request from the UI list
+  private removeRequestFromList(requestId: string): void {
+    this.mentorshipRequests = this.mentorshipRequests.filter(req => req.id !== requestId);
+  }
+
+  // Remove the notification for a specific mentorship request
+  private removeMentorshipRequestNotification(requestId: string): void {
+    // Find the notification with this requestId in its data field
+    const relatedNotification = this.notifications.find(notification =>
+      notification.type === 'mentorship_request' &&
+      notification.data?.requestId === requestId
+    );
+
+    if (relatedNotification) {
+      console.log('Removing notification for request:', requestId);
+      this.notificationService.deleteNotification(relatedNotification.id).then(() => {
+        console.log('Notification removed successfully');
+        // The notification will be automatically removed from the UI due to real-time updates
+      }).catch(error => {
+        console.error('Failed to remove notification:', error);
+      });
+    } else {
+      console.log('No matching notification found for request:', requestId);
+    }
   }
 
   // Reload mentor profile to update counts

@@ -12,9 +12,27 @@ import { ProfileService } from '../../services/profile.service';
 })
 export class Header {
   private authService = inject(AuthService);
+  private profileService = inject(ProfileService);
   isMenuOpen = false;
+  userRole: string = 'mentee';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    this.loadUserRole();
+  }
+
+  private loadUserRole() {
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.profileService.getProfileCompletionStatus(user.uid).subscribe({
+        next: (status) => {
+          this.userRole = status?.role || 'mentee';
+        },
+        error: () => {
+          this.userRole = 'mentee';
+        }
+      });
+    }
+  }
 
   // Navigate to login page
   goToLogin() {
@@ -51,15 +69,7 @@ export class Header {
 
   // Get user role
   getUserRole(): string {
-    // For now, simplified - in real app would fetch from profile
-    try {
-      const user = localStorage.getItem('user') || sessionStorage.getItem('user');
-      if (user) {
-        const userData = JSON.parse(user);
-        return userData.role || 'mentee';
-      }
-    } catch (e) {}
-    return 'mentee';
+    return this.userRole;
   }
 
   // Navigate to appropriate dashboard based on role

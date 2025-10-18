@@ -30,7 +30,7 @@ export class MenteeDashboard implements OnInit {
       title: 'My Mentors',
       description: 'View paired mentors and ongoing mentorship relationships',
       icon: '👥',
-      route: '/progress',
+      route: '/my-mentors',
       color: 'bg-green-600',
     },
     {
