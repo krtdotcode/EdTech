@@ -311,6 +311,46 @@ export class Profile implements OnInit {
     return this.editForm.get('availability')?.value?.split(',').map((a: string) => a.trim()).filter((a: string) => a) || [];
   }
 
+  // PASSWORD RESET FUNCTIONALITY
+  passwordResetLoading = false;
+  passwordResetSuccess = false;
+  passwordResetError = '';
+
+  resetPassword(): void {
+    const user = this.authService.getCurrentUser();
+    if (!user?.email) {
+      this.passwordResetError = 'Unable to get user email. Please try again.';
+      return;
+    }
+
+    this.passwordResetLoading = true;
+    this.passwordResetError = '';
+    this.passwordResetSuccess = false;
+
+    this.authService.sendPasswordResetEmail(user.email).subscribe({
+      next: () => {
+        this.passwordResetLoading = false;
+        this.passwordResetSuccess = true;
+        this.passwordResetError = '';
+      },
+      error: (error: any) => {
+        this.passwordResetLoading = false;
+        this.passwordResetSuccess = false;
+
+        // Handle different error cases
+        if (error.code === 'auth/too-many-requests') {
+          this.passwordResetError = 'Too many reset attempts. Please wait before trying again.';
+        } else if (error.code === 'auth/user-not-found') {
+          this.passwordResetError = 'Email address not found.';
+        } else {
+          this.passwordResetError = 'Failed to send password reset email. Please try again later.';
+        }
+
+        console.error('Password reset error:', error);
+      }
+    });
+  }
+
   // Add/remove methods for edit form
   addSkill(skill: string): void {
     if (skill && skill.trim()) {

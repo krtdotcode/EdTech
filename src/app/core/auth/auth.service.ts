@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  sendPasswordResetEmail,
   user,
   User,
 } from '@angular/fire/auth';
@@ -86,5 +87,11 @@ export class AuthService {
         return userDocSnap.exists() ? userDocSnap.data()['role'] : null;
       })
     );
+  }
+
+  // SEND PASSWORD RESET EMAIL
+  sendPasswordResetEmail(email: string): Observable<void> {
+    const promise = sendPasswordResetEmail(this.auth, email);
+    return from(promise);
   }
 }

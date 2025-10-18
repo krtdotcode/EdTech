@@ -139,6 +139,52 @@
             </div>
           </div>
         </div>
+
+        <!-- Account Security -->
+        <div class="bg-white rounded-lg shadow-sm border p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Account Security</h3>
+
+          <!-- Password Reset Section -->
+          <div class="space-y-4">
+            <div>
+              <h4 class="text-sm font-medium text-gray-900 mb-2">Password</h4>
+              <p class="text-sm text-gray-600 mb-4">
+                Reset your password by sending a reset email to your registered email address.
+              </p>
+
+              <!-- Success Message -->
+              <div *ngIf="passwordResetSuccess" class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg" role="alert">
+                <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                Password reset email sent! Check your email and follow the instructions to reset your password.
+              </div>
+
+              <!-- Error Message -->
+              <div *ngIf="passwordResetError" class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+                <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                {{ passwordResetError }}
+              </div>
+
+              <!-- Reset Button -->
+              <button
+                (click)="resetPassword()"
+                [disabled]="passwordResetLoading"
+                class="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <span *ngIf="passwordResetLoading" class="flex items-center justify-center">
+                  <svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                  Sending Reset Email...
+                </span>
+                <span *ngIf="!passwordResetLoading">Send Password Reset Email</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
