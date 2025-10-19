@@ -1,10 +1,12 @@
 {
+  "project": "edtech-56637",
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
-    "public": "dist/edtech",
+    "site": "edtech-56637",
+    "public": "dist/edtech/browser",
     "ignore": [
       "firebase.json",
       "**/.*",
