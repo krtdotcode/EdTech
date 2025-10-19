@@ -92,7 +92,7 @@ export class MentorRequests implements OnInit {
       // Update request status
       this.profileService.updateMentorshipRequestStatus(requestId, 'accepted').subscribe({
         next: async () => {
-          console.log('Request accepted');
+
 
           // Immediately remove the request from the UI
           this.removeRequestFromList(requestId);
@@ -159,7 +159,7 @@ export class MentorRequests implements OnInit {
       // Update request status
       this.profileService.updateMentorshipRequestStatus(requestId, 'rejected').subscribe({
         next: async () => {
-          console.log('Request rejected');
+
 
           // Immediately remove the request from the UI
           this.removeRequestFromList(requestId);

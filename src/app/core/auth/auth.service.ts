@@ -70,7 +70,6 @@ export class AuthService {
   // Returns true if someone is signed in, false if not
   isAuthenticated(): boolean {
     const authenticated = !!this.auth.currentUser;
-    console.log('🔐 User authentication status:', authenticated, 'User:', this.auth.currentUser?.email);
     return authenticated;
   }
 

@@ -225,13 +225,13 @@ export class ProfileCompletion implements OnInit, OnDestroy {
 
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
-      console.log('Profile completion - Current user:', currentUser.uid);
+
 
       // First check if user has already completed profile (should redirect if so)
       this.profileService.hasUserCompletedProfile(currentUser.uid).subscribe({
         next: (hasCompleted) => {
           if (hasCompleted) {
-            console.log('Profile completion - User already completed profile, redirecting');
+
             // User already completed profile, get their role and redirect
             this.authService.getUserRole(currentUser.uid).subscribe({
               next: (role) => {
@@ -259,7 +259,6 @@ export class ProfileCompletion implements OnInit, OnDestroy {
 
       this.authService.getUserRole(currentUser.uid).subscribe({
         next: (role) => {
-          console.log('Profile completion - User role:', role);
 
           if (role) {
             this.userRole = role as 'mentee' | 'mentor' | 'both';

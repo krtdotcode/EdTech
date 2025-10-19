@@ -17,11 +17,12 @@ export class ComingSoon {
   @Input() icon: string = '🚀';
   @Input() features: { icon: string; title: string; description: string }[] = [];
   @Input() actions: { label: string; route: string }[] = [];
+  @Input() dashboardRoute: string = '/mentee-dashboard'; // Default to mentee dashboard, parent can override
 
   constructor(private router: Router) {}
 
   goBackToDashboard(): void {
-    // Simple navigation back - in a real app this might be more sophisticated
-    this.router.navigate(['/']);
+    // Use the specified or default dashboard route
+    this.router.navigate([this.dashboardRoute]);
   }
 }

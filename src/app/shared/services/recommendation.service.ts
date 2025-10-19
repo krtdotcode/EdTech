@@ -12,7 +12,7 @@ export class RecommendationService {
     mentee: MenteeProfile,
     allMentors: MentorProfile[]
   ): Observable<MentorProfile[]> {
-    console.log('Calculating recommendations for mentee:', mentee);
+
 
     const recommendedMentors = allMentors
       .map((mentor) => {
@@ -81,7 +81,7 @@ export class RecommendationService {
           score += factors['language_match'];
         }
 
-        console.log(`Mentor ${mentor.name}: score=${score.toFixed(2)}`, factors);
+
 
         return { mentor, score, factors };
       })
@@ -90,7 +90,7 @@ export class RecommendationService {
       .slice(0, 10) // Return top 10 recommendations
       .map((item) => item.mentor);
 
-    console.log('Final recommendations:', recommendedMentors.length, 'mentors');
+
     return of(recommendedMentors);
   }
 }

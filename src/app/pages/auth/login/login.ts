@@ -98,7 +98,6 @@ export class Login {
       this.authService.login(email, password).subscribe({
         next: (result) => {
           // SUCCESS: User signed in
-          console.log('Login successful:', result);
           this.checkProfileAndRedirect(result.user.uid);
         },
         error: (error) => {
@@ -131,7 +130,6 @@ export class Login {
 
   // CHECK IF USER HAS COMPLETED PROFILE AND REDIRECT ACCORDINGLY
   private checkProfileAndRedirect(userId: string): void {
-    console.log('Login - Checking profile completion status for user:', userId);
 
     // First check if user has completed their profile (simple one-time check)
     this.profileService.hasUserCompletedProfile(userId).subscribe({
@@ -144,11 +142,9 @@ export class Login {
           this.authService.getUserRole(userId).subscribe({
             next: (role) => {
               if (role === 'mentor') {
-                console.log('Login - User is mentor, redirecting to mentor dashboard');
                 this.router.navigate(['/mentor-dashboard']);
               } else {
                 // Both mentees and 'both' role users go to mentee dashboard
-                console.log('Login - User is mentee/both, redirecting to mentee dashboard');
                 this.router.navigate(['/mentee-dashboard']);
               }
             },
@@ -160,7 +156,6 @@ export class Login {
           });
         } else {
           // User has never completed a profile, go to profile completion
-          console.log('Login - User has not completed profile, redirecting to profile completion');
           this.router.navigate(['/profile-completion']);
         }
       },

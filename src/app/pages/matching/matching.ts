@@ -95,7 +95,7 @@ export class Matching implements OnInit {
 
   applyFilters(): void {
     this.filteredMentors = this.allMentors.filter(mentor => {
-      // 🚨 CRITICAL: Exclude mentors already connected with the current mentee
+      // CRITICAL: Exclude mentors already connected with the current mentee
       const mentorUserId = mentor.userId || mentor.id.replace('_mentor', '');
       const isAlreadyConnected = this.currentMentee?.mentors?.includes(mentorUserId);
       if (isAlreadyConnected) {
@@ -266,6 +266,9 @@ export class Matching implements OnInit {
   }
 
   goBackToDashboard(): void {
+    // Navigate based on user role - could be either mentor or mentee
+    // For now defaulting to mentee dashboard since matching is primarily for mentees
+    // but mentors might access it too
     this.router.navigate(['/mentee-dashboard']);
   }
 }

@@ -60,7 +60,7 @@ export class MentorDashboard implements OnInit, OnDestroy {
       title: 'Progress Tracking',
       description: 'Track mentee progress and milestones',
       icon: '📊',
-      route: '/mentee-progress',
+      route: '/progress',
       color: 'bg-emerald-600',
     },
     {
@@ -131,13 +131,13 @@ export class MentorDashboard implements OnInit, OnDestroy {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    console.log('Loading notifications for user:', currentUser.uid);
+
     const notificationsSub = this.notificationService.getUserNotifications().subscribe({
       next: (notifications) => {
-        console.log('Received notifications:', notifications);
+
         this.notifications = notifications;
         this.unreadNotificationsCount = notifications.filter(n => !n.read).length;
-        console.log('Unread notifications count:', this.unreadNotificationsCount);
+
       },
       error: (error) => {
         console.error('Error loading notifications:', error);
@@ -181,13 +181,20 @@ export class MentorDashboard implements OnInit, OnDestroy {
     return menteeId ? menteeId.charAt(0).toUpperCase() : '?';
   }
 
+  getCurrentRating(): number {
+    // Returns the current stored rating from the mentor profile
+    return this.currentMentor?.ratings || 0;
+  }
+
+
+
   acceptRequest(requestId: string): void {
     // Set loading state
     this.setRequestOperationStatus(requestId, 'accept', 'loading');
 
     this.profileService.acceptMentorshipRequest(requestId).subscribe({
       next: () => {
-        console.log('Mentorship request accepted successfully');
+
         this.setRequestOperationStatus(requestId, 'accept', 'completed');
 
         // Immediately remove the request from the UI
@@ -213,7 +220,7 @@ export class MentorDashboard implements OnInit, OnDestroy {
 
     this.profileService.rejectMentorshipRequest(requestId).subscribe({
       next: () => {
-        console.log('Mentorship request rejected');
+
         this.setRequestOperationStatus(requestId, 'reject', 'completed');
 
         // Immediately remove the request from the UI
@@ -293,15 +300,11 @@ export class MentorDashboard implements OnInit, OnDestroy {
     );
 
     if (relatedNotification) {
-      console.log('Removing notification for request:', requestId);
       this.notificationService.deleteNotification(relatedNotification.id).then(() => {
-        console.log('Notification removed successfully');
         // The notification will be automatically removed from the UI due to real-time updates
       }).catch(error => {
         console.error('Failed to remove notification:', error);
       });
-    } else {
-      console.log('No matching notification found for request:', requestId);
     }
   }
 
@@ -321,8 +324,6 @@ export class MentorDashboard implements OnInit, OnDestroy {
       });
     }
   }
-
-
 
   markAllNotificationsAsRead(): void {
     this.notificationService.markAllNotificationsAsRead().then(() => {
