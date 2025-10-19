@@ -1,42 +1,218 @@
-<div class="min-h-screen bg-gray-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+<!-- Messages Page (similar to Feedback page structure) -->
+<div *ngIf="!userRole" class="min-h-screen bg-gray-50 flex items-center justify-center">
+  <app-header></app-header>
+  <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+</div>
 
-    <!-- Navigation Header -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-      <div class="flex items-center justify-between">
+<!-- Main Content -->
+<div *ngIf="userRole" class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <app-header></app-header>
+
+  <!-- Navigation and Title -->
+  <div class="bg-white border-b border-gray-200 px-4 py-4">
+    <div class="max-w-6xl mx-auto">
+      <button
+        (click)="goBackToDashboard()"
+        class="flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-4"
+      >
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Dashboard
+      </button>
+
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Messages</h1>
+          <p class="text-gray-600 mt-1">Chat with your mentorship partners</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-6xl mx-auto px-4 py-8">
+
+    <!-- Active Connections Summary -->
+    <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
+      <div class="text-center">
+        <div class="text-6xl font-bold text-purple-600 mb-2">{{ activeConnections.length }}</div>
+        <p class="text-gray-600">Active Mentorship Connections</p>
+        <p class="text-sm text-gray-500 mt-1">{{ userRole === 'mentor' ? 'Start messaging with your mentees' : 'Chat with your mentor' }}</p>
+      </div>
+    </div>
+
+    <!-- Messages Section -->
+    <div class="bg-white rounded-lg shadow-sm border">
+
+      <!-- Header -->
+      <div class="p-6 border-b border-gray-200">
+        <h2 class="text-xl font-semibold text-gray-900">Your Mentorship Conversations</h2>
+        <p class="text-gray-600 mt-1">Chat with your active mentorship partners</p>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+        <p class="text-gray-600 mt-2">Loading conversations...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading && activeConnections.length === 0" class="text-center py-12">
+        <svg class="mx-auto h-16 w-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No Active Connections</h3>
+        <p class="text-gray-600 mb-4">
+          You don't have any active mentorship relationships yet. Start by finding a mentor or accepting mentorship requests.
+        </p>
         <button
           (click)="goBackToDashboard()"
-          class="flex items-center text-gray-600 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
-          title="Back to Dashboard"
+          class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
         >
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-          </svg>
-          Back to Dashboard
+          Go to Dashboard
         </button>
+      </div>
 
-        <div class="flex-1 text-center">
-          <h1 class="text-2xl font-bold text-gray-900">Messages</h1>
-          <p class="text-gray-600 mt-1">Connect and communicate with your mentees/mentor</p>
-        </div>
+      <!-- Conversations List -->
+      <div *ngIf="!loading && activeConnections.length > 0" class="divide-y divide-gray-200">
+        <div *ngFor="let connection of activeConnections"
+             (click)="startChat(connection)"
+             class="p-6 hover:bg-gray-50 cursor-pointer transition-colors">
 
-        <div class="w-36 flex justify-end">
-          <div class="text-sm text-gray-500">
-            Coming Soon
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <!-- Avatar -->
+              <div class="w-12 h-12 rounded-full overflow-hidden bg-purple-100 flex items-center justify-center">
+                <img
+                  *ngIf="connection.photoUrl"
+                  [src]="connection.photoUrl"
+                  [alt]="connection.name"
+                  class="w-full h-full object-cover"
+                  (error)="$event.target.style.display='none'">
+                <span
+                  class="text-purple-600 font-medium text-lg"
+                  [style.display]="connection.photoUrl ? 'none' : 'block'">
+                  {{ connection.name[0].toUpperCase() }}
+                </span>
+              </div>
+
+              <!-- User Info -->
+              <div class="flex-1">
+                <h4 class="text-lg font-semibold text-gray-900">{{ connection.name }}</h4>
+                <p class="text-gray-600 capitalize">{{ connection.role }}</p>
+
+                <!-- Last Message (if exists) -->
+                <div *ngIf="connection.lastMessage" class="mt-2 flex items-center text-sm">
+                  <span class="text-gray-500 min-w-0 flex-1 truncate">
+                    {{ connection.lastMessage.senderId === currentUserId ? 'You: ' : '' }}{{ connection.lastMessage.content }}
+                  </span>
+                  <span class="text-gray-400 ml-2">
+                    {{ getTimeAgo(connection.lastMessage.timestamp) }}
+                  </span>
+                </div>
+
+                <div *ngIf="!connection.lastMessage" class="mt-2 text-sm text-gray-500">
+                  Click to start conversation
+                </div>
+              </div>
+            </div>
+
+            <!-- Unread Badge -->
+            <div *ngIf="connection.unreadCount > 0" class="text-right">
+              <span class="inline-flex items-center justify-center w-8 h-8 bg-purple-600 text-white text-sm font-medium rounded-full">
+                {{ connection.unreadCount > 9 ? '9+' : connection.unreadCount }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- Placeholder for Messages -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-      <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
-        <span class="text-4xl">💬</span>
-      </div>
-      <h2 class="text-xl font-semibold text-gray-900 mb-2">Messaging Feature</h2>
-      <p class="text-gray-600 mb-4">Real-time messaging between mentors and mentees is under development.</p>
-      <p class="text-sm text-gray-500">For now, you can accept/decline mentorship requests and receive notifications about status updates.</p>
-    </div>
-
   </div>
+
+  <!-- Chat Modal -->
+  <div *ngIf="showChatModal && selectedConnection" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[80vh] flex flex-col">
+
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-200">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center overflow-hidden">
+            <img
+              *ngIf="selectedConnection.photoUrl"
+              [src]="selectedConnection.photoUrl"
+              [alt]="selectedConnection.name"
+              class="w-full h-full object-cover"
+              (error)="$event.target.style.display='none'">
+            <span
+              class="text-purple-600 font-medium"
+              [style.display]="selectedConnection.photoUrl ? 'none' : 'block'">
+              {{ selectedConnection.name[0].toUpperCase() }}
+            </span>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Chat with {{ selectedConnection.name }}</h3>
+            <p class="text-sm text-gray-600 capitalize">{{ selectedConnection.role }}</p>
+          </div>
+        </div>
+        <button
+          (click)="closeChatModal()"
+          class="text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Messages Area -->
+      <div class="flex-1 overflow-y-auto p-6 space-y-4 min-h-0 messages-modal">
+
+        <div *ngIf="chatMessages.length === 0" class="text-center py-8 text-gray-500">
+          <svg class="mx-auto h-12 w-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+          <h4 class="text-sm font-medium mb-2">Start the conversation</h4>
+          <p class="text-xs">Send your first message to begin chatting.</p>
+        </div>
+
+        <div *ngFor="let message of chatMessages"
+             [class.flex-row-reverse]="message.senderId === currentUserId"
+             class="flex">
+          <div
+            class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg shadow-sm text-sm"
+            [class.bg-purple-500]="message.senderId === currentUserId"
+            [class.text-white]="message.senderId === currentUserId"
+            [class.bg-gray-100]="message.senderId !== currentUserId"
+            [class.text-gray-900]="message.senderId !== currentUserId">
+            <p class="whitespace-pre-wrap break-words">{{ message.content }}</p>
+            <p class="text-xs opacity-70 mt-1">{{ getTimeAgo(message.timestamp) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message Input -->
+      <div class="p-6 border-t border-gray-200">
+        <form (ngSubmit)="sendChatMessage()" class="flex gap-3">
+          <input
+            [(ngModel)]="chatMessage"
+            name="chatMessage"
+            type="text"
+            placeholder="Type your message..."
+            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            required>
+          <button
+            type="submit"
+            [disabled]="!chatMessage.trim() || sendingMessage"
+            class="px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors">
+            <span *ngIf="sendingMessage">Sending...</span>
+            <span *ngIf="!sendingMessage">Send</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <app-footer></app-footer>
 </div>
