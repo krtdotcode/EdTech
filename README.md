@@ -1,39 +1,178 @@
 # EdTech
 
-Connecting Mentors and Mentees.
+A comprehensive platform connecting mentors and mentees in the education technology sector, built with Angular and Firebase.
 
-## Mentor-Mentee Matching Features
+## Overview
 
-This application includes a comprehensive mentor-mentee matching system with the following features:
+EdTech is a web application designed to facilitate mentor-mentee relationships within the educational technology field. The platform provides an intelligent matching system, profile management, mentorship request workflow, and communication tools to support effective mentorship experiences.
 
-### 1. Profile Data Management
-- **Database Schema:** Defined for `MentorProfile`, `MenteeProfile`, and `MentorshipRequest` in `src/app/shared/models/profile.model.ts`.
-- **API Endpoints:** Implemented in `src/app/shared/services/profile.service.ts` for retrieving and updating mentor and mentee profiles.
+## Features
 
-### 2. Search & Filtering
-- **Frontend UI:** Components for search bar and filter options (skills, goals, industry, location, availability, ratings) are available in `src/app/pages/matching/matching.html`.
-- **Backend Logic:** Implemented in `src/app/pages/matching/matching.ts` and `src/app/shared/services/profile.service.ts` for searching and filtering mentor profiles.
-- **Display Results:** Search results are displayed in `src/app/pages/matching/matching.html`.
+### Mentor-Mentee Matching System
+- **Intelligent Recommendation Engine**: AI-driven algorithm matching mentors and mentees based on skills, goals, location, availability, and other weighted factors
+- **Advanced Search and Filtering**: Comprehensive search with filters for skills, industry, location, availability, and ratings
+- **Profile Management**: Complete profile creation and management for both mentors and mentees
 
-### 3. Recommendation Engine
-- **Algorithm Design:** An AI-driven recommendation algorithm based on profile matching, goals, and weighted factors (e.g., skill overlap > location > availability) is implemented.
-- **Backend Service & API:** The `src/app/shared/services/recommendation.service.ts` contains the logic and acts as the API endpoint for mentor recommendations.
-- **Display Recommendations:** Recommended mentors are displayed in `src/app/pages/matching/matching.html`.
+### Collaboration Tools
+- **Request/Approval Workflow**: Streamlined system for sending, receiving, and managing mentorship requests
+- **Messaging System**: Integrated communication platform for mentor-mentee conversations
+- **Dashboard Access**: Separate dashboards for mentors and mentees to track active mentorships
 
-### 4. Request/Approval Workflow
-- **Database Schema:** Defined for mentorship requests in `src/app/shared/models/profile.model.ts`.
-- **Frontend UI (Mentee):** Mentees can send mentorship requests via `src/app/pages/matching/matching.html` and `src/app/pages/matching/matching.ts`.
-- **Frontend UI (Mentor):** Mentors can view and manage pending requests (accept/reject) in `src/app/pages/mentor-requests/mentor-requests.html` and `src/app/pages/mentor-requests/mentor-requests.ts`.
-- **Backend API Endpoints:** Implemented in `src/app/shared/services/profile.service.ts` for creating, accepting, and rejecting requests.
-- **Configurable Limit:** Logic for limiting active mentees per mentor is implemented in `src/app/shared/services/profile.service.ts`.
-- **Notification System:** Basic notification (console logs and alerts) for requests and approvals/rejections is in place.
+### Core Functionality
+- **Authentication System**: Secure login and signup with Firebase Auth
+- **Profile Completion**: Guided onboarding process for comprehensive user profiles
+- **Mentor Limits**: Configurable limits for active mentees per mentor
+- **Notification System**: Real-time notifications for requests and updates
 
-### 5. Testing
-- **Unit and Integration Tests:** Comprehensive tests are provided for:
-    - `ProfileService`: `src/app/shared/services/profile.service.spec.ts`
-    - `RecommendationService`: `src/app/shared/services/recommendation.service.spec.ts`
-    - `Matching Component`: `src/app/pages/matching/matching.spec.ts`
-    - `MentorRequests Component`: `src/app/pages/mentor-requests/mentor-requests.spec.ts`
+## Technology Stack
 
-### 6. Styling
-- **DaisyUI and Tailwind CSS:** All relevant frontend components have been converted to use DaisyUI and Tailwind CSS for modern and responsive styling.
+- **Frontend**: Angular 20 with TypeScript
+- **Styling**: Tailwind CSS with DaisyUI components
+- **Backend**: Firebase (Authentication, Firestore Database, Hosting)
+- **Testing**: Jasmine and Karma
+- **Package Management**: npm
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── core/                    # Core services and guards
+│   │   ├── auth/               # Authentication service
+│   │   └── guards/             # Route guards
+│   ├── shared/                 # Shared components and services
+│   │   ├── components/         # Reusable UI components
+│   │   ├── models/             # Data models
+│   │   └── services/           # Shared business logic services
+│   └── pages/                  # Application pages/routing modules
+│       ├── auth/               # Authentication pages
+│       ├── home/               # Home page
+│       ├── matching/           # Mentor-mentee matching
+│       ├── profile/            # User profiles
+│       ├── messages/           # Messaging system
+│       ├── mentor-dashboard/   # Mentor dashboard
+│       ├── mentee-dashboard/   # Mentee dashboard
+│       └── [other pages...]
+├── environments/               # Environment configurations
+└── styles.scss                 # Global styles
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18.0.0 or higher
+- npm 9.0.0 or higher
+- Firebase account and project
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/krtdotcode/EdTech.git
+   cd edtech
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure Firebase**
+   - Create a Firebase project at [https://console.firebase.google.com](https://console.firebase.google.com)
+   - Enable Authentication and Firestore Database
+   - Copy your Firebase configuration to `src/environments/environment.ts`
+
+4. **Configure your Firebase settings**
+   - Replace the placeholder values in `src/environments/environment.ts` with your Firebase project configuration
+   - Update Firestore rules if needed (see `firestore.rules`)
+   - Configure Firestore indexes if required (see `firestore.indexes.json`)
+
+### Development
+
+1. **Start the development server**
+   ```bash
+   npm start
+   ```
+   The application will be available at `http://localhost:4200`
+
+2. **Run tests**
+   ```bash
+   npm test
+   ```
+
+3. **Build for production**
+   ```bash
+   npm run build
+   ```
+
+### Deployment
+
+The application can be deployed to Firebase Hosting:
+```bash
+firebase deploy
+```
+
+Make sure your Firebase project is configured and authenticated locally.
+
+## Usage
+
+### For New Users
+1. Register an account through the signup page
+2. Complete your profile during onboarding
+3. Specify whether you're registering as a mentor or mentee
+4. Start using the platform to find matches and request mentorships
+
+### For Mentors
+- Review incoming mentorship requests
+- Manage active mentorship relationships
+- Communicate with mentees through the messaging system
+- Provide feedback and guidance
+
+### For Mentees
+- Browse mentor profiles and search for suitable matches
+- Send mentorship requests to potential mentors
+- Communicate with approved mentors
+- Track progress and leave feedback
+
+## API Services
+
+The application provides several key services:
+
+- **ProfileService**: Manages user profile data and mentorship requests
+- **RecommendationService**: Handles AI-driven mentor recommendations
+- **AuthService**: Manages user authentication
+- **MessagingService**: Handles real-time messaging functionality
+
+## Testing
+
+Comprehensive unit and integration tests are provided:
+```bash
+npm test
+```
+
+Test coverage includes core services, components, and API integrations.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Acknowledgment
+
+Part of the code was inspired by the official Angular documentation and Firebase documentation.
+
+## Credits
+
+### Developers
+
+**Kurt Joshua Cayaga**
+- 3rd Year | BS Computer Science
+- University of Cabuyao
+
+**Jaireell Son Regala**
+- 3rd Year | BS Information Technology
+- Bulacan State University
