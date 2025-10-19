@@ -12,7 +12,7 @@ export interface UserProfile {
   goals: string[];
   availability: string[];
   preferredLanguage?: string;
-  role: 'mentee' | 'mentor' | 'both';
+  role: 'mentee' | 'mentor';
 }
 
 export interface MentorProfile extends UserProfile {

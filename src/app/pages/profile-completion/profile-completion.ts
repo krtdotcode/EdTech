@@ -22,7 +22,7 @@ export class ProfileCompletion implements OnInit, OnDestroy {
   loading = false;
   errorMessage = '';
   successMessage = '';
-  userRole: 'mentee' | 'mentor' | 'both' | null = null;
+  userRole: 'mentee' | 'mentor' | null = null;
   showRoleSelection = true;
 
   // Predefined avatars (using free avatar services)
@@ -261,9 +261,9 @@ export class ProfileCompletion implements OnInit, OnDestroy {
         next: (role) => {
 
           if (role) {
-            this.userRole = role as 'mentee' | 'mentor' | 'both';
+            this.userRole = role as 'mentee' | 'mentor';
             // Check if user already has a profile for their role
-            this.checkExistingProfileAndRedirect(currentUser.uid, role as 'mentee' | 'mentor' | 'both');
+            this.checkExistingProfileAndRedirect(currentUser.uid, role as 'mentee' | 'mentor');
           } else {
             console.log('Profile completion - No role found, showing role selection');
             this.showRoleSelection = true;
@@ -304,18 +304,13 @@ export class ProfileCompletion implements OnInit, OnDestroy {
     const preferredMentorSkillsControl = this.profileForm.get('preferredMentorSkills');
     const preferredMentorGoalsControl = this.profileForm.get('preferredMentorGoals');
 
-    if (this.userRole === 'mentor' || this.userRole === 'both') {
+    if (this.userRole === 'mentor') {
       expertiseControl?.setValidators(Validators.required);
       interestsControl?.clearValidators();
       preferredMentorSkillsControl?.clearValidators();
       preferredMentorGoalsControl?.clearValidators();
     } else if (this.userRole === 'mentee') {
       expertiseControl?.clearValidators();
-      interestsControl?.setValidators(Validators.required);
-      preferredMentorSkillsControl?.setValidators(Validators.required);
-      preferredMentorGoalsControl?.setValidators(Validators.required);
-    } else { // 'both'
-      expertiseControl?.setValidators(Validators.required);
       interestsControl?.setValidators(Validators.required);
       preferredMentorSkillsControl?.setValidators(Validators.required);
       preferredMentorGoalsControl?.setValidators(Validators.required);
@@ -353,7 +348,7 @@ export class ProfileCompletion implements OnInit, OnDestroy {
   }
 
   // CHECK IF USER ALREADY HAS A PROFILE AND REDIRECT ACCORDINGLY
-  checkExistingProfileAndRedirect(userId: string, role: 'mentee' | 'mentor' | 'both'): void {
+  checkExistingProfileAndRedirect(userId: string, role: 'mentee' | 'mentor'): void {
     if (role === 'mentee') {
       this.profileService.getMenteeById(userId).subscribe({
         next: (profile) => {
@@ -385,37 +380,6 @@ export class ProfileCompletion implements OnInit, OnDestroy {
         error: (error: any) => {
           console.error('Error checking existing mentor profile:', error);
           // Show form even if error checking
-          this.updateFormValidators();
-        }
-      });
-    } else if (role === 'both') {
-      // For 'both' role, check if they have either profile
-      this.profileService.getMenteeById(userId).subscribe({
-        next: (menteeProfile) => {
-          if (menteeProfile) {
-            // Has mentee profile, go to mentee dashboard (they can switch roles later)
-            this.router.navigate(['/mentee-dashboard']);
-          } else {
-            // Check if they have mentor profile
-            this.profileService.getMentorById(userId).subscribe({
-              next: (mentorProfile) => {
-                if (mentorProfile) {
-                  // Has mentor profile only, still show form to complete mentee profile
-                  this.updateFormValidators();
-                } else {
-                  // No profiles yet, show form
-                  this.updateFormValidators();
-                }
-              },
-              error: () => {
-                // Show form even if error
-                this.updateFormValidators();
-              }
-            });
-          }
-        },
-        error: () => {
-          // Show form even if error
           this.updateFormValidators();
         }
       });
@@ -455,95 +419,7 @@ export class ProfileCompletion implements OnInit, OnDestroy {
         console.log('Creating profile with role:', this.userRole);
         console.log('Profile data:', commonProfile);
 
-        if (this.userRole === 'both') {
-          // For 'both' role, create both mentee and mentor profiles
-          let menteeCreated = false;
-          let mentorCreated = false;
-
-          const menteeProfile: MenteeProfile = {
-            ...commonProfile,
-            interests: formValue.interests,
-            preferredMentorSkills: formValue.preferredMentorSkills,
-            preferredMentorGoals: formValue.preferredMentorGoals,
-            role: 'mentee'
-          };
-
-          const mentorProfile: MentorProfile = {
-            ...commonProfile,
-            expertise: formValue.expertise,
-            ratings: 0,
-            activeMentees: 0,
-            maxMentees: 3,
-            role: 'mentor'
-          };
-
-          console.log('Creating mentee profile:', menteeProfile);
-          console.log('Creating mentor profile:', mentorProfile);
-
-          // Check required fields before creating profile
-          if (!menteeProfile.name || !menteeProfile.bio || !menteeProfile.location ||
-              !menteeProfile.skills || menteeProfile.skills.length === 0 ||
-              !menteeProfile.goals || menteeProfile.goals.length === 0 ||
-              !menteeProfile.availability || menteeProfile.availability.length === 0) {
-            console.error('Missing required fields for mentee profile:', menteeProfile);
-            this.errorMessage = 'Missing required fields. Please fill in all required information.';
-            this.loading = false;
-            return;
-          }
-
-          this.profileService.createMenteeProfile(menteeProfile).subscribe({
-            next: () => {
-              console.log('Mentee profile created successfully');
-              menteeCreated = true;
-              if (mentorCreated) {
-                // Mark profile as completed
-                this.profileService.markProfileCompleted(currentUser.uid, 'both').subscribe({
-                  next: () => {
-                    this.successMessage = 'Both mentee and mentor profiles created successfully!';
-                    this.router.navigate(['/mentee-dashboard']);
-                  },
-                  error: (err: any) => {
-                    console.error('Error marking profile completed:', err);
-                    this.successMessage = 'Both profiles created successfully!';
-                    this.router.navigate(['/mentee-dashboard']);
-                  }
-                });
-              }
-            },
-            error: (err: any) => {
-              this.errorMessage = 'Error creating mentee profile.';
-              console.error('Detailed mentee profile creation error:', err);
-              console.error('Profile data that failed:', menteeProfile);
-              this.loading = false;
-            }
-          });
-
-          this.profileService.createMentorProfile(mentorProfile).subscribe({
-            next: () => {
-              mentorCreated = true;
-              if (menteeCreated) {
-                // Mark profile as completed
-                this.profileService.markProfileCompleted(currentUser.uid, 'both').subscribe({
-                  next: () => {
-                    this.successMessage = 'Both mentee and mentor profiles created successfully!';
-                    this.router.navigate(['/mentee-dashboard']);
-                  },
-                  error: (err: any) => {
-                    console.error('Error marking profile completed:', err);
-                    this.successMessage = 'Both profiles created successfully!';
-                    this.router.navigate(['/mentee-dashboard']);
-                  }
-                });
-              }
-            },
-            error: (err: any) => {
-              this.errorMessage = 'Error creating mentor profile.';
-              console.error('Detailed mentor profile creation error:', err);
-              this.loading = false;
-            }
-          });
-
-        } else if (this.userRole === 'mentee') {
+        if (this.userRole === 'mentee') {
           const menteeProfile: MenteeProfile = {
             ...commonProfile,
             interests: formValue.interests,

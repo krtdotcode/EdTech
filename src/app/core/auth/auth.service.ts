@@ -26,7 +26,7 @@ export class AuthService {
   }
 
   // CREATE NEW ACCOUNT
-  register(email: string, password: string, role?: 'mentee' | 'mentor' | 'both'): Observable<any> {
+  register(email: string, password: string, role?: 'mentee' | 'mentor'): Observable<any> {
     const promise = createUserWithEmailAndPassword(this.auth, email, password);
 
     if (role) {
@@ -70,7 +70,7 @@ export class AuthService {
   }
 
   // SAVE USER ROLE TO FIRESTORE
-  saveUserRole(uid: string, role: 'mentee' | 'mentor' | 'both'): Observable<void> {
+  saveUserRole(uid: string, role: 'mentee' | 'mentor'): Observable<void> {
     const userDoc = doc(this.firestore, 'users', uid);
     return from(setDoc(userDoc, { role }));
   }

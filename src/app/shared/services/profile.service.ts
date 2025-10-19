@@ -308,7 +308,7 @@ constructor(private firestore: Firestore) {}
   }
 
   // Mark user's profile as completed
-  markProfileCompleted(userId: string, role: 'mentee' | 'mentor' | 'both'): Observable<void> {
+  markProfileCompleted(userId: string, role: 'mentee' | 'mentor'): Observable<void> {
     const statusDocRef = doc(this.firestore, 'userStatus', userId);
     const completionStatus = {
       hasCompletedProfile: true,
