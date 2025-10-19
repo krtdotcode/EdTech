@@ -1,14 +1,10 @@
-<!-- Loading State -->
 <div *ngIf="!userRole" class="min-h-screen bg-gray-50 flex items-center justify-center">
   <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
 </div>
 
-<!-- Main Content -->
 <div *ngIf="userRole" class="min-h-screen bg-gray-50">
-  <!-- Header -->
   <app-header></app-header>
 
-  <!-- Navigation and Title -->
   <div class="bg-white border-b border-gray-200 px-4 py-4">
     <div class="max-w-6xl mx-auto">
       <button
@@ -27,7 +23,6 @@
           <p class="text-gray-600 mt-1">View reviews and provide feedback</p>
         </div>
 
-        <!-- Submit Review Button -->
         <button
           (click)="openSubmitModal()"
           class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
@@ -42,7 +37,6 @@
     </div>
   </div>
 
-  <!-- Main Content -->
   <div class="max-w-6xl mx-auto px-4 py-8">
     <!-- Rating Summary (for received reviews) -->
     <div class="bg-white rounded-lg shadow-sm border p-6 mb-8"
@@ -210,7 +204,7 @@
   <!-- Submit Review Modal -->
   <div *ngIf="showSubmitModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
     <div class="bg-white rounded-lg shadow-xl max-w-lg mx-4 w-full">
-      <!-- Modal Header -->
+      
       <div class="flex items-center justify-between p-6 border-b border-gray-200">
         <h3 class="text-lg font-semibold text-gray-900">Write a Review</h3>
         <button
@@ -223,7 +217,6 @@
         </button>
       </div>
 
-      <!-- Modal Body -->
       <form (ngSubmit)="submitReview()" class="p-6 space-y-6">
         <!-- Select Person to Review -->
         <div>
@@ -291,7 +284,6 @@
         </div>
       </form>
 
-      <!-- Modal Footer -->
       <div class="flex justify-end gap-3 p-6 border-t border-gray-200">
         <button
           type="button"

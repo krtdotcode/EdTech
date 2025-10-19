@@ -1,15 +1,11 @@
-<!-- Messages Page (similar to Feedback page structure) -->
 <div *ngIf="!userRole" class="min-h-screen bg-gray-50 flex items-center justify-center">
   <app-header></app-header>
   <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
 </div>
 
-<!-- Main Content -->
 <div *ngIf="userRole" class="min-h-screen bg-gray-50">
-  <!-- Header -->
   <app-header></app-header>
 
-  <!-- Navigation and Title -->
   <div class="bg-white border-b border-gray-200 px-4 py-4">
     <div class="max-w-6xl mx-auto">
       <button
@@ -31,7 +27,6 @@
     </div>
   </div>
 
-  <!-- Main Content -->
   <div class="max-w-6xl mx-auto px-4 py-8">
 
     <!-- Active Connections Summary -->
@@ -46,13 +41,11 @@
     <!-- Messages Section -->
     <div class="bg-white rounded-lg shadow-sm border">
 
-      <!-- Header -->
       <div class="p-6 border-b border-gray-200">
         <h2 class="text-xl font-semibold text-gray-900">Your Mentorship Conversations</h2>
         <p class="text-gray-600 mt-1">Chat with your active mentorship partners</p>
       </div>
 
-      <!-- Loading -->
       <div *ngIf="loading" class="text-center py-8">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
         <p class="text-gray-600 mt-2">Loading conversations...</p>
@@ -118,8 +111,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- Unread Badge -->
             <div *ngIf="connection.unreadCount > 0" class="text-right">
               <span class="inline-flex items-center justify-center w-8 h-8 bg-purple-600 text-white text-sm font-medium rounded-full">
                 {{ connection.unreadCount > 9 ? '9+' : connection.unreadCount }}

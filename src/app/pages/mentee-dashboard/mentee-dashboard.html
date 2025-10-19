@@ -1,17 +1,12 @@
-<!-- Loading State -->
 <div *ngIf="loading" class="min-h-screen bg-gray-50 flex items-center justify-center">
   <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
 </div>
 
-<!-- Main Dashboard Content -->
 <div *ngIf="!loading" class="h-auto bg-gray-50">
-  <!-- Header -->
   <app-header></app-header>
 
-  <!-- Main Content -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <!-- Welcome Section -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
       <div class="flex items-center space-x-4">
         <div class="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
@@ -61,7 +56,7 @@
           </div>
           <div class="ml-4">
             <p class="text-sm font-medium text-gray-600">Sessions Completed</p>
-            <p class="text-2xl font-bold text-gray-900">0</p> <!-- TODO: Get from progress data -->
+            <p class="text-2xl font-bold text-gray-900">0</p>
           </div>
         </div>
       </div>

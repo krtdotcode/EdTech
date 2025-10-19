@@ -3,7 +3,7 @@ export interface UserProfile {
   userId: string;
   name: string;
   email: string;
-  photoUrl?: string; // Temporarily disabled due to Firestore 1MB limit
+  photoUrl?: string;
   bio: string;
   location: string;
   skills: string[];

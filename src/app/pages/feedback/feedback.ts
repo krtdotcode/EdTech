@@ -25,14 +25,11 @@ export class Feedback implements OnInit {
   currentUserId = '';
   userRole: 'mentee' | 'mentor' | 'both' | null = null;
 
-  // Tabs
   activeTab: 'received' | 'given' = 'received';
 
-  // Reviews data
   receivedReviews: ReviewWithDetails[] = [];
   givenReviews: Review[] = [];
 
-  // Loading states
   loadingReceived = false;
   loadingGiven = false;
 

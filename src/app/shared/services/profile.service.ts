@@ -8,67 +8,33 @@ import { MentorProfile, MenteeProfile, MentorshipRequest, Review } from '../mode
   providedIn: 'root',
 })
 export class ProfileService {
-constructor(private firestore: Firestore) {
-  console.log('🔥 ProfileService initialized');
-  console.log('🔥 Firestore instance:', firestore);
-}
-
+constructor(private firestore: Firestore) {}
   // Create a new mentee profile in Firestore
   createMenteeProfile(profile: MenteeProfile): Observable<MenteeProfile> {
-    console.log('🔥 Creating mentee profile in Firestore:', profile);
+    const profileDocRef = doc(this.firestore, 'profiles', `${profile.userId}_mentee`);
+    const profileWithDocId = { ...profile, id: `${profile.userId}_mentee` };
 
-    try {
-      const profileDocRef = doc(this.firestore, 'profiles', `${profile.userId}_mentee`);
-      const profileWithDocId = { ...profile, id: `${profile.userId}_mentee` };
-      console.log('🔥 Document path:', profileDocRef.path);
-      console.log('🔥 Profile data to save:', profileWithDocId);
-
-      return from(setDoc(profileDocRef, profileWithDocId)).pipe(
-        tap(() => console.log('✅ Firestore setDoc succeeded')),
-        map(() => {
-          console.log('✅ Mentee profile created successfully');
-          return profileWithDocId;
-        }),
-        catchError((error) => {
-          console.error('❌ Firestore setDoc failed:', error);
-          console.error('❌ Error code:', error.code);
-          console.error('❌ Error message:', error.message);
-          throw error;
-        })
-      );
-    } catch (error) {
-      console.error('❌ Error before Firestore call:', error);
-      throw error;
-    }
+    return from(setDoc(profileDocRef, profileWithDocId)).pipe(
+      map(() => profileWithDocId),
+      catchError((error) => {
+        console.error('Error creating mentee profile:', error);
+        throw error;
+      })
+    );
   }
 
   // Create a new mentor profile in Firestore
   createMentorProfile(profile: MentorProfile): Observable<MentorProfile> {
-    console.log('🔥 Creating mentor profile in Firestore:', profile);
+    const profileDocRef = doc(this.firestore, 'profiles', `${profile.userId}_mentor`);
+    const profileWithDocId = { ...profile, id: `${profile.userId}_mentor` };
 
-    try {
-      const profileDocRef = doc(this.firestore, 'profiles', `${profile.userId}_mentor`);
-      const profileWithDocId = { ...profile, id: `${profile.userId}_mentor` };
-      console.log('🔥 Document path:', profileDocRef.path);
-      console.log('🔥 Profile data to save:', profileWithDocId);
-
-      return from(setDoc(profileDocRef, profileWithDocId)).pipe(
-        tap(() => console.log('✅ Firestore setDoc succeeded')),
-        map(() => {
-          console.log('✅ Mentor profile created successfully');
-          return profileWithDocId;
-        }),
-        catchError((error) => {
-          console.error('❌ Firestore setDoc failed:', error);
-          console.error('❌ Error code:', error.code);
-          console.error('❌ Error message:', error.message);
-          throw error;
-        })
-      );
-    } catch (error) {
-      console.error('❌ Error before Firestore call:', error);
-      throw error;
-    }
+    return from(setDoc(profileDocRef, profileWithDocId)).pipe(
+      map(() => profileWithDocId),
+      catchError((error) => {
+        console.error('Error creating mentor profile:', error);
+        throw error;
+      })
+    );
   }
 
   // Get all mentors from Firestore
@@ -224,30 +190,18 @@ constructor(private firestore: Firestore) {
 
   // Accept mentorship request and establish relationship
   acceptMentorshipRequest(requestId: string): Observable<boolean> {
-    // First get the request details
     const requestDocRef = doc(this.firestore, 'mentorshipRequests', requestId);
 
     return from(getDoc(requestDocRef)).pipe(
-      // Update request status and establish relationships
       tap((requestDoc) => {
         if (requestDoc.exists()) {
           const requestData = requestDoc.data() as any;
-
-          // Update request status to accepted
           updateDoc(requestDocRef, { status: 'accepted' });
 
-          // Extract user IDs from document IDs (remove '_mentor' or '_mentee' suffix)
           const mentorUserId = requestData.mentorId.replace('_mentor', '').replace('_mentee', '');
           const menteeUserId = requestData.menteeId.replace('_mentor', '').replace('_mentee', '');
 
-          console.log('Establishing mentorship relationship:');
-          console.log('- Mentor userId:', mentorUserId);
-          console.log('- Mentee userId:', menteeUserId);
-
-          // Add mentee to mentor's mentees list
           this.addMenteeToMentorRelation(mentorUserId, menteeUserId);
-
-          // Add mentor to mentee's mentors list
           this.addMentorToMenteeRelation(menteeUserId, mentorUserId);
         }
       }),
@@ -275,12 +229,8 @@ constructor(private firestore: Firestore) {
 
   // Add mentee to mentor's mentees array and update active count
   private addMenteeToMentorRelation(mentorUserId: string, menteeUserId: string): void {
-    console.log('Adding mentee', menteeUserId, 'to mentor', mentorUserId);
-
-    // Get mentor profile by userId
     this.getMentorById(mentorUserId).subscribe(mentor => {
       if (mentor) {
-        console.log('Current mentor mentees:', mentor.mentees);
         const mentees = mentor.mentees || [];
         if (!mentees.includes(menteeUserId)) {
           mentees.push(menteeUserId);
@@ -289,29 +239,18 @@ constructor(private firestore: Firestore) {
             mentees: mentees,
             activeMentees: (mentor.activeMentees || 0) + 1
           };
-
-          console.log('Updating mentor with:', updatedMentor);
           this.updateMentorProfile(updatedMentor).subscribe({
-            next: () => console.log('✅ Mentor profile updated successfully'),
-            error: (error) => console.error('❌ Error updating mentor profile:', error)
+            error: (error) => console.error('Error updating mentor profile:', error)
           });
-        } else {
-          console.log('Mentee already in mentees list');
         }
-      } else {
-        console.error('Mentor not found:', mentorUserId);
       }
     });
   }
 
   // Add mentor to mentee's mentors array
   private addMentorToMenteeRelation(menteeUserId: string, mentorUserId: string): void {
-    console.log('Adding mentor', mentorUserId, 'to mentee', menteeUserId);
-
-    // Get mentee profile by userId
     this.getMenteeById(menteeUserId).subscribe(mentee => {
       if (mentee) {
-        console.log('Current mentee mentors:', mentee.mentors);
         const mentors = mentee.mentors || [];
         if (!mentors.includes(mentorUserId)) {
           mentors.push(mentorUserId);
@@ -319,17 +258,10 @@ constructor(private firestore: Firestore) {
             ...mentee,
             mentors: mentors
           };
-
-          console.log('Updating mentee with:', updatedMentee);
           this.updateMenteeProfile(updatedMentee).subscribe({
-            next: () => console.log('✅ Mentee profile updated successfully'),
-            error: (error) => console.error('❌ Error updating mentee profile:', error)
+            error: (error) => console.error('Error updating mentee profile:', error)
           });
-        } else {
-          console.log('Mentor already in mentors list');
         }
-      } else {
-        console.error('Mentee not found:', menteeUserId);
       }
     });
   }
@@ -357,15 +289,9 @@ constructor(private firestore: Firestore) {
     );
   }
 
-  // Send mentorship request and create notification
+
   sendMentorshipRequestWithNotification(menteeId: string, mentorId: string): Observable<MentorshipRequest> {
-    return this.sendMentorshipRequest(menteeId, mentorId).pipe(
-      tap(request => {
-        // Here you would send notification to mentor
-        // For now, we'll just log it
-        console.log('Mentorship request sent from', menteeId, 'to', mentorId);
-      })
-    );
+    return this.sendMentorshipRequest(menteeId, mentorId);
   }
 
   // Get user's profile completion status
@@ -563,7 +489,6 @@ constructor(private firestore: Firestore) {
     );
   }
 
-  // Update mentor's average rating after a new review
   private updateMentorAverageRating(mentorId: string): void {
     this.getReviewsForUser(mentorId).subscribe({
       next: (reviews) => {
@@ -572,15 +497,13 @@ constructor(private firestore: Firestore) {
         const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
         const averageRating = totalRating / reviews.length;
 
-        // Update mentor profile with new average rating
         this.getMentorById(mentorId).subscribe(mentor => {
           if (mentor) {
             const updatedMentor: MentorProfile = {
               ...mentor,
-              ratings: Math.round(averageRating * 10) / 10 // Round to 1 decimal place
+              ratings: Math.round(averageRating * 10) / 10
             };
             this.updateMentorProfile(updatedMentor).subscribe({
-              next: () => console.log('Mentor rating updated successfully'),
               error: (error) => console.error('Error updating mentor rating:', error)
             });
           }

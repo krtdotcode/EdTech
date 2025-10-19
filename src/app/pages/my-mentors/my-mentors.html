@@ -1,16 +1,12 @@
-<!-- Loading State -->
 <div *ngIf="loading" class="min-h-screen bg-gray-50 flex items-center justify-center">
   <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
 </div>
 
-<!-- Main Content -->
 <div *ngIf="!loading" class="h-auto bg-gray-50">
-  <!-- Header and Subheader -->
+
   <app-header></app-header>
 
-  <!-- Main Content -->
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Back Button and Title -->
     <div class="mb-6">
       <button
         (click)="goBackToDashboard()"

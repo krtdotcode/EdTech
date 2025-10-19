@@ -1,5 +1,4 @@
 // This service handles all authentication operations with Firebase
-// It's like a bridge between your app and Firebase's authentication system
 import { Injectable } from '@angular/core';
 import {
   Auth,
@@ -27,7 +26,6 @@ export class AuthService {
   }
 
   // CREATE NEW ACCOUNT
-  // Takes email and password, creates account in Firebase
   register(email: string, password: string, role?: 'mentee' | 'mentor' | 'both'): Observable<any> {
     const promise = createUserWithEmailAndPassword(this.auth, email, password);
 
@@ -47,14 +45,12 @@ export class AuthService {
   }
 
   // SIGN IN TO EXISTING ACCOUNT
-  // Takes email and password, signs user in
   login(email: string, password: string): Observable<any> {
     const promise = signInWithEmailAndPassword(this.auth, email, password);
     return from(promise); // Convert promise to observable
   }
 
   // SIGN OUT
-  // Signs current user out
   logout(): Observable<any> {
     const promise = signOut(this.auth);
     return from(promise); // Convert promise to observable

@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-gray-50" *ngIf="profile">
-  <!-- Back Navigation -->
+
   <div class="bg-white border-b border-gray-200 px-4 py-4">
     <div class="mx-auto">
       <button
@@ -15,7 +15,6 @@
   </div>
 
   <div class="mx-auto px-4 py-8">
-    <!-- Header Card -->
     <div class="bg-white rounded-lg shadow-sm border mb-8">
       <div class="p-6">
         <div class="flex flex-col lg:flex-row items-center lg:items-start gap-6">
@@ -184,7 +183,6 @@
             </button>
           </div>
 
-          <!-- Divider -->
           <hr class="my-6 border-gray-300">
 
           <!-- Delete Account Section -->
@@ -195,7 +193,6 @@
               Permanently delete your account and all associated data. This action cannot be undone.
             </p>
 
-            <!-- Delete Button -->
             <button
               (click)="openDeleteAccountModal()"
               class="w-full px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
@@ -460,7 +457,7 @@
     <!-- Delete Account Confirmation Modal -->
     <div *ngIf="showDeleteAccountModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div class="bg-white rounded-lg shadow-xl max-w-md mx-4 w-full">
-        <!-- Modal Header -->
+
         <div class="flex items-center justify-between p-6 border-b border-gray-200">
           <h3 class="text-lg font-semibold text-gray-900">Delete Account</h3>
           <button
@@ -473,7 +470,6 @@
           </button>
         </div>
 
-        <!-- Modal Body -->
         <div class="p-6">
           <div class="flex items-start mb-4">
             <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mr-4">

@@ -13,12 +13,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/auth/signup/signup').then((m) => m.Signup),
   },
   {
-    path: 'forgot-password',
-    loadComponent: () =>
-      import('./pages/auth/forgot-password/forgot-password').then((m) => m.ForgotPassword),
-    canActivate: [AuthGuard],
-  },
-  {
     path: 'profile-completion',
     loadComponent: () =>
       import('./pages/profile-completion/profile-completion').then((m) => m.ProfileCompletion),
@@ -42,11 +36,6 @@ export const routes: Routes = [
   {
     path: 'profile',
     loadComponent: () => import('./pages/profile/profile').then((m) => m.Profile),
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'admin',
-    loadComponent: () => import('./pages/admin/admin').then((m) => m.Admin),
     canActivate: [AuthGuard],
   },
   {

@@ -109,7 +109,7 @@ export class ProfileCompletion implements OnInit, OnDestroy {
 
     this.profileForm = this.fb.group({
       name: ['', Validators.required],
-      photoUrl: [''], // Optional now due to size limit
+      photoUrl: [''],
       bio: ['', Validators.required],
       location: ['', Validators.required],
       skills: this.fb.array([], Validators.required),
@@ -443,12 +443,12 @@ export class ProfileCompletion implements OnInit, OnDestroy {
           userId: currentUser.uid,
           name: formValue.name,
           email: currentUser.email!,
-          photoUrl: formValue.photoUrl, // Now using selected avatar URL
+          photoUrl: formValue.photoUrl,
           bio: formValue.bio,
           location: formValue.location,
-          skills: formValue.skills, // This is already an array from FormArray
-          goals: formValue.goals, // This is already an array from FormArray
-          availability: formValue.availability, // This is already an array from FormArray
+          skills: formValue.skills,
+          goals: formValue.goals,
+          availability: formValue.availability,
           preferredLanguage: formValue.preferredLanguage || '',
         };
 

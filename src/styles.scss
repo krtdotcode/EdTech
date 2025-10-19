@@ -1,23 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
+@plugin "daisyui";
 
 // Global button styles
 button {
   @apply cursor-pointer;
 }
-@plugin "daisyui";
 
 body {
   font-family: 'Inter', sans-serif;
 }
 
-/* Global scrollbar styles */
 html, body {
   overflow-y: auto;
   height: auto;
 }
 
-/* Ensure scrollbars are visible */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -37,7 +35,6 @@ html, body {
   background: #94a3b8;
 }
 
-/* Firefox */
 * {
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 #f1f5f9;

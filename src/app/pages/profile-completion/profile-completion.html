@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 relative overflow-hidden flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
-  <!-- Particles Background -->
+
   <ngx-particles
     [id]="'tsparticles'"
     [particlesInit]="particlesInit"
@@ -14,13 +14,10 @@
       <p class="mt-4 text-gray-600">Checking your profile status...</p>
     </div>
 
-    <!-- Logo -->
-    <!-- Logo -->
     <div *ngIf="!loading" class="flex justify-center">
       <img src="edtech-logo.png" alt="EdTech Logo" class="h-12 w-auto" />
     </div>
 
-    <!-- Title -->
     <div *ngIf="!loading" class="text-center">
       <h1 class="text-2xl font-bold text-gray-900">
         Complete Your Profile
