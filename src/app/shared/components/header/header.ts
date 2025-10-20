@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, ViewportScroller } from '@angular/common';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ProfileService } from '../../services/profile.service';
 
@@ -13,6 +13,7 @@ import { ProfileService } from '../../services/profile.service';
 export class Header {
   private authService = inject(AuthService);
   private profileService = inject(ProfileService);
+  private viewportScroller = inject(ViewportScroller);
   isMenuOpen = false;
   userRole: string = 'mentee';
 
@@ -80,6 +81,10 @@ export class Header {
     } else {
       this.router.navigate(['/mentee-dashboard']);
     }
+  }
+
+  scrollToAbout() {
+    this.viewportScroller.scrollToAnchor('about-edtech-section');
   }
 
   // Toggle mobile menu

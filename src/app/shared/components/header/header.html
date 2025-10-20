@@ -15,12 +15,9 @@
           <a routerLink="/home" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
             Home
           </a>
-          <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-            How it Works
-          </a>
-          <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-            Resources
-          </a>
+          <button (click)="scrollToAbout()" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+            About EdTech
+          </button>
           <a routerLink="/login" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
             Login
           </a>
@@ -47,9 +44,6 @@
           <!-- Show Mentor Requests for mentors -->
           <a *ngIf="getUserRole() !== 'mentee'" routerLink="/mentor-requests" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
             Requests
-          </a>
-          <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-            Resources
           </a>
           <div class="border-l border-gray-300 pl-4 flex items-center space-x-3">
             <span class="text-sm text-gray-600 font-medium">{{ getUserEmail() }}</span>
@@ -83,12 +77,9 @@
         <a routerLink="/home" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
           Home
         </a>
-        <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
-          How it Works
-        </a>
-        <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
-          Resources
-        </a>
+        <button (click)="scrollToAbout()" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium text-left">
+          About EdTech
+        </button>
         <a routerLink="/login" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
           Login
         </a>
@@ -115,9 +106,6 @@
         <!-- Show Mentor Requests for mentors -->
         <a *ngIf="getUserRole() !== 'mentee'" routerLink="/mentor-requests" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
           Requests
-        </a>
-        <a routerLink="/resources" class="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">
-          Resources
         </a>
         <div class="border-t border-gray-200 mt-2 pt-2">
           <span class="block px-3 py-1 text-sm text-gray-600">{{ getUserEmail() }}</span>

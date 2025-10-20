@@ -11,6 +11,10 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html, body {
   overflow-y: auto;
   height: auto;
